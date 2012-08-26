@@ -40,6 +40,11 @@ typedef enum {
 
 #undef GL_EXT_compiled_vertex_array
 
+#if defined(OS_MAC)
+typedef void (* PFNGLLOCKARRAYSEXTPROC) (GLint first, GLsizei count);
+typedef void (* PFNGLUNLOCKARRAYSEXTPROC) (void);
+#endif
+
 extern PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p;
 extern PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p;
 

@@ -21,7 +21,12 @@ module.
 
 #include "bh.h"
 
+#ifdef OS_MAC
+#include <freetype/ft2build.h>
+#else
 #include <ft2build.h>
+#endif
+
 #include <stdlib.h>
 #include FT_OUTLINE_H
 

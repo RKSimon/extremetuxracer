@@ -57,29 +57,28 @@ GNU General Public License for more details.
 #include <string>
 #include <iostream>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_joystick.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_mixer.h"
-
 #if defined ( OS_LINUX )
 	#include <unistd.h>
 	#include <sys/types.h>
 	#include <pwd.h>
 	#include <dirent.h>
 	#include <sys/time.h>
+	#include <GL/gl.h>
+	#include <GL/glu.h>
 	#include <GL/glx.h>
 	#define SEP "/"
 #elif defined ( OS_WIN32_MINGW )
 	#define SEP "/"
 	#include <dirent.h>
+	#include <GL/gl.h>
+	#include <GL/glu.h>
 	#include <GL/glext.h>
 #elif defined ( OS_WIN32_MSC )
 	#include <io.h>
 	#include <direct.h>
 	#include <windows.h>
+	#include <GL/gl.h>
+	#include <GL/glu.h>
 	#pragma warning (disable:4244)	
 	#pragma warning (disable:4305)	
 	#pragma warning (disable:4761)	
@@ -88,6 +87,8 @@ GNU General Public License for more details.
 	#include <io.h>
 	#include <direct.h>
 	#include <windows.h>
+	#include <GL/gl.h>
+	#include <GL/glu.h>
 	#define SEP "\\"
 #elif defined ( OS_MAC )
 	#include <unistd.h>
@@ -95,8 +96,22 @@ GNU General Public License for more details.
 	#include <pwd.h>
 	#include <dirent.h>
 	#include <sys/time.h>
-	#include <GL/glx.h>
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+	#include <OpenGL/glext.h>
 	#define SEP "/"
+#endif
+
+#if defined ( OS_MAC )
+	#include "SDL/SDL.h"
+	#include "SDL/SDL_joystick.h"
+	#include "SDL_image/SDL_image.h"
+	#include "SDL_mixer/SDL_mixer.h"
+#else
+	#include "SDL/SDL.h"
+	#include "SDL/SDL_joystick.h"
+	#include "SDL/SDL_image.h"
+	#include "SDL/SDL_mixer.h"
 #endif
 
 // --------------------------------------------------------------------
