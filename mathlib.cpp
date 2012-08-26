@@ -105,17 +105,17 @@ TVector3 ProjectToPlane (TVector3 nml, TVector3 v){
 } 
 
 double NormVector (TVector3 *v) {
-    double denom = 1;
-	
-	if (v->x == 0 && v->y == 0 && v->z == 0) return 0.0;
-	denom = sqrt (v->x * v->x + v->y * v->y + v->z * v->z);
+	double denom = (v->x * v->x + v->y * v->y + v->z * v->z);
+	if (denom <= 0.0) return 0.0;
+	denom = sqrt (denom);
 	*v = ScaleVector (1.0 / denom, *v);
 	return denom;
 }
 
 double NormVectorN (TVector3 &v) {
-	if (v.x == 0 && v.y == 0 && v.z == 0) return 0.0;
-	float denom = sqrt (v.x * v.x + v.y * v.y + v.z * v.z);
+	double denom = (v.x * v.x + v.y * v.y + v.z * v.z);
+	if (denom <= 0.0) return 0.0;
+	denom = sqrt (denom);
 	v = ScaleVector (1.0 / denom, v);
 	return denom;
 }
