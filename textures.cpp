@@ -70,16 +70,24 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 
 	if (mirroring) {
 		for (int y=0; y<ny; y++) {
+#if 1
+			memcpy( data + y * pitch, sdlData + ( ny - 1 - y ) * pitch, pitch*sizeof(sdlData[0]) );
+#else
 			for (int x=0; x<pitch; x++) {
 				data [y * pitch + x] = sdlData [(ny-1-y) * pitch + x];	
 			}
+#endif
 		}
 	} else {
+#if 1
+		memcpy( data, sdlData, ny*pitch*sizeof(sdlData[0]) );
+#else
 		for (int y=0; y<ny; y++) {
 			for (int x=0; x<pitch; x++) {
 				data [y * pitch + x] = sdlData [y * pitch + x];	
 			}
 		}
+#endif
 	}
 
 	if (SDL_MUSTLOCK (sdlImage)) SDL_UnlockSurface (sdlImage);
