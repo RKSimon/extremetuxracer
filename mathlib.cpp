@@ -22,76 +22,8 @@ double VectorLength (const TVector3 &v) {
 	return sqrt (v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
-
-TVector3 MakeVector (double x, double y, double z){
-    TVector3 result;
-    result.x = x;
-    result.y = y;
-    result.z = z;
-    return result;
-}
-
-TVector2 MakeVector2 (double x, double y){
-    TVector2 result;
-    result.x = x;
-    result.y = y;
-    return result;
-}
-
-TVector3 MakeVector3 (double x, double y, double z) {
-	return MakeVector (x, y, z);
-}
-
-TVector4 MakeVector4 (float x, float y, float z, float w) {
-    TVector4 result;
-    result.x = x;
-    result.y = y;
-    result.z = z;
-    result.w = w;
-    return result;
-}
-
-TIndex2 MakeIndex2 (int i, int j){
-    TIndex2 result;
-    result.i = i;
-    result.j = j;
-    return result;
-}
-
-TIndex3 MakeIndex3 (int i, int j, int k) {
-    TIndex3 result;
-    result.i = i;
-    result.j = j;
-    result.k = k;
-    return result;
-}
-
-double DotProduct (TVector3 v1, TVector3 v2){
-    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
-
-TVector3 ScaleVector (double s, TVector3 v){
-    TVector3 rval;
-    rval.x = s * v.x;
-    rval.y = s * v.y;
-    rval.z = s * v.z;
-    return rval;
-}
-
-TVector3 AddVectors (TVector3 v1, TVector3 v2){
-    TVector3 result;
-    result.x = v1.x + v2.x;
-    result.y = v1.y + v2.y;
-    result.z = v1.z + v2.z;
-    return result;
-}
-
-TVector3 SubtractVectors (TVector3 v1, TVector3 v2){
-    TVector3 result;
-    result.x = v1.x - v2.x;
-    result.y = v1.y - v2.y;
-    result.z = v1.z - v2.z;
-    return result;
+double VectorLength (double x, double y, double z) {
+	return sqrt (x * x + y * y + z * z);
 }
 
 TVector3 ProjectToPlane (TVector3 nml, TVector3 v){
@@ -118,15 +50,6 @@ double NormVectorN (TVector3 &v) {
 	denom = sqrt (denom);
 	v = ScaleVector (1.0 / denom, v);
 	return denom;
-}
-
-
-TVector3 CrossProduct(TVector3 u, TVector3 v){
-    TVector3 ret;
-    ret.x = u.y * v.z - u.z * v.y;
-    ret.y = u.z * v.x - u.x * v.z;
-    ret.z = u.x * v.y - u.y * v.x;
-    return ret;
 }
 
 TVector3 TransformVector(TMatrix mat, TVector3 v){

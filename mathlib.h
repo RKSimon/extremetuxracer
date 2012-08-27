@@ -28,23 +28,98 @@ const TVector3 GravVec = {0.0, -1.0, 0.0};
 //			vector and matrix
 // --------------------------------------------------------------------
 
-double      VectorLength (const TVector3 &v);
+inline TVector3 MakeVector (double x, double y, double z){
+    TVector3 result;
+    result.x = x;
+    result.y = y;
+    result.z = z;
+    return result;
+}
 
-TVector3	MakeVector (double x, double y, double z);
-TVector2	MakeVector2 (double x, double y);
-TVector3	MakeVector3 (double x, double y, double z);
-TVector4	MakeVector4 (float x, float y, float z, float w);
-TIndex2		MakeIndex2 (int i, int j);
-TIndex3		MakeIndex3 (int i, int j, int k);
+inline TVector2 MakeVector2 (double x, double y){
+    TVector2 result;
+    result.x = x;
+    result.y = y;
+    return result;
+}
 
-TVector3	ScaleVector (double s, TVector3 v);
-TVector3	AddVectors (TVector3 v1, TVector3 v2);
-TVector3	SubtractVectors (TVector3 v1, TVector3 v2);
+inline TVector3 MakeVector3 (double x, double y, double z) {
+        return MakeVector (x, y, z);
+}
+
+inline TVector4 MakeVector4 (float x, float y, float z, float w) {
+    TVector4 result;
+    result.x = x;
+    result.y = y;
+    result.z = z;
+    result.w = w;
+    return result;
+}
+
+inline TIndex2 MakeIndex2 (int i, int j) {
+    TIndex2 result;
+    result.i = i;
+    result.j = j;
+    return result;
+}
+
+inline TIndex3 MakeIndex3 (int i, int j, int k) {
+    TIndex3 result;
+    result.i = i;
+    result.j = j;
+    result.k = k;
+    return result;
+}
+
+inline TVector3 ScaleVector (double s, TVector3 v){
+    TVector3 rval;
+    rval.x = s * v.x;
+    rval.y = s * v.y;
+    rval.z = s * v.z;
+    return rval;
+}
+
+inline TVector3 AddVectors (TVector3 v1, TVector3 v2){
+    TVector3 result;
+    result.x = v1.x + v2.x;
+    result.y = v1.y + v2.y;
+    result.z = v1.z + v2.z;
+    return result;
+}
+
+inline TVector3 SubtractVectors (TVector3 v1, TVector3 v2){
+    TVector3 result;
+    result.x = v1.x - v2.x;
+    result.y = v1.y - v2.y;
+    result.z = v1.z - v2.z;
+    return result;
+}
+
+inline double DotProduct (TVector3 v1, TVector3 v2){
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+inline TVector3 CrossProduct(TVector3 u, TVector3 v){
+    TVector3 ret;
+    ret.x = u.y * v.z - u.z * v.y;
+    ret.y = u.z * v.x - u.x * v.z;
+    ret.z = u.x * v.y - u.y * v.x;
+    return ret;
+}
+
+inline double VectorSquaredLength (const TVector3 &v) {
+        return (v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+inline double VectorSquaredLength (double x, double y, double z) {
+        return (x * x + y * y + z * z);
+}
+
+double		VectorLength (const TVector3 &v);
+double		VectorLength (double x, double y, double z);
+
 double		NormVector (TVector3 *v);
 double		NormVectorN (TVector3 &v);	// new version with reference
-
-double		DotProduct (TVector3 v1, TVector3 v2);
-TVector3	CrossProduct (TVector3 u, TVector3 v);
 
 TVector3	ProjectToPlane (TVector3 nml, TVector3 v);
 TVector3	TransformVector (TMatrix mat, TVector3 v);
