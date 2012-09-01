@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "gui.h"
 
 #define USE_UNICODE true
+//#define USE_TEXTURE_FONT true
 
 // --------------------------------------------------------------------
 // First some common function used for textboxes and called by
@@ -195,9 +196,14 @@ void CFont::UnicodeStr (wchar_t *buff, const char *string) {
 // --------------------------------------------------------------------
 
 int CFont::LoadFont (string name, const char *path) {
-	if (numFonts >= MAX_FONTS) return -1;	
+	if (numFonts >= MAX_FONTS) return -1;
+
+#if defined(USE_TEXTURE_FONT)
+	fonts[numFonts] = new FTGLTextureFont (path);
+#else
 	fonts[numFonts] = new FTGLPixmapFont (path);
-//	fonts[numFonts] = new FTGLTextureFont (path);
+#endif
+
 	if (fonts[numFonts]->Error()) {
 		Message ("Failed to open font");
 		return -1;
@@ -307,9 +313,17 @@ void CFont::DrawText (float x, float y, const char *text) {
 	if (left < 0) left = 0;
 
 	if (forientation == OR_TOP) {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, param.y_resolution - curr_size - y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)(param.y_resolution - curr_size - y));
+#endif
 	} else {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)y);
+#endif
 	}
 
 	if (USE_UNICODE) fonts[curr_font]->Render (UnicodeStr (text));
@@ -331,9 +345,17 @@ void CFont::DrawText (float x, float y, const wchar_t *text) {
 	if (left < 0) left = 0;
 
 	if (forientation == OR_TOP) {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, param.y_resolution - curr_size - y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)(param.y_resolution - curr_size - y));
+#endif
 	} else {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)y);
+#endif
 	}
 
 	fonts[curr_font]->Render (text);
@@ -361,9 +383,17 @@ void CFont::DrawText
 
 
 	if (forientation == OR_TOP) {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, param.y_resolution - size - y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)(param.y_resolution - size - y));
+#endif
 	} else {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)y);
+#endif
 	}
 
 	if (USE_UNICODE) fonts[temp_font]->Render (UnicodeStr (text));
@@ -387,9 +417,17 @@ void CFont::DrawText
 	if (left < 0) left = 0;
 
 	if (forientation == OR_TOP) {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, param.y_resolution - size - y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)(param.y_resolution - size - y));
+#endif
 	} else {
+#if defined(USE_TEXTURE_FONT)
+		glTranslatef (left, y, 0.0f);
+#else
 		glRasterPos2i ((int)left, (int)y);
+#endif
 	}
 
 	fonts[temp_font]->Render (text);
