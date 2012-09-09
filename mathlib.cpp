@@ -107,14 +107,16 @@ void MultiplyRotationMatrices (TMatrix mat, TMatrix inv, double angle, char axis
 
 void MultiplyTranslationMatrices(TMatrix mat, TMatrix inv, double x, double y, double z) {
   if(mat) {
-    TMatrix t;
-    MakeTranslationMatrix( t, x, y, z );
-    MultiplyMatrices( mat, mat, t );
+    for (int i=0; i<4; i++ ) {
+      mat[3][i] += mat[0][i] * x
+                 + mat[1][i] * y
+                 + mat[2][i] * z;
+    }
   }
   if(inv) {
-    TMatrix it;
-    MakeTranslationMatrix( it, -x, -y, -z );
-    MultiplyMatrices( inv, it, inv );
+    inv[3][0] -= inv[3][3] * x;
+    inv[3][1] -= inv[3][3] * y;
+    inv[3][2] -= inv[3][3] * z;
   }
 }
 
