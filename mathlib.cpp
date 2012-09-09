@@ -120,14 +120,19 @@ void MultiplyTranslationMatrices(TMatrix mat, TMatrix inv, double x, double y, d
 
 void MultiplyScalingMatrices(TMatrix mat, TMatrix inv, double x, double y, double z) {
   if(mat) {
-    TMatrix s;
-    MakeScalingMatrix( s, x, y, z );
-    MultiplyMatrices( mat, mat, s );
+    for (int i=0; i<4; i++) {
+      mat[0][i] *= x;
+      mat[1][i] *= y;
+      mat[2][i] *= z;
+    }
   }
   if(inv) {
-    TMatrix is;
-    MakeScalingMatrix( is, 1.0 / x, 1.0 / y, 1.0 / z );
-    MultiplyMatrices( inv, is, inv );
+    double ix = 1.0 / x, iy = 1.0 / y, iz = 1.0 / z;
+    for (int j=0; j<4; j++) {
+      inv[j][0] *= ix;
+      inv[j][1] *= iy;
+      inv[j][2] *= iz;
+    }
   }
 }
 
