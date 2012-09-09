@@ -121,35 +121,150 @@ double		VectorLength (double x, double y, double z);
 double		NormVector (TVector3 *v);
 double		NormVectorN (TVector3 &v);	// new version with reference
 
+// --------------------------------------------------------------------
+//			        transform
+// --------------------------------------------------------------------
+
+inline TVector3 TransformVector(TMatrix mat, TVector3 v) {
+    TVector3 r;
+    r.x = v.x * mat[0][0] + v.y * mat[1][0] + v.z * mat[2][0];
+    r.y = v.x * mat[0][1] + v.y * mat[1][1] + v.z * mat[2][1];
+    r.z = v.x * mat[0][2] + v.y * mat[1][2] + v.z * mat[2][2];
+    return r;
+}
+
+inline TVector3 TransformNormal(TVector3 n, TMatrix mat) {
+    TVector3 r;
+    r.x = n.x * mat[0][0] + n.y * mat[0][1] + n.z * mat[0][2];
+    r.y = n.x * mat[1][0] + n.y * mat[1][1] + n.z * mat[1][2];
+    r.z = n.x * mat[2][0] + n.y * mat[2][1] + n.z * mat[2][2];
+    return r;
+}
+
+inline TVector3 TransformPoint(TMatrix mat, TVector3 p) {
+    TVector3 r;
+    r.x = p.x * mat[0][0] + p.y * mat[1][0] + p.z * mat[2][0];
+    r.y = p.x * mat[0][1] + p.y * mat[1][1] + p.z * mat[2][1];
+    r.z = p.x * mat[0][2] + p.y * mat[1][2] + p.z * mat[2][2];
+    r.x += mat[3][0];
+    r.y += mat[3][1];
+    r.z += mat[3][2];
+    return r;
+}
+
+// --------------------------------------------------------------------
+//			         plane
+// --------------------------------------------------------------------
+
+inline TPlane MakePlane (double nx, double ny, double nz, double d) {
+    TPlane tmp;
+    tmp.nml.x = nx;
+    tmp.nml.y = ny;
+    tmp.nml.z = nz;
+    tmp.d = d;
+    return tmp;
+}
+
+inline double DistanceToPlane (TPlane plane, TVector3 pt) {
+    return
+        plane.nml.x * pt.x +
+        plane.nml.y * pt.y +
+        plane.nml.z * pt.z +
+        plane.d;
+}
+
 TVector3	ProjectToPlane (TVector3 nml, TVector3 v);
-TVector3	TransformVector (TMatrix mat, TVector3 v);
-TVector3	TransformNormal (TVector3 n, TMatrix mat);	// not used ?
-TVector3	TransformPoint (TMatrix mat, TVector3 p);
-TPlane		MakePlane (double nx, double ny, double nz, double d);
 bool		IntersectPlanes (TPlane s1, TPlane s2, TPlane s3, TVector3 *p);
-double		DistanceToPlane (TPlane plane, TVector3 pt);
+
+// --------------------------------------------------------------------
+//			         matrix
+// --------------------------------------------------------------------
+
+inline void MultiplyMatrices (TMatrix ret, TMatrix mat1, TMatrix mat2){
+    int i,j;
+    TMatrix r;
+
+    for (i= 0 ; i< 4 ; i++)
+        for (j= 0 ; j< 4 ; j++)
+            r[j][i]= mat1[0][i] * mat2[j][0] +
+                mat1[1][i] * mat2[j][1] +
+                mat1[2][i] * mat2[j][2] +
+                mat1[3][i] * mat2[j][3];
+
+    for (i= 0 ; i< 4 ; i++)
+        for (j= 0 ; j< 4 ; j++)
+            ret[i][j] = r[i][j];
+}
+
 
 void MakeIdentityMatrix (TMatrix h);
 void MakeRotationMatrix (TMatrix mat, double angle, char axis);
 void MakeTranslationMatrix (TMatrix mat, double x, double y, double z);
 void MakeScalingMatrix (TMatrix mat, double x, double y, double z);
 
-void MultiplyMatrices (TMatrix ret, TMatrix mat1, TMatrix mat2);
+void MultiplyRotationMatrices (TMatrix mat, TMatrix inv, double angle, char axis);
+void MultiplyTranslationMatrices(TMatrix mat, TMatrix inv, double x, double y, double z);
+void MultiplyScalingMatrices(TMatrix mat, TMatrix inv, double x, double y, double z);
+
 void TransposeMatrix (TMatrix mat, TMatrix trans);
 void MakeBasisMat (TMatrix mat,	TVector3 w1, TVector3 w2, TVector3 w3);
 void MakeBasismatrix_Inv (TMatrix mat, TMatrix invMat, TVector3 w1, TVector3 w2, TVector3 w3);
 void RotateAboutVectorMatrix (TMatrix mat, TVector3 u, double angle);
 
-TQuaternion MakeQuaternion (double x, double y, double z, double w);
-TQuaternion AddQuaternions (TQuaternion q, TQuaternion r);		// not used?
-TQuaternion MultiplyQuaternions (TQuaternion q, TQuaternion r);	// not used?
-TQuaternion ScaleQuaternion (double s, TQuaternion q);
-TQuaternion ConjugateQuaternion (TQuaternion q);
-void 		MakeMatrixFromQuaternion (TMatrix mat, TQuaternion q);
+// --------------------------------------------------------------------
+//			       quaternion
+// --------------------------------------------------------------------
+
+inline TQuaternion MakeQuaternion (double x, double y, double z, double w) {
+    TQuaternion q;
+    q.x = x;
+    q.y = y;
+    q.z = z;
+    q.w = w;
+    return q;
+}
+
+inline TQuaternion MultiplyQuaternions (TQuaternion q, TQuaternion r) {
+    TQuaternion res;
+    res.x = q.y * r.z - q.z * r.y + r.w * q.x + q.w * r.x;
+    res.y = q.z * r.x - q.x * r.z + r.w * q.y + q.w * r.y;
+    res.z = q.x * r.y - q.y * r.x + r.w * q.z + q.w * r.z;
+    res.w = q.w * r.w - q.x * r.x - q.y * r.y - q.z * r.z;
+    return res;
+}
+
+inline TQuaternion AddQuaternions (TQuaternion q, TQuaternion r) {
+    TQuaternion res;
+    res.x = q.x + r.x;
+    res.y = q.y + r.y;
+    res.z = q.z + r.z;
+    res.w = q.w + r.w;
+    return res;
+}
+
+inline TQuaternion ConjugateQuaternion (TQuaternion q) {
+    TQuaternion res;
+    res.x = -1 * q.x;
+    res.y = -1 * q.y;
+    res.z = -1 * q.z;
+    res.w = q.w;
+    return res;
+}
+
+inline TQuaternion ScaleQuaternion (double s, TQuaternion q) {
+    TQuaternion res;
+    res.x = s * q.x;
+    res.y = s * q.y;
+    res.z = s * q.z;
+    res.w = s * q.w;
+    return res;
+}
+
+void        MakeMatrixFromQuaternion (TMatrix mat, TQuaternion q);
 TQuaternion MakeQuaternionFromMatrix (TMatrix mat);
 TQuaternion MakeRotationQuaternion (TVector3 s, TVector3 t);
 TQuaternion InterpolateQuaternions (TQuaternion q, TQuaternion r, double t);
-TVector3	RotateVector (TQuaternion q, TVector3 v);
+TVector3    RotateVector (TQuaternion q, TVector3 v);
 
 bool		IntersectPolygon (TPolygon p, TVector3 *v);
 bool		IntersectPolyhedron (TPolyhedron p);
