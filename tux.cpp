@@ -186,7 +186,6 @@ void CCharShape::AddAction (int node_name, int type, TVector3 vec, double val) {
 
 bool CCharShape::TranslateNode (int node_name, TVector3 vec) {
     TCharNode *node;
-    TMatrix TransMatrix;
 
     if (GetNode (node_name, &node) == false) return false;
 
@@ -198,7 +197,6 @@ bool CCharShape::TranslateNode (int node_name, TVector3 vec) {
 
 bool CCharShape::RotateNode (int node_name, int axis, double angle) {
     TCharNode *node;
-    TMatrix rotMatrix;
     char caxis = '0';
 
     if (GetNode (node_name, &node) == false) return false;
@@ -225,7 +223,7 @@ bool CCharShape::RotateNode (string node_trivialname, int axis, double angle) {
 
 void CCharShape::ScaleNode (int node_name, TVector3 vec) {
     TCharNode *node;
-    TMatrix matrix;
+    //TMatrix matrix;
 
     if  (GetNode (node_name, &node) == false) return;
 
@@ -882,7 +880,7 @@ int CCharShape::GetNodeName (string node_trivialname) {
 
 void CCharShape::RefreshNode (int idx) {
 	if (idx < 0 || idx >= numNodes) return;
-    TMatrix TempMatrix;
+    //TMatrix TempMatrix;
 	char caxis;
 	double angle;
 	
