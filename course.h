@@ -162,6 +162,8 @@ public:
 	void MakeStandardPolyhedrons ();
 	void GetGLArrays (GLubyte **vnc_array);
 	void FillGlArrays();
+	void EnableGLArrays();
+	void DisableGLArrays();
 
 	void GetDimensions (double *w, double *l);
 	void GetPlayDimensions (double *pw, double *pl);

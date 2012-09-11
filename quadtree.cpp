@@ -1287,9 +1287,13 @@ void UpdateQuadtree (TVector3 view_pos, float detail){
 }
 
 void RenderQuadtree(){
-    GLubyte *vnc_array;
-    Course.GetGLArrays (&vnc_array);
-    root->Render (root_corner_data, vnc_array);
+    Course.EnableGLArrays();
+    {
+        GLubyte *vnc_array;
+        Course.GetGLArrays (&vnc_array);
+        root->Render (root_corner_data, vnc_array);
+    }
+    Course.DisableGLArrays();
 }
 
 
