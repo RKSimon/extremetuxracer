@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "spx.h"
 #include <fstream>
 #include "course.h"
+
 // --------------------------------------------------------------------
 //				class CImage
 // --------------------------------------------------------------------
@@ -451,13 +452,19 @@ void CTexture::DrawDirect (GLuint texid) {
 	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
 	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
 
-    glColor4f (1.0, 1.0, 1.0, 1.0);
-	glBegin (GL_QUADS);
-	    glTexCoord2f (0, 0); glVertex2f (0, 0);
-	    glTexCoord2f (1, 0); glVertex2f (w, 0);
-	    glTexCoord2f (1, 1); glVertex2f (w, h);
-	    glTexCoord2f (0, 1); glVertex2f (0, h);
-	glEnd();
+	const GLfloat tex[] = { 0,0, 1,0, 1,1, 0,1 };
+	const GLfloat vtx[] = { 0,0, w,0, w,h, 0,h };
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+ 
+	glColor4f (1.0, 1.0, 1.0, 1.0);
+	glVertexPointer (2, GL_FLOAT, 0, vtx);
+	glTexCoordPointer (2, GL_FLOAT, 0, tex);
+	glDrawArrays (GL_TRIANGLE_FAN,0,4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void CTexture::Draw (int idx) {
@@ -485,21 +492,32 @@ void CTexture::DrawDirect (GLuint texid, int x, int y, float size) {
 	if (forientation == OR_TOP) {
 		top = param.y_resolution - y;
 		bott = top - height;
-
 	} else {
 		bott = y;
 		top = bott + height;
-    }
-	if (x >= 0) left = x; else left = (param.x_resolution - width) / 2;
+	}
+
+	left = (x >= 0 ? x : (param.x_resolution - width) / 2 );
 	right = left + width;
 
-    glColor4f (1.0, 1.0, 1.0, 1.0);
-	glBegin (GL_QUADS);
-	    glTexCoord2f (0, 0); glVertex2f (left, bott);
-	    glTexCoord2f (1, 0); glVertex2f (right, bott);
-	    glTexCoord2f (1, 1); glVertex2f (right, top);
-	    glTexCoord2f (0, 1); glVertex2f (left, top);
-	glEnd();
+	const GLfloat tex[] = { 0,0, 1,0, 1,1, 0,1 };
+	const GLfloat vtx[] = {
+		 left, bott,
+		right, bott,
+		right, top,
+		 left, top
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+ 
+	glColor4f (1.0, 1.0, 1.0, 1.0);
+	glVertexPointer (2, GL_FLOAT, 0, vtx);
+	glTexCoordPointer (2, GL_FLOAT, 0, tex);
+	glDrawArrays (GL_TRIANGLE_FAN,0,4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void CTexture::Draw (int idx, int x, int y, float size) {
@@ -527,17 +545,29 @@ void CTexture::DrawDirect (GLuint texid, int x, int y, float width, float height
 	} else {
 		bott = y;
 		top = bott + height;
-    }
-	if (x >= 0) left = x; else left = (param.x_resolution - width) / 2;
+	}
+
+	left = (x >= 0 ? x : (param.x_resolution - width) / 2 );
 	right = left + width;
 
-    glColor4f (1.0, 1.0, 1.0, 1.0);
-	glBegin (GL_QUADS);
-	    glTexCoord2f (0, 0); glVertex2f (left, bott);
-	    glTexCoord2f (1, 0); glVertex2f (right, bott);
-	    glTexCoord2f (1, 1); glVertex2f (right, top);
-	    glTexCoord2f (0, 1); glVertex2f (left, top);
-	glEnd();
+	const GLfloat tex[] = { 0,0, 1,0, 1,1, 0,1 };
+	const GLfloat vtx[] = {
+		 left, bott,
+		right, bott,
+		right, top,
+		 left, top
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+ 
+	glColor4f (1.0, 1.0, 1.0, 1.0);
+	glVertexPointer (2, GL_FLOAT, 0, vtx);
+	glTexCoordPointer (2, GL_FLOAT, 0, tex);
+	glDrawArrays (GL_TRIANGLE_FAN,0,4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void CTexture::Draw (int idx, int x, int y, int width, int height) {
@@ -561,25 +591,42 @@ void CTexture::DrawDirectFrame (GLuint texid, int x, int y, double w, double h, 
 		if (w < 1) glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &ww);
 		if (h < 1) glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &hh);
 
-	   glColor4f (col.r, col.g, col.b, 1.0);
-		
+		const GLfloat vtx[] = {
+		    xx - frame, yy - frame,
+		    xx + ww + frame, yy - frame,
+		    xx + ww + frame, yy + hh + frame,
+		    xx - frame, yy + hh + frame
+		};
+
 		glDisable (GL_TEXTURE_2D);
-		glBegin (GL_QUADS);
-			glVertex2f (xx - frame, yy - frame);
-		    glVertex2f (xx + ww + frame, yy - frame);
-		    glVertex2f (xx + ww + frame, yy + hh + frame);
-		    glVertex2f (xx - frame, yy + hh + frame);
-		glEnd();
+		glEnableClientState(GL_VERTEX_ARRAY);
+ 
+		glColor4f (col.r, col.g, col.b, 1.0);
+		glVertexPointer (2, GL_FLOAT, 0, vtx);
+		glDrawArrays (GL_TRIANGLE_FAN,0,4);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
 		glEnable (GL_TEXTURE_2D);
 	}
 
-    glColor4f (1.0, 1.0, 1.0, 1.0);
-	glBegin (GL_QUADS);
-		glTexCoord2f (0, 0); glVertex2f (xx, yy);
-	    glTexCoord2f (1, 0); glVertex2f (xx + ww, yy);
-	    glTexCoord2f (1, 1); glVertex2f (xx + ww, yy + hh);
-	    glTexCoord2f (0, 1); glVertex2f (xx, yy + hh);
-	glEnd();
+	const GLfloat tex[] = { 0,0, 1,0, 1,1, 0,1 };
+	const GLfloat vtx[] = {
+		xx, yy,
+		xx + ww, yy,
+		xx + ww, yy + hh,
+		xx, yy + hh
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+ 
+	glColor4f (1.0, 1.0, 1.0, 1.0);
+	glVertexPointer (2, GL_FLOAT, 0, vtx);
+	glTexCoordPointer (2, GL_FLOAT, 0, tex);
+	glDrawArrays (GL_TRIANGLE_FAN,0,4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void CTexture::DrawFrame (int idx, int x, int y, double w, double h, int frame, TColor col) {
@@ -598,9 +645,9 @@ void CTexture::SetOrientation (int orientation) {
 
 void CTexture::DrawNumChr (char c, int x, int y, int w, int h, TColor col) {
 	static string numidxstr = "[0]0[1]1[2]2[3]3[4]4[5]5[6]6[7]7[8]8[9]9[:]10[ ]11";
-    float texleft, texright, texw;
+	float texleft, texright, texw;
 	char chrname[2]; 	
-    TVector2 bl, tr;
+	TVector2 bl, tr;
 	chrname[0]= c;
 	chrname[1]= 0;
 
@@ -617,13 +664,29 @@ void CTexture::DrawNumChr (char c, int x, int y, int w, int h, TColor col) {
 	texleft = idx * texw;
 	texright = (idx + 1) * texw;
 
+	const GLfloat tex[] = {
+		texleft, 0,
+		texright, 0,
+		texright, 1,
+		texleft, 1
+	};
+	const GLfloat vtx[] = {
+		bl.x, bl.y,
+		tr.x, bl.y,
+		tr.x, tr.y,
+		bl.x, tr.y
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+ 
 	glColor4f (col.r, col.g, col.b, col.a);
-	glBegin (GL_QUADS);
-	    glTexCoord2f (texleft, 0); glVertex2f (bl.x, bl.y);
-	    glTexCoord2f (texright, 0); glVertex2f (tr.x, bl.y);
-	    glTexCoord2f (texright, 1); glVertex2f (tr.x, tr.y);
-	    glTexCoord2f (texleft, 1); glVertex2f (bl.x, tr.y);
-	glEnd();
+	glVertexPointer (2, GL_FLOAT, 0, vtx);
+	glTexCoordPointer (2, GL_FLOAT, 0, tex);
+	glDrawArrays (GL_TRIANGLE_FAN,0,4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 } 
 
 void CTexture::DrawNumStr (const char *s, int x, int y, float size, TColor col) {
@@ -632,7 +695,7 @@ void CTexture::DrawNumStr (const char *s, int x, int y, float size, TColor col) 
 		return;
 	}
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_TEXTURE_2D);
+	glEnable (GL_TEXTURE_2D);
 	int qw = (int)(22 * size);
 	int qh = (int)(32 * size);
 
