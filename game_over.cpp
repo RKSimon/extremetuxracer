@@ -58,7 +58,7 @@ static void mouse_cb (int button, int state, int x, int y) {
 void GameOverMotionFunc  (int x, int y) {
     TVector2 old_pos;
     
-	if (Winsys.ModePending ()) return;
+    if (Winsys.ModePending ()) return;
     y = param.y_resolution - y;
     old_pos = cursor_pos;
     cursor_pos = MakeVector2 (x, y); 
@@ -68,30 +68,39 @@ void GameOverMotionFunc  (int x, int y) {
 
 void DrawMessageFrame (float x, float y, float w, float h, int line, 
 		TColor backcol, TColor framecol, float transp) {
-
+    glPushMatrix();
 	float yy = param.y_resolution - y - h; 
-	if (x < 0) 	x = (param.x_resolution - w) / 2;
-
-	glPushMatrix();
-	glDisable (GL_TEXTURE_2D);
-    
-	glColor4f (framecol.r, framecol.g, framecol.b, transp); 
+	if (x < 0) x = (param.x_resolution - w) / 2;
 	glTranslatef (x, yy, 0);
-	glBegin (GL_QUADS );
-	    glVertex2f (0, 0 );
-	    glVertex2f (w, 0 );
-	    glVertex2f (w, h );
-	    glVertex2f (0, h );
-	glEnd();
+
+	glDisable (GL_TEXTURE_2D);
+	glEnableClientState (GL_VERTEX_ARRAY);
+
+	// front
+	const GLfloat front[] = {
+		0, 0, 
+		w, 0,
+		w, h,
+		0, h
+	};
+
+	glColor4f (framecol.r, framecol.g, framecol.b, transp);
+	glVertexPointer (2, GL_FLOAT, 0, front);
+	glDrawArrays (GL_TRIANGLE_FAN,0,4);
+
+	// back
+	const GLfloat back[] = {
+		0 + line, 0 + line,
+		w - line, 0 + line,
+		w - line, h - line,
+		0 + line, h - line
+	}; 
 
 	glColor4f (backcol.r, backcol.g, backcol.b, transp);
-	glBegin (GL_QUADS );
-	    glVertex2f (0 + line, 0 + line );
-	    glVertex2f (w - line, 0 + line );
-	    glVertex2f (w - line, h - line );
-	    glVertex2f (0 + line, h - line );
-	glEnd();
-
+	glVertexPointer (2, GL_FLOAT, 0, back);
+	glDrawArrays (GL_TRIANGLE_FAN,0,4);
+ 
+	glDisableClientState (GL_VERTEX_ARRAY);
 	glEnable (GL_TEXTURE_2D);
     glPopMatrix();
 }
