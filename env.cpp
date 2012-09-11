@@ -226,67 +226,105 @@ void CEnvironment::DrawSkybox (TVector3 pos) {
 
 	glColor4f (1.0, 1.0, 1.0, 1.0);
 	glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glPushMatrix();
 	glTranslatef (pos.x, pos.y, pos.z);
 	
+	const GLfloat tex[] = {
+		aa, aa,
+		bb, aa,
+		bb, bb,
+		aa, bb
+	};
+
 	// front
+	const GLfloat front[] = {
+		-1, -1, -1,
+		 1, -1, -1,
+		 1,  1, -1,
+		-1,  1, -1		
+	};
+
 	glBindTexture (GL_TEXTURE_2D, Skybox[0]);
-	glBegin(GL_QUADS);
-		glTexCoord2f (aa, aa); glVertex3f (-1, -1, -1);
-		glTexCoord2f (bb, aa); glVertex3f ( 1, -1, -1);
-		glTexCoord2f (bb, bb); glVertex3f ( 1,  1, -1);
-		glTexCoord2f (aa, bb); glVertex3f (-1,  1, -1);
-	glEnd();
+	glVertexPointer(3, GL_FLOAT, 0, front);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 	
 	// left
+	const GLfloat left[] = {
+		-1, -1,  1,
+		-1, -1, -1,
+		-1,  1, -1,
+		-1,  1,  1		
+	};
+
 	glBindTexture (GL_TEXTURE_2D, Skybox[1]);
-	glBegin(GL_QUADS);
-		glTexCoord2f (aa, aa); glVertex3f (-1, -1,  1);
-		glTexCoord2f (bb, aa); glVertex3f (-1, -1, -1);
-		glTexCoord2f (bb, bb); glVertex3f (-1,  1, -1);
-		glTexCoord2f (aa, bb); glVertex3f (-1,  1,  1);
-	glEnd();
-	
+	glVertexPointer(3, GL_FLOAT, 0, left);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
 	// right
+	const GLfloat right[] = {
+		 1, -1, -1,
+		 1, -1,  1,
+		 1,  1,  1,
+		 1,  1, -1		
+	};
+
 	glBindTexture (GL_TEXTURE_2D, Skybox[2]);
-	glBegin(GL_QUADS);
-		glTexCoord2f (aa, aa); glVertex3f (1, -1, -1);
-		glTexCoord2f (bb, aa); glVertex3f (1, -1,  1);
-		glTexCoord2f (bb, bb); glVertex3f (1,  1,  1);
-		glTexCoord2f (aa, bb); glVertex3f (1,  1, -1);
-	glEnd();
+	glVertexPointer(3, GL_FLOAT, 0, right);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 	// normally, the following textures are unvisible
 	// see game_config.cpp (param.full_skybox)
 	if (param.full_skybox) {
 		// top
+		const GLfloat top[] = {
+			-1,  1, -1,
+			 1,  1, -1,
+			 1,  1,  1,
+			-1,  1,  1
+		};
+
 		glBindTexture (GL_TEXTURE_2D, Skybox[3]);
-		glBegin(GL_QUADS);
-			glTexCoord2f (aa, aa); glVertex3f (-1, 1, -1);
-			glTexCoord2f (bb, aa); glVertex3f ( 1, 1, -1);
-			glTexCoord2f (bb, bb); glVertex3f ( 1, 1,  1);
-			glTexCoord2f (aa, bb); glVertex3f (-1, 1,  1);
-		glEnd();
+		glVertexPointer(3, GL_FLOAT, 0, top);
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glDrawArrays(GL_TRIANGLE_FAN,0,4);
 		
 		// bottom
+		const GLfloat bottom[] = {
+			-1, -1,  1,
+			 1, -1,  1,
+			 1, -1, -1,
+			-1, -1, -1
+		};
+
 		glBindTexture (GL_TEXTURE_2D, Skybox[4]);
-		glBegin(GL_QUADS);
-			glTexCoord2f (aa, aa); glVertex3f (-1, -1,  1);
-			glTexCoord2f (bb, aa); glVertex3f ( 1, -1,  1);
-			glTexCoord2f (bb, bb); glVertex3f ( 1, -1, -1);
-			glTexCoord2f (aa, bb); glVertex3f (-1, -1, -1);
-		glEnd();
+		glVertexPointer(3, GL_FLOAT, 0, bottom);
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glDrawArrays(GL_TRIANGLE_FAN,0,4);
 		
 		// back
+		const GLfloat back[] = {
+			 1, -1,  1,
+			-1, -1,  1,
+			-1,  1,  1,
+			 1,  1,  1
+		};
+
 		glBindTexture (GL_TEXTURE_2D, Skybox[5]);
-		glBegin(GL_QUADS);
-			glTexCoord2f (aa, aa); glVertex3f ( 1, -1, 1);
-			glTexCoord2f (bb, aa); glVertex3f (-1, -1, 1);
-			glTexCoord2f (bb, bb); glVertex3f (-1,  1, 1);
-			glTexCoord2f (aa, bb); glVertex3f ( 1,  1, 1);
-		glEnd();
+		glVertexPointer(3, GL_FLOAT, 0, back);
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glDrawArrays(GL_TRIANGLE_FAN,0,4);
 	}	
 	glPopMatrix();
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void CEnvironment::DrawFog () {
