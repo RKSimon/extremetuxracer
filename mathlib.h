@@ -28,7 +28,7 @@ const TVector3 GravVec = {0.0, -1.0, 0.0};
 //			vector and matrix
 // --------------------------------------------------------------------
 
-inline TVector3 MakeVector (double x, double y, double z){
+inline TVector3 MakeVector (scalar_t x, scalar_t y, scalar_t z){
     TVector3 result;
     result.x = x;
     result.y = y;
@@ -36,23 +36,40 @@ inline TVector3 MakeVector (double x, double y, double z){
     return result;
 }
 
-inline TVector2 MakeVector2 (double x, double y){
+inline TVector2 MakeVector2 (scalar_t x, scalar_t y){
     TVector2 result;
     result.x = x;
     result.y = y;
     return result;
 }
 
-inline TVector3 MakeVector3 (double x, double y, double z) {
+inline TVector3 MakeVector3 (scalar_t x, scalar_t y, scalar_t z) {
         return MakeVector (x, y, z);
 }
 
-inline TVector4 MakeVector4 (float x, float y, float z, float w) {
+inline TVector4 MakeVector4 (scalar_t x, scalar_t y, scalar_t z, scalar_t w) {
     TVector4 result;
     result.x = x;
     result.y = y;
     result.z = z;
     result.w = w;
+    return result;
+}
+
+inline TColor MakeColor (scalar_t r, scalar_t g, scalar_t b, scalar_t a) {
+    TColor result;
+    result.r = r;
+    result.g = g;
+    result.b = b;
+    result.a = a;
+    return result;
+}
+
+inline TColor3 MakeColor3 (scalar_t r, scalar_t g, scalar_t b) {
+    TColor3 result;
+    result.r = r;
+    result.g = g;
+    result.b = b;
     return result;
 }
 
@@ -71,7 +88,7 @@ inline TIndex3 MakeIndex3 (int i, int j, int k) {
     return result;
 }
 
-inline TVector3 ScaleVector (double s, TVector3 v){
+inline TVector3 ScaleVector (scalar_t s, TVector3 v){
     TVector3 rval;
     rval.x = s * v.x;
     rval.y = s * v.y;
@@ -95,7 +112,7 @@ inline TVector3 SubtractVectors (TVector3 v1, TVector3 v2){
     return result;
 }
 
-inline double DotProduct (TVector3 v1, TVector3 v2){
+inline scalar_t DotProduct (TVector3 v1, TVector3 v2){
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
@@ -107,11 +124,11 @@ inline TVector3 CrossProduct(TVector3 u, TVector3 v){
     return ret;
 }
 
-inline double VectorSquaredLength (const TVector3 &v) {
+inline scalar_t VectorSquaredLength (const TVector3 &v) {
         return (v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
-inline double VectorSquaredLength (double x, double y, double z) {
+inline scalar_t VectorSquaredLength (scalar_t x, scalar_t y, scalar_t z) {
         return (x * x + y * y + z * z);
 }
 
@@ -156,7 +173,7 @@ inline TVector3 TransformPoint(TMatrix mat, TVector3 p) {
 //			         plane
 // --------------------------------------------------------------------
 
-inline TPlane MakePlane (double nx, double ny, double nz, double d) {
+inline TPlane MakePlane (scalar_t nx, scalar_t ny, scalar_t nz, scalar_t d) {
     TPlane tmp;
     tmp.nml.x = nx;
     tmp.nml.y = ny;
@@ -165,7 +182,7 @@ inline TPlane MakePlane (double nx, double ny, double nz, double d) {
     return tmp;
 }
 
-inline double DistanceToPlane (TPlane plane, TVector3 pt) {
+inline scalar_t DistanceToPlane (TPlane plane, TVector3 pt) {
     return
         plane.nml.x * pt.x +
         plane.nml.y * pt.y +
@@ -215,7 +232,7 @@ void RotateAboutVectorMatrix (TMatrix mat, TVector3 u, double angle);
 //			       quaternion
 // --------------------------------------------------------------------
 
-inline TQuaternion MakeQuaternion (double x, double y, double z, double w) {
+inline TQuaternion MakeQuaternion (scalar_t x, scalar_t y, scalar_t z, scalar_t w) {
     TQuaternion q;
     q.x = x;
     q.y = y;
@@ -251,7 +268,7 @@ inline TQuaternion ConjugateQuaternion (TQuaternion q) {
     return res;
 }
 
-inline TQuaternion ScaleQuaternion (double s, TQuaternion q) {
+inline TQuaternion ScaleQuaternion (scalar_t s, TQuaternion q) {
     TQuaternion res;
     res.x = s * q.x;
     res.y = s * q.y;
