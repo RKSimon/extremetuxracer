@@ -58,28 +58,28 @@ GNU General Public License for more details.
 
 typedef double scalar_t;
 
-typedef struct {double x, y;}			TVector2;
-typedef struct {double x, y, z;}		TVector3;
-typedef struct {double x, y, z, w;} 	TVector4;
+typedef struct {scalar_t x, y;}		TVector2;
+typedef struct {scalar_t x, y, z;}	TVector3;
+typedef struct {scalar_t x, y, z, w;} 	TVector4;
 
-typedef struct {int i, j;}				TIndex2;
-typedef struct {int i, j, k;}			TIndex3;
-typedef struct {int i, j, k, l;}		TIndex4;
+typedef struct {int i, j;}		TIndex2;
+typedef struct {int i, j, k;}		TIndex3;
+typedef struct {int i, j, k, l;}	TIndex4;
 
-typedef struct {double r, g, b, a;}		TColor;
-typedef struct {double r, g, b;}		TColor3;
-typedef struct {double x, y, z;}		TTuple;
-typedef struct {double a, b, c, d;}		TTuple4;
+typedef struct {scalar_t r, g, b, a;}	TColor;
+typedef struct {scalar_t r, g, b;}	TColor3;
+typedef struct {scalar_t x, y, z;}	TTuple;
+typedef struct {scalar_t a, b, c, d;}	TTuple4;
 
-typedef double							TMatrix[4][4]; 
-typedef double							TMatrixGL[16];
-typedef struct {double x, y, z, w;}		TQuaternion;
+typedef scalar_t			TMatrix[4][4]; 
+typedef scalar_t			TMatrixGL[16];
+typedef struct {scalar_t x, y, z, w;}	TQuaternion;
 
-typedef struct {TVector3 nml; double d;}			TPlane;
+typedef struct {TVector3 nml; scalar_t d;}		TPlane;
 typedef struct {int num_vertices; int *vertices;} 	TPolygon;
-typedef struct {double radius; int divisions;}		TSphere;
-typedef struct {TVector3 pt; TVector3 vec;}			TRay;
-typedef struct {int width, height;}				TScreenRes;
+typedef struct {scalar_t radius; int divisions;}	TSphere;
+typedef struct {TVector3 pt; TVector3 vec;}		TRay;
+typedef struct {int width, height;}			TScreenRes;
 
 typedef struct {
     int num_vertices;
@@ -91,31 +91,31 @@ typedef struct {
 typedef struct {
     TColor diffuse;
     TColor specular_colour;
-    double specular_exp;
+    scalar_t specular_exp;
 } TMaterial;
 
 typedef struct {
-    double time;
+    scalar_t time;
     TVector3 pos;
-    double yaw;      
-    double pitch;    
-    double l_shldr;
-    double r_shldr;
-    double l_hip;
-    double r_hip;
+    scalar_t yaw;      
+    scalar_t pitch;    
+    scalar_t l_shldr;
+    scalar_t r_shldr;
+    scalar_t l_hip;
+    scalar_t r_hip;
 } key_frame_t; 
 
 typedef struct {
 	TVector3 pt;
-    double height;
-    double diam;
+    scalar_t height;
+    scalar_t diam;
     int tree_type;
 } TCollidable;
 
 typedef struct {
 	TVector3 pt;
-    double height;
-    double diam;
+    scalar_t height;
+    scalar_t diam;
     int item_type;
     int collectable;
     bool drawable;
