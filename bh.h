@@ -65,7 +65,6 @@ GNU General Public License for more details.
 	#include <sys/time.h>
 	#include <GL/gl.h>
 	#include <GL/glu.h>
-	#include <GL/glx.h>
 	#define SEP "/"
 #elif defined ( OS_WIN32_MINGW )
 	#define SEP "/"
@@ -98,7 +97,6 @@ GNU General Public License for more details.
 	#include <sys/time.h>
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glu.h>
-	#include <OpenGL/glext.h>
 	#define SEP "/"
 #endif
 
