@@ -46,23 +46,6 @@ const TColor colDDBackgr =	{0.13, 0.2, 0.4, 1.0};
 const TColor colMess =		{0.3, 0.3, 0.7, 1.0};
 const TColor colSky =		{0.82, 0.86, 0.88, 1.0};
 
-TColor MakeColor (double r, double g, double b, double a) {
-	TColor res;
-	res.r = r;
-	res.g = g;
-	res.b = b;
-	res.a = a;
-	return res;
-}
-
-TColor3 MakeColor3 (double r, double g, double b) {
-	TColor3 res;
-	res.r = r;
-	res.g = g;
-	res.b = b;
-	return res;
-}
-
 // --------------------------------------------------------------------
 //				print utils
 // --------------------------------------------------------------------
