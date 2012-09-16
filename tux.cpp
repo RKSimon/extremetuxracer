@@ -60,7 +60,6 @@ CCharShape::CCharShape () {
 	numNodes = 0;
 	numMaterials = 0;
 	numMatlines = 0;
-	numDisplayLists = 0;
 
 	useActions = false;
 	newActions = false;
@@ -417,29 +416,6 @@ void CCharShape::DrawCharSphere (int num_divisions) {
     gluDeleteQuadric (qobj);
 }
 
-GLuint CCharShape::GetDisplayList (int divisions) {
-    static bool initialized = false;
-    static GLuint *display_lists = NULL;
-    int base_divisions;
-    int i, idx;
-    if  (!initialized) {
-		initialized = true;
-		base_divisions = param.tux_sphere_divisions;
-		numDisplayLists = MAX_SPHERE_DIV - MIN_SPHERE_DIV + 1;
-		display_lists = (GLuint*) malloc (sizeof(GLuint) * numDisplayLists);
-		for (i=0; i<numDisplayLists; i++) display_lists[i] = 0;
-    }
-
-    idx = divisions - MIN_SPHERE_DIV;
-    if  (display_lists[idx] == 0) {
-		display_lists[idx] = glGenLists (1);
-		glNewList (display_lists[idx], GL_COMPILE);
-		DrawCharSphere (divisions);
-		glEndList ();
-    }
-    return display_lists[idx];
-}
-
 void CCharShape::DrawNodes (TCharNode *node) {
     TCharNode *child;
     glPushMatrix();
@@ -456,14 +432,7 @@ void CCharShape::DrawNodes (TCharNode *node) {
 
     if (node->visible == true) {
 		set_material (mat->diffuse, mat->specular, mat->exp);
-	
-		#if defined (OS_LINUX)
-			DrawCharSphere (node->divisions);
-//			if (USE_CHAR_DISPLAY_LIST) glCallList (GetDisplayList (node->divisions));
-//				else DrawCharSphere (node->divisions);
-		#else 
-			DrawCharSphere (node->divisions);
-		#endif
+		DrawCharSphere (node->divisions);
     } 
 // -------------- recursive loop -------------------------------------
     child = node->child;

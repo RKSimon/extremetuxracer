@@ -24,7 +24,6 @@ GNU General Public License for more details.
 #define	MAX_CHAR_NODES 256
 #define	MAX_CHAR_MAT 32
 
-#define USE_CHAR_DISPLAY_LIST true
 #define MIN_SPHERE_DIV 3
 #define MAX_SPHERE_DIV 16 
 
@@ -78,7 +77,6 @@ private:
 	string MaterialIndex;
 	string Matlines[MAX_CHAR_MAT];
 	int numMatlines;
-	int numDisplayLists;
 
 	// nodes 
 	int GetNodeIdx (int node_name);
@@ -98,7 +96,6 @@ private:
 
 	// drawing 
 	void DrawCharSphere (int num_divisions);
-	GLuint GetDisplayList (int divisions);
 	void DrawNodes (TCharNode *node);
 	TVector3 AdjustRollvector (CControl *ctrl, TVector3 vel, TVector3 zvec);
 
