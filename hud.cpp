@@ -56,10 +56,10 @@ GNU General Public License for more details.
 #define NUM_FPS_FRAMES 10 
 #define CIRCLE_DIVISIONS 10
 
-static GLfloat energy_background_color[] = { 0.2, 0.2, 0.2, 0.0 };
-static GLfloat energy_foreground_color[] = { 0.54, 0.59, 1.00, 0.5 };
-static GLfloat speedbar_background_color[] = { 0.2, 0.2, 0.2, 0.0 };
-static GLfloat hud_white[] = { 1.0, 1.0, 1.0, 1.0 };
+static TColor energy_background_color = MakeColor( 0.2, 0.2, 0.2, 0.0 );
+static TColor energy_foreground_color = MakeColor( 0.54, 0.59, 1.00, 0.5 );
+static TColor speedbar_background_color = MakeColor( 0.2, 0.2, 0.2, 0.0 );
+static TColor hud_white = MakeColor( 1.0, 1.0, 1.0, 1.0 );
 
 static const TColor text_colour = {0, 0, 0, 1};
 
@@ -194,7 +194,7 @@ void draw_gauge (double speed, double energy) {
 	Tex.BindTex (GAUGE_ENERGY);
 	y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
 
-	glColor4fv (energy_background_color);
+	glColor4f (energy_background_color.r, energy_background_color.g, energy_background_color.b, energy_background_color.a);
 	glBegin (GL_QUADS);
 	    glVertex2f (0.0, y);
 	    glVertex2f (GAUGE_IMG_SIZE, y);
@@ -202,7 +202,7 @@ void draw_gauge (double speed, double energy) {
 	    glVertex2f (0.0, GAUGE_IMG_SIZE);
 	glEnd ();
 
-	glColor4fv (energy_foreground_color);
+	glColor4f (energy_foreground_color.r, energy_foreground_color.g, energy_foreground_color.b, energy_foreground_color.a);
 	glBegin (GL_QUADS);
 	    glVertex2f (0.0, 0.0);
 	    glVertex2f (GAUGE_IMG_SIZE, 0.0);
@@ -231,13 +231,13 @@ void draw_gauge (double speed, double energy) {
 	    speedbar_frac +=  speed/SPEEDBAR_GREEN_MAX_SPEED * SPEEDBAR_GREEN_FRACTION;
 	}
 
-	glColor4fv (speedbar_background_color);
+	glColor4f (speedbar_background_color.r, speedbar_background_color.g, speedbar_background_color.b, speedbar_background_color.a);
 	Tex.BindTex (GAUGE_SPEED);
 	draw_partial_tri_fan (1.0);
-	glColor4fv (hud_white);
+	glColor4f (hud_white.r, hud_white.g, hud_white.b, hud_white.a);
 	draw_partial_tri_fan (min (1.0, speedbar_frac));
 
-	glColor4fv (hud_white);
+	glColor4f (hud_white.r, hud_white.g, hud_white.b, hud_white.a);
 	Tex.BindTex (GAUGE_OUTLINE);
 	glBegin (GL_QUADS);
 	    glVertex2f (0.0, 0.0);
