@@ -115,26 +115,37 @@ void DrawTrackmarks (void) {
 		glBindTexture (GL_TEXTURE_2D, texid[q->track_type]);
 
 		if ((q->track_type == TRACK_HEAD) || (q->track_type == TRACK_TAIL)) { 
-			glBegin(GL_QUADS);
-			
-			glNormal3f (q->n1.x, q->n1.y, q->n1.z);
-			glTexCoord2f (q->t1.x, q->t1.y);
-			glVertex3f (q->v1.x, q->v1.y, q->v1.z);
-		
-			glNormal3f (q->n2.x, q->n2.y, q->n2.z);
-			glTexCoord2f (q->t2.x, q->t2.y);
-			glVertex3f (q->v2.x, q->v2.y, q->v2.z);
+			const GLfloat tex[] = {
+				q->t1.x, q->t1.y,
+				q->t2.x, q->t2.y,
+				q->t4.x, q->t4.y,
+				q->t3.x, q->t3.y
+			};
+			const GLfloat nrm[] = {
+				q->n1.x, q->n1.y, q->n1.z,
+				q->n2.x, q->n2.y, q->n2.z,
+				q->n4.x, q->n4.y, q->n4.z,
+				q->n3.x, q->n3.y, q->n3.z
+			};
+			const GLfloat vtx[] = {
+				q->v1.x, q->v1.y, q->v1.z,
+				q->v2.x, q->v2.y, q->v2.z,
+				q->v4.x, q->v4.y, q->v4.z,
+				q->v3.x, q->v3.y, q->v3.z
+			};
 
-			glNormal3f (q->n4.x, q->n4.y, q->n4.z);
-			glTexCoord2f (q->t4.x, q->t4.y);
-			glVertex3f (q->v4.x, q->v4.y, q->v4.z);
-		
-			glNormal3f (q->n3.x, q->n3.y, q->n3.z);
-			glTexCoord2f (q->t3.x, q->t3.y);
-			glVertex3f (q->v3.x, q->v3.y, q->v3.z);
-		
-			glEnd();
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
+			glNormalPointer(GL_FLOAT, 0, nrm);
+			glVertexPointer(3, GL_FLOAT, 0, vtx);
+			glTexCoordPointer(2, GL_FLOAT, 0, tex);
+			glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_NORMAL_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
 		} else {
 			glBegin(GL_QUAD_STRIP);
 				glNormal3f (q->n2.x, q->n2.y, q->n2.z);
@@ -164,12 +175,12 @@ void DrawTrackmarks (void) {
 					glTexCoord2f (q->t4.x, q->t4.y);
 					glVertex3f (q->v4.x, q->v4.y, q->v4.z);
 		
-				glNormal3f (q->n3.x, q->n3.y, q->n3.z);
-				glTexCoord2f (q->t3.x, q->t3.y);
-				glVertex3f (q->v3.x, q->v3.y, q->v3.z);
-			
-				qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
-			}
+					glNormal3f (q->n3.x, q->n3.y, q->n3.z);
+					glTexCoord2f (q->t3.x, q->t3.y);
+					glVertex3f (q->v3.x, q->v3.y, q->v3.z);
+				
+					qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
+				}
 			glEnd();
 		}
     }
