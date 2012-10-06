@@ -33,7 +33,7 @@ char *NewStr (const char *s) {
     char *dest;
     dest = (char *) malloc (sizeof(char) * (strlen(s) + 1));
     if (dest == NULL) printf ("malloc failed\n");
-    strcpy (dest, s);
+    else strcpy (dest, s);
     return dest;
 }
 
@@ -401,8 +401,8 @@ void Int_CharN (char *s, const int val, const int cnt) {
 char *NewStrN (const char *s) {
     char *dest;
     dest = (char *) malloc (sizeof(char) * (strlen(s) + 1));
-    if (dest == 0) Message ("malloc failed","");
-    strcpy (dest, s);
+    if (dest == NULL) Message ("malloc failed","");
+    else strcpy (dest, s);
     return dest;
 }
 
