@@ -323,7 +323,7 @@ void add_track_mark (CControl *ctrl, int *id) {
 }
 
 void UpdateTrackmarks (CControl *ctrl) {
-	int trackid;
+	int trackid = -1;
 	TTerrType *TerrList = Course.TerrList;
 
 	if (param.perf_level < 3) return;	
