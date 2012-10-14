@@ -25,17 +25,17 @@ typedef struct {
 } gl_value_t;
 
 gl_value_t gl_values[] = {
-    { "maximum lights", GL_MAX_LIGHTS, GL_INT },
-    { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_INT },
-    { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_INT },
-    { "max texture size", GL_MAX_TEXTURE_SIZE, GL_INT },
+    { "maximum lights", GL_MAX_LIGHTS, GL_SHORT },
+    { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_SHORT },
+    { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_SHORT },
+    { "max texture size", GL_MAX_TEXTURE_SIZE, GL_SHORT },
     { "double buffering", GL_DOUBLEBUFFER, GL_UNSIGNED_BYTE },
-    { "red bits", GL_RED_BITS, GL_INT },
-    { "green bits", GL_GREEN_BITS, GL_INT },
-    { "blue bits", GL_BLUE_BITS, GL_INT },
-    { "alpha bits", GL_ALPHA_BITS, GL_INT },
-    { "depth bits", GL_DEPTH_BITS, GL_INT },
-    { "stencil bits", GL_STENCIL_BITS, GL_INT } };
+    { "red bits", GL_RED_BITS, GL_SHORT },
+    { "green bits", GL_GREEN_BITS, GL_SHORT },
+    { "blue bits", GL_BLUE_BITS, GL_SHORT },
+    { "alpha bits", GL_ALPHA_BITS, GL_SHORT },
+    { "depth bits", GL_DEPTH_BITS, GL_SHORT },
+    { "stencil bits", GL_STENCIL_BITS, GL_SHORT } };
 
 void check_gl_error() {
     GLenum error;
@@ -117,26 +117,27 @@ void PrintGLInfo (){
 	Message ("", "");
     for (i=0; i<(int)(sizeof(gl_values)/sizeof(gl_values[0])); i++) {
 		switch (gl_values[i].type) {
-			case GL_INT:
-	    	glGetIntegerv (gl_values[i].value, &int_val);
-		    ss = Int_StrN (int_val);
+		    case GL_SHORT:
+			glGetIntegerv (gl_values[i].value, &int_val);
+			ss = Int_StrN (int_val);
 			Message (gl_values[i].name, ss.c_str());
 		    break;
 
-			case GL_FLOAT:
-		    glGetFloatv (gl_values[i].value, &float_val);
-    		ss = Float_StrN (float_val, 2);
+		    case GL_FLOAT:
+			glGetFloatv (gl_values[i].value, &float_val);
+			ss = Float_StrN (float_val, 2);
 			Message (gl_values[i].name, ss.c_str());
 		    break;
 
-			case GL_UNSIGNED_BYTE:
-	    	glGetBooleanv (gl_values[i].value, &boolean_val);
-		    ss = Int_StrN (boolean_val);
+		    case GL_UNSIGNED_BYTE:
+			glGetBooleanv (gl_values[i].value, &boolean_val);
+			ss = Int_StrN (boolean_val);
 			Message (gl_values[i].name, ss.c_str());
 		    break;
 
-			default:
+		    default:
 			Message ("","");
+		    break;
 		}
     }
 }
