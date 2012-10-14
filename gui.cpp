@@ -171,38 +171,32 @@ void PrintIconButton (int nr, int focus, int state) {
 				framesize, framesize, line, colBlack, framecol, 1.0);
 
 	glEnable (GL_TEXTURE_2D);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindTexture (GL_TEXTURE_2D, IconButtons[nr].texid);
-    glColor4f (1.0, 1.0, 1.0, 1.0);
+	glColor4f (1.0, 1.0, 1.0, 1.0);
 
-	glBegin (GL_QUADS);
-	switch (state) {
-		case 0:
-			glTexCoord2f (0, 0.5); glVertex2f (x,y);
-			glTexCoord2f (0.5, 0.5); glVertex2f (r,y);
-			glTexCoord2f (0.5, 1.0); glVertex2f (r,t);
-			glTexCoord2f (0, 1.0); glVertex2f (x,t);
-		break;
-		case 1:
-			glTexCoord2f (0.5, 0.5); glVertex2f (x,y);
-			glTexCoord2f (1.0, 0.5); glVertex2f (r,y);
-			glTexCoord2f (1.0, 1.0); glVertex2f (r,t);
-			glTexCoord2f (0.5, 1.0); glVertex2f (x,t);
-		break;
-		case 2:
-			glTexCoord2f (0, 0); glVertex2f (x,y);
-			glTexCoord2f (0.5, 0); glVertex2f (r,y);
-			glTexCoord2f (0.5, 0.5); glVertex2f (r,t);
-			glTexCoord2f (0, 0.5); glVertex2f (x,t);
-		break;
-		case 3:
-			glTexCoord2f (0.5, 0); glVertex2f (x,y);
-			glTexCoord2f (1.0, 0); glVertex2f (r,y);
-			glTexCoord2f (1.0, 0.5); glVertex2f (r,t);
-			glTexCoord2f (0.5, 0.5); glVertex2f (x,t);
-		break;
+	const GLfloat tex[4][8] = {
+		{ 0.0,0.5, 0.5,0.5, 0.5,1.0, 0.0,1.0 },
+		{ 0.5,0.5, 1.0,0.5, 1.0,1.0, 0.5,1.0 },
+		{ 0.0,0.0, 0.5,0.0, 0.5,0.5, 0.0,0.5 },
+		{ 0.5,0.0, 1.0,0.0, 1.0,0.5, 0.5,0.5 }
+	};
+	const GLfloat vtx[8] = {
+		x,y, r,y, r,t, x,t
+	};
+
+	if( ( 0 <= state ) && ( state <= 3 ) )
+	{
+		glTexCoordPointer(2, GL_FLOAT, 0, tex[state]);
+		glVertexPointer(2, GL_FLOAT, 0, vtx);
+		glDrawArrays(GL_TRIANGLE_FAN,0,4);
 	}
-	glEnd ();
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void DrawArrow (int x, int y, int dir, bool active, int sel) {
@@ -210,8 +204,8 @@ void DrawArrow (int x, int y, int dir, bool active, int sel) {
 	double textr[6] = {1.0, 0.5, 1.0, 1.0, 0.5, 1.0};
 	double texbl[6] = {0.25, 0.25, 0.75, 0.00, 0.00, 0.50};
 	double texbr[6] = {0.50, 0.50, 1.00, 0.25, 0.25, 0.75};
-    double texleft, texright, textop, texbottom;
-    TVector2 bl, tr;
+	double texleft, texright, textop, texbottom;
+	TVector2 bl, tr;
 
 	int type;	 
 	if (active) type = 3 * dir + 1 + sel; else type = 3 * dir;
@@ -226,21 +220,33 @@ void DrawArrow (int x, int y, int dir, bool active, int sel) {
 	texbottom = texbl[type];	
 	textop = texbr[type];
 	
+	glEnable (GL_TEXTURE_2D );
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_TEXTURE_2D );
 	Tex.BindTex (LB_ARROWS);
 	glColor4f (1.0, 1.0, 1.0, 1.0);
 	
-	glBegin( GL_QUADS );
-	    glTexCoord2f (texleft, texbottom); 
-		glVertex2f (bl.x, bl.y );
-	    glTexCoord2f (texright, texbottom); 
-		glVertex2f (tr.x, bl.y );
-	    glTexCoord2f (texright, textop); 
-		glVertex2f (tr.x, tr.y );
-	    glTexCoord2f (texleft, textop); 
-		glVertex2f (bl.x, tr.y );
-	glEnd();
+	const GLfloat tex[] = {
+		texleft,  texbottom,
+		texright, texbottom,
+		texright, textop,
+		texleft,  textop
+	};
+	const GLfloat vtx[] = {
+		bl.x, bl.y,
+		tr.x, bl.y,
+		tr.x, tr.y,
+		bl.x, tr.y
+	};
+
+	glTexCoordPointer(2, GL_FLOAT, 0, tex);
+	glVertexPointer(2, GL_FLOAT, 0, vtx);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -285,29 +291,38 @@ void GetFocus (int x, int y, int *focus, int *dir) {
 
 void DrawFrameX (int x, int y, int w, int h, int line, 
 		TColor backcol, TColor framecol, double transp) {
-	double yy = param.y_resolution - y - h;
+    double yy = param.y_resolution - y - h;
  
-	if (x < 0) x = (param.x_resolution -w) / 2;
-	glPushMatrix();
+    if (x < 0) x = (param.x_resolution -w) / 2;
+    glPushMatrix();
 	glDisable (GL_TEXTURE_2D);
     
-	glColor4f (framecol.r, framecol.g, framecol.b, transp); 
 	glTranslatef (x, yy, 0);
-	glBegin (GL_QUADS );
-	    glVertex2f (0, 0 );
-	    glVertex2f (w, 0 );
-	    glVertex2f (w, h );
-	    glVertex2f (0, h );
-	glEnd();
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	const GLfloat vtx1[] = {
+		0, 0,
+		w, 0,
+		w, h,
+		0, h
+	};
+	const GLfloat vtx2[] = {
+	    0 + line, 0 + line,
+	    w - line, 0 + line,
+	    w - line, h - line,
+	    0 + line, h - line
+	};
+
+	glColor4f (framecol.r, framecol.g, framecol.b, transp); 
+	glVertexPointer(2, GL_FLOAT, 0, vtx1);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 	glColor4f (backcol.r, backcol.g, backcol.b, transp);
-	glBegin (GL_QUADS );
-	    glVertex2f (0 + line, 0 + line );
-	    glVertex2f (w - line, 0 + line );
-	    glVertex2f (w - line, h - line );
-	    glVertex2f (0 + line, h - line );
-	glEnd();
+	glVertexPointer(2, GL_FLOAT, 0, vtx2);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
+	glDisableClientState(GL_VERTEX_ARRAY);
 	glEnable (GL_TEXTURE_2D);
     glPopMatrix();
 }
@@ -325,54 +340,79 @@ void DrawLevel (int x, int y, int level, double fact) {
 	bott = lev[level];
 	top = bott + 0.25;
 	
+	glEnable (GL_TEXTURE_2D);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_TEXTURE_2D);
 	Tex.BindTex (STARS);
 	glColor4f (1.0, 1.0, 1.0, 1.0);
-	
-	glBegin( GL_QUADS );
-	    glTexCoord2f (0, bott); 
-		glVertex2f (bl.x, bl.y );
-	    glTexCoord2f (0.75, bott); 
-		glVertex2f (tr.x, bl.y );
-	    glTexCoord2f (0.75, top); 
-		glVertex2f (tr.x, tr.y );
-	    glTexCoord2f (0, top); 
-		glVertex2f (bl.x, tr.y );
-	glEnd();
+
+	const GLfloat tex[] = {
+		0.00, bott,
+		0.75, bott,
+		0.75, top,
+		0.00, top
+	};
+	const GLfloat vtx[] = {
+		bl.x, bl.y,
+		tr.x, bl.y,
+		tr.x, tr.y,
+		bl.x, tr.y
+	};
+
+	glTexCoordPointer(2, GL_FLOAT, 0, tex);
+	glVertexPointer(2, GL_FLOAT, 0, vtx);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void DrawBonus (int x, int y, int max, int num) {
-    TVector2 bl, tr;
+	TVector2 bl, tr;
 	double bott, top;
 	int i;
 		
 	bl.y = param.y_resolution - y - 32;
 	tr.y = param.y_resolution - y;
 
+	glEnable (GL_TEXTURE_2D);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_TEXTURE_2D);
 	Tex.BindTex (TUXBONUS);
+
 	glColor4f (1.0, 1.0, 1.0, 1.0);
 
 	for (i=0; i<max; i++) {
 		bl.x = x + i * 40;
 		tr.x = bl.x + 32;
 	
-		if (i<num) bott = 0.5; else bott = 0.0;
+		bott = ( i < num ? 0.5 : 0.0 );
 		top = bott + 0.5;
-		
-		glBegin( GL_QUADS );
-		    glTexCoord2f (0, bott); 
-			glVertex2f (bl.x, bl.y );
-		    glTexCoord2f (1, bott); 
-			glVertex2f (tr.x, bl.y );
-	    	glTexCoord2f (1, top); 
-			glVertex2f (tr.x, tr.y );
-		    glTexCoord2f (0, top); 
-			glVertex2f (bl.x, tr.y );
-		glEnd();
+
+		const GLfloat tex[] = {
+			0, bott,
+			1, bott,
+			1, top,
+			0, top
+		};
+		const GLfloat vtx[] = {
+			bl.x, bl.y,
+			tr.x, bl.y,
+			tr.x, tr.y,
+			bl.x, tr.y
+		};
+
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glVertexPointer(2, GL_FLOAT, 0, vtx);
+		glDrawArrays(GL_TRIANGLE_FAN,0,4);
 	}
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void DrawBonusExt (int y, int numraces, int num) {
@@ -405,8 +445,11 @@ void DrawBonusExt (int y, int numraces, int num) {
 	bl.y = param.y_resolution - y - 32 -4;
 	tr.y = param.y_resolution - y - 0 -4;
 
+	glEnable (GL_TEXTURE_2D);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_TEXTURE_2D);
 	Tex.BindTex (TUXBONUS);
 	glColor4f (1.0, 1.0, 1.0, 1.0);
 
@@ -423,14 +466,28 @@ void DrawBonusExt (int y, int numraces, int num) {
 		if (i<num) {
 			bott = 0.5;
 			top = 1.0;
-			glBegin (GL_QUADS);
-				glTexCoord2f (0, bott); glVertex2f (bl.x, bl.y);
-				glTexCoord2f (1, bott); glVertex2f (tr.x, bl.y);
-				glTexCoord2f (1, top);  glVertex2f (tr.x, tr.y);
-				glTexCoord2f (0, top);  glVertex2f (bl.x, tr.y);
-			glEnd();
+
+			const GLfloat tex[] = {
+				0.00, bott,
+				1.00, bott,
+				1.00, top,
+				0.00, top
+			};
+			const GLfloat vtx[] = {
+				bl.x, bl.y,
+				tr.x, bl.y,
+				tr.x, tr.y,
+				bl.x, tr.y
+			};
+
+			glTexCoordPointer(2, GL_FLOAT, 0, tex);
+			glVertexPointer(2, GL_FLOAT, 0, vtx);
+			glDrawArrays(GL_TRIANGLE_FAN,0,4);
 		}
 	}
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 // ------------------ new ---------------------------------------------
