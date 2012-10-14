@@ -45,14 +45,21 @@ void DrawCrsr (float x, float y, int pos, double timestep) {
 		TColor col = MakeColor (1, 1, 0, 1);
 		float scrheight = param.y_resolution;
 
+		const GLfloat vtx[] = {
+			x,   scrheight-y-h,
+			x+w, scrheight-y-h,
+			x+w, scrheight-y,
+			x,   scrheight-y
+		};
+
 		glDisable (GL_TEXTURE_2D);
+		glEnableClientState(GL_VERTEX_ARRAY);
+
 		glColor4f (col.r, col.g, col.b, col.a);
-		glBegin (GL_QUADS);
-			glVertex2f (x,   scrheight-y-h);
-			glVertex2f (x+w, scrheight-y-h);
-			glVertex2f (x+w, scrheight-y);
-			glVertex2f (x,   scrheight-y);
-		glEnd();
+		glVertexPointer(2, GL_FLOAT, 0, vtx);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
 		glEnable (GL_TEXTURE_2D);
 	}
 	crsrtime += timestep;
