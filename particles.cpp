@@ -186,30 +186,44 @@ void draw_ui_snow (void) {
     yres = param.y_resolution;
 	
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	Tex.BindTex (SNOW_PART);
+    Tex.BindTex (SNOW_PART);
+
     glColor4f(part_col[0], part_col[1], part_col[2], part_col[3]);
-	part_col[3] = 0.3;  
+    part_col[3] = 0.3;  
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
     glPushMatrix();
 	for  (i=0; i<num_snowparticles; i++) {
 	    pt = &particles[i].pt;
 	    size = particles[i].size;
 	    tex_min = &particles[i].tex_min;
 	    tex_max = &particles[i].tex_max;
-	    glPushMatrix();
-		glTranslatef (pt->x * xres, pt->y * yres, 0);
-		glBegin (GL_QUADS);
-		    glTexCoord2f (tex_min->x, tex_min->y);
-		    glVertex2f (0, 0);
-		    glTexCoord2f (tex_max->x, tex_min->y);
-		    glVertex2f (size, 0);
-		    glTexCoord2f (tex_max->x, tex_max->y);
-		    glVertex2f (size, size);
-		    glTexCoord2f (tex_min->x, tex_max->y);
-		    glVertex2f (0, size);
-		glEnd();
-	    glPopMatrix();
-    }
+
+	    const float dx = pt->x * xres;
+	    const float dy = pt->y * yres;
+	    const GLfloat vtx[] = {
+		dx,      dy,
+		dx+size, dy,
+		dx+size, dy+size,
+		dx,      dy+size
+	    };
+	    const GLfloat tex[] = {
+		tex_min->x, tex_min->y,
+		tex_max->x, tex_min->y,
+		tex_max->x, tex_max->y,
+		tex_min->x, tex_max->y
+	    };
+
+	    glVertexPointer(2, GL_FLOAT, 0, vtx);
+	    glTexCoordPointer(2, GL_FLOAT, 0, tex);
+	    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+	}
     glPopMatrix();
+
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 } 
 
 void reset_ui_snow_cursor_pos (TVector2 pos) {
@@ -289,7 +303,6 @@ void draw_billboard (CControl *ctrl,
 		     bool use_world_y_axis, 
 		     TVector2 min_tex_coord, TVector2 max_tex_coord)
 {
-    TVector3 pt;
     TVector3 x_vec;
     TVector3 y_vec;
     TVector3 z_vec;
@@ -312,25 +325,43 @@ void draw_billboard (CControl *ctrl,
 		z_vec.z = ctrl->view_mat[2][2];
     }
 
-    glBegin (GL_QUADS);
-		pt = AddVectors (center_pt, ScaleVector (-width/2.0, x_vec));
-		pt = AddVectors (pt, ScaleVector (-height/2.0, y_vec));
-		glNormal3f (z_vec.x, z_vec.y, z_vec.z);
-		glTexCoord2f (min_tex_coord.x, min_tex_coord.y);
-		glVertex3f (pt.x, pt.y, pt.z);
+    TVector3 pt = AddVectors (center_pt, ScaleVector (-width/2.0, x_vec));
+    TVector3 pt0 = AddVectors (pt, ScaleVector (-height/2.0, y_vec));
+    TVector3 pt1 = AddVectors (pt0, ScaleVector (width, x_vec));
+    TVector3 pt2 = AddVectors (pt1, ScaleVector (height, y_vec));
+    TVector3 pt3 = AddVectors (pt2, ScaleVector (-width, x_vec));
 
-		pt = AddVectors (pt, ScaleVector (width, x_vec));
-		glTexCoord2f (max_tex_coord.x, min_tex_coord.y);
-		glVertex3f (pt.x, pt.y, pt.z);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		pt = AddVectors (pt, ScaleVector (height, y_vec));
-		glTexCoord2f (max_tex_coord.x, max_tex_coord.y);
-		glVertex3f (pt.x, pt.y, pt.z);
+    const GLfloat vtx[] = {
+	pt0.x, pt0.y, pt0.z,
+	pt1.x, pt1.y, pt1.z,
+	pt2.x, pt2.y, pt2.z,
+	pt3.x, pt3.y, pt3.z
+    };
+    const GLfloat nrm[] = {
+	z_vec.x, z_vec.y, z_vec.z,
+	z_vec.x, z_vec.y, z_vec.z,
+	z_vec.x, z_vec.y, z_vec.z,
+	z_vec.x, z_vec.y, z_vec.z
+    };
+    const GLfloat tex[] = {
+	min_tex_coord.x, min_tex_coord.y,
+	max_tex_coord.x, min_tex_coord.y,
+	max_tex_coord.x, max_tex_coord.y,
+	min_tex_coord.x, max_tex_coord.y
+    };
 
-		pt = AddVectors (pt, ScaleVector (-width, x_vec));
-		glTexCoord2f (min_tex_coord.x, max_tex_coord.y);
-		glVertex3f (pt.x, pt.y, pt.z);
-    glEnd ();
+    glNormalPointer(GL_FLOAT, 0, nrm);
+    glVertexPointer(3, GL_FLOAT, 0, vtx);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex);
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void create_new_particles (TVector3 loc, TVector3 vel, int num)  {
@@ -721,9 +752,9 @@ void CFlakes::Update (double timestep, CControl *ctrl) {
 void CFlakes::DrawArea (int ar, CControl *ctrl) {
     TVector2 *tex_min, *tex_max;
     TVector3 *pt;
-	float size;
+    float size;
     int i;
-	TFlake flake;
+    TFlake flake;
 
 	if (g_game.snow_id < 1) return;
 
@@ -733,34 +764,48 @@ void CFlakes::DrawArea (int ar, CControl *ctrl) {
 
 	set_gl_options (PARTICLES);
 	glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	Tex.BindTex (T_WIDGETS);  
+	Tex.BindTex (T_WIDGETS);
+
 	TColor particle_colour = Env.ParticleColor ();
-    glColor4f (particle_colour.r, particle_colour.g, particle_colour.b, particle_colour.a);
+	glColor4f (particle_colour.r, particle_colour.g, particle_colour.b, particle_colour.a);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	for  (i=0; i < areas[ar].num_flakes; i++) {
 		flake = areas[ar].flakes[i];
 		pt = &flake.pt;
-	    size = flake.size;
-	    tex_min = &flake.tex_min;
-	    tex_max = &flake.tex_max;
+		size = flake.size;
+		tex_min = &flake.tex_min;
+		tex_max = &flake.tex_max;
 
 		if ((DistanceToPlane (lp, *pt) < 0) && (DistanceToPlane (rp, *pt) < 0)) {
 			glPushMatrix();
 			glTranslatef (pt->x, pt->y, pt->z);
 			if (areas[ar].rotate_flake) glRotatef (dir_angle, 0, 1, 0);
-			glBegin (GL_QUADS);
-				glTexCoord2f (tex_min->x, tex_min->y);
-				glVertex3f (0, 0, 0);
-				glTexCoord2f (tex_max->x, tex_min->y);
-				glVertex3f (size, 0, 0);
-				glTexCoord2f (tex_max->x, tex_max->y);
-				glVertex3f (size, size, 0);
-				glTexCoord2f (tex_min->x, tex_max->y);
-				glVertex3f (0, size, 0);
-			glEnd();
+
+			const GLfloat vtx[] = {
+				0.0,  0.0,  0.0,
+				size, 0.0,  0.0,
+				size, size, 0.0,
+				0.0,  size, 0.0
+			};
+			const GLfloat tex[] = {
+				tex_min->x, tex_min->y,
+				tex_max->x, tex_min->y,
+				tex_max->x, tex_max->y,
+				tex_min->x, tex_max->y
+			};
+
+			glVertexPointer(3, GL_FLOAT, 0, vtx);
+			glTexCoordPointer(2, GL_FLOAT, 0, tex);
+			glDrawArrays(GL_TRIANGLE_FAN,0,4);
 			glPopMatrix();
 		}
 	} 
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 } 
 
 void CFlakes::Draw (CControl *ctrl) {
@@ -830,33 +875,45 @@ void CCurtain::Draw (CControl *ctrl) {
 	TColor particle_colour = Env.ParticleColor ();
 	glColor4f (particle_colour.r, particle_colour.g, particle_colour.b, 1.0);
 
+	const GLfloat tex[] = {
+		0,0, 1,0, 1,1, 0,1
+	};
+
 	// glEnable (GL_NORMALIZE);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	for (int i=0; i<MAX_CURTAINS; i++) {
 		if (enabled[i]) {	
 			Tex.BindTex (texture[i]);  
 			float halfsize = size[i] / 2;
+
+			const GLfloat vtx[] = {
+				-halfsize, -halfsize, 0.0,
+				+halfsize, -halfsize, 0.0,
+				+halfsize, +halfsize, 0.0,
+				-halfsize, +halfsize, 0.0
+			};
+
+			// glNormal3f (0, 0, 1);
+			glVertexPointer(3, GL_FLOAT, 0, vtx);
+			glTexCoordPointer(2, GL_FLOAT, 0, tex);
+
 			for (int co=0; co<numCols[i]; co++) {
 				for (int row=0; row<numRows[i]; row++) {
 					pt = &curtains[i][co][row].pt;
 					glPushMatrix();
-					glTranslatef (pt->x, pt->y, pt->z);
-					glRotatef (-curtains[i][co][row].angle, 0, 1, 0);
-					// glNormal3f (0, 0, 1);
-					glBegin (GL_QUADS);
-						glTexCoord2f (0, 0);
-						glVertex3f (-halfsize, -halfsize, 0);
-						glTexCoord2f (1, 0);
-						glVertex3f (halfsize, -halfsize, 0);
-						glTexCoord2f (1, 1);
-						glVertex3f (halfsize, halfsize, 0);
-						glTexCoord2f (0, 1);
-						glVertex3f (-halfsize, halfsize, 0);
-					glEnd();
+						glTranslatef (pt->x, pt->y, pt->z);
+						glRotatef (-curtains[i][co][row].angle, 0, 1, 0);
+						glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 					glPopMatrix();
 				}
 			}
 		}
 	}
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void CCurtain::Update (float timestep, CControl *ctrl) {
@@ -1187,7 +1244,7 @@ void InitSnow (CControl *ctrl) {
 	Curtain.Init (ctrl);
 }
 
- void UpdateSnow (double timestep, CControl *ctrl) {
+void UpdateSnow (double timestep, CControl *ctrl) {
 	if (g_game.snow_id < 1 || g_game.snow_id > 3) return;
 	Flakes.Update (timestep, ctrl);
 	Curtain.Update (timestep, ctrl);
