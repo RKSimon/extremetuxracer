@@ -139,12 +139,12 @@ GNU General Public License for more details.
 	#define glOrtho         glOrthof
 	#define glFrustum       glFrustumf
 
-	inline void gluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar )
+	inline void gluPerspective( double fovy, double aspect, double zNear, double zFar )
 	{
-		GLdouble ymax = zNear * tan( fovy * M_PI / 360.0 );
-		GLdouble ymin = -ymax;
-		GLdouble xmin = ymin * aspect;
-		GLdouble xmax = ymax * aspect;
+		GLfloat ymax = zNear * tan( fovy * M_PI / 360.0 );
+		GLfloat ymin = -ymax;
+		GLfloat xmin = ymin * aspect;
+		GLfloat xmax = ymax * aspect;
 		glFrustumf( xmin, xmax, ymin, ymax, zNear, zFar );
 	}
 #endif
