@@ -34,16 +34,18 @@ ifeq ($(OS),Windows_NT)
   endif #SystemRoot
 else
   UNAME := $(shell uname)
-  CC = g++
-  LD = g++
 
   ifeq ($(UNAME), Darwin)
     # ----------------- MAC OS --------------------------------------------
+    CC = g++
+    LD = g++
     CFLAGS = -Wall -O2 -DOS_MAC -framework OpenGL -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype
     LDFLAGS = -framework Cocoa
     OBJ += SDLMain.o
   else
     # ----------------- Linux (Default) -----------------------------------
+    CC ?= g++
+    LD ?= g++
     CFLAGS = -Wall -O2 -DOS_LINUX -I/usr/include/freetype2
     LDFLAGS = -lGL -lGLU -lSDL -lSDL_image -lSDL_mixer -lfreetype 
   endif #Darwin
