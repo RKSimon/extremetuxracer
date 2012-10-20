@@ -40,7 +40,7 @@ typedef enum {
 
 #undef GL_EXT_compiled_vertex_array
 
-#if defined(OS_MAC)
+#if defined(OS_MAC) || defined(HAVE_GL_GLES1) || defined(HAVE_GL_GLES2)
 typedef void (* PFNGLLOCKARRAYSEXTPROC) (GLint first, GLsizei count);
 typedef void (* PFNGLUNLOCKARRAYSEXTPROC) (void);
 #endif

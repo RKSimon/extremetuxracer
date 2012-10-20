@@ -131,6 +131,24 @@ GNU General Public License for more details.
 #define WINDOW_TITLE "Extreme Tux Racer " VERSION
 #define PROG_DIR "/usr/local/games/etr-bh"
 
+// --------------------------------------------------------------------
+//			GLES -> GL conversion
+// --------------------------------------------------------------------
+
+#if defined ( HAVE_GL_GLES1 ) || defined ( HAVE_GL_GLES2 )
+	#define glOrtho         glOrthof
+	#define glFrustum       glFrustumf
+
+	inline void gluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar )
+	{
+		GLdouble ymax = zNear * tan( fovy * M_PI / 360.0 );
+		GLdouble ymin = -ymax;
+		GLdouble xmin = ymin * aspect;
+		GLdouble xmax = ymax * aspect;
+		glFrustumf( xmin, xmax, ymin, ymax, zNear, zFar );
+	}
+#endif
+
 using namespace std;
 
 #include "etr_types.h"

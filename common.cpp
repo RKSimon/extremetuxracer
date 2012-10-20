@@ -244,6 +244,7 @@ bool DirExistsWin (const char *dirname) {
     return true;
 }
 
+#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2)
 void DrawStdSphere (int num_divisions) {
     double theta, phi, d_theta, d_phi, eps, twopi;
     double x, y, z;
@@ -328,6 +329,7 @@ void DrawStdSphere (int num_divisions) {
         } 
     } 
 } 
+#endif
 
 // --------------------------------------------------------------------
 //				date and time

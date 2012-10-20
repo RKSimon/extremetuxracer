@@ -29,7 +29,9 @@ gl_value_t gl_values[] = {
     { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_SHORT },
     { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_SHORT },
     { "max texture size", GL_MAX_TEXTURE_SIZE, GL_SHORT },
+#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2)
     { "double buffering", GL_DOUBLEBUFFER, GL_UNSIGNED_BYTE },
+#endif
     { "red bits", GL_RED_BITS, GL_SHORT },
     { "green bits", GL_GREEN_BITS, GL_SHORT },
     { "blue bits", GL_BLUE_BITS, GL_SHORT },
@@ -95,15 +97,16 @@ void PrintGLInfo (){
     GLint int_val;
     GLfloat float_val;
     GLboolean boolean_val;
-	string ss;
+    string ss;
 
     Message ("Gl vendor: ", (char*)glGetString (GL_VENDOR));
     Message ("Gl renderer: ", (char*)glGetString (GL_RENDERER));
     Message ("Gl version: ", (char*)glGetString (GL_VERSION));
     extensions = NewStr ((char*) glGetString (GL_EXTENSIONS));
     Message ("", "");
-	Message ("Gl extensions:", "");
-	Message ("", "");
+
+    Message ("Gl extensions:", "");
+    Message ("", "");
 	
     oldp = extensions;
     while ((p=strchr(oldp,' '))) {
@@ -114,7 +117,8 @@ void PrintGLInfo (){
     if (*oldp) Message (oldp,"");
 
     free (extensions);
-	Message ("", "");
+    Message ("", "");
+
     for (i=0; i<(int)(sizeof(gl_values)/sizeof(gl_values[0])); i++) {
 		switch (gl_values[i].type) {
 		    case GL_SHORT:
