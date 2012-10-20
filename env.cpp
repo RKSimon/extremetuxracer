@@ -109,7 +109,7 @@ void CEnvironment::SetupLight () {
 
 void CEnvironment::SetupFog () {
     glEnable (GL_FOG);
-    glFogi   (GL_FOG_MODE, fog.mode);
+    glFogf   (GL_FOG_MODE, fog.mode);
     glFogf   (GL_FOG_START, fog.start);
     glFogf   (GL_FOG_END, fog.end);
     glFogfv  (GL_FOG_COLOR, fog.color);
@@ -329,21 +329,21 @@ void CEnvironment::DrawSkybox (TVector3 pos) {
 
 void CEnvironment::DrawFog () {
     TPlane bottom_plane, top_plane;
-    TVector3 left, right, vpoint;
+    TVector3 left, right;
     TVector3 topleft, topright;
     TVector3 bottomleft = NullVec; 
-	TVector3 bottomright = NullVec;
+    TVector3 bottomright = NullVec;
     float height;
 
-	if (!fog.is_on) return;
+    if (!fog.is_on) return;
 
-	// the clipping planes are calculated by view frustum (view.cpp)
-	leftclip = get_left_clip_plane ();
-	rightclip = get_right_clip_plane ();
-	farclip = get_far_clip_plane ();
-	bottomclip = get_bottom_clip_plane ();
+    // the clipping planes are calculated by view frustum (view.cpp)
+    leftclip = get_left_clip_plane ();
+    rightclip = get_right_clip_plane ();
+    farclip = get_far_clip_plane ();
+    bottomclip = get_bottom_clip_plane ();
 
-	// --------------- calculate the planes ---------------------------
+    // --------------- calculate the planes ---------------------------
 
     float slope = tan (ANGLES_TO_RADIANS (Course.GetCourseAngle()));
 //	TPlane left_edge_plane = MakePlane (1.0, 0.0, 0.0, 0.0);
@@ -357,51 +357,115 @@ void CEnvironment::DrawFog () {
     height = Course.GetMaxHeight (0) + fog.height;
     top_plane.d = -height * top_plane.nml.y;
 
-
     if (!IntersectPlanes (bottom_plane, farclip, leftclip,  &left)) return;
     if (!IntersectPlanes (bottom_plane, farclip, rightclip, &right)) return;
     if (!IntersectPlanes (top_plane,    farclip, leftclip,  &topleft)) return;
     if (!IntersectPlanes (top_plane,    farclip, rightclip, &topright)) return;
     if (!IntersectPlanes (bottomclip,   farclip, leftclip,  &bottomleft)) return;
     if (!IntersectPlanes (bottomclip,   farclip, rightclip, &bottomright)) return;
-    
-	TVector3 leftvec  = SubtractVectors (topleft, left);
+
+    TVector3 leftvec  = SubtractVectors (topleft, left);
     TVector3 rightvec = SubtractVectors (topright, right);
 
-	// --------------- draw the fog plane -----------------------------
+    TVector3 vpoint1 = AddVectors (topleft, leftvec);
+    TVector3 vpoint2 = AddVectors (topright, rightvec);
+    TVector3 vpoint3 = AddVectors (topleft, ScaleVector (3.0, leftvec));
+    TVector3 vpoint4 = AddVectors (topright, ScaleVector (3.0, rightvec));
 
-	set_gl_options (FOG_PLANE);
+    // --------------- draw the fog plane -----------------------------
+
+    set_gl_options (FOG_PLANE);
     glEnable (GL_FOG);
-	
-	// only the alpha channel is used
-	float bottom_dens[4]     = {0, 0, 0, 1.0};
-	float top_dens[4]        = {0, 0, 0, 0.9};
-	float leftright_dens[4]  = {0, 0, 0, 0.3};
-	float top_bottom_dens[4] = {0, 0, 0, 0.0};
 
+    // only the alpha channel is used
+    float bottom_dens[4]     = {0, 0, 0, 1.0};
+    float top_dens[4]        = {0, 0, 0, 0.9};
+    float leftright_dens[4]  = {0, 0, 0, 0.3};
+    float top_bottom_dens[4] = {0, 0, 0, 0.0};
+
+#if 0
+    //glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY);
+
+	// only the alpha channel is used
+	const GLfloat col[] = {
+		// bottom density
+		0, 0, 0, 1.0,
+		0, 0, 0, 1.0,
+		0, 0, 0, 1.0,
+		0, 0, 0, 1.0,
+
+		// top density
+		0, 0, 0, 0.9,
+		0, 0, 0, 0.9,
+
+		// left/right density
+		0, 0, 0, 0.3,
+		0, 0, 0, 0.3,
+
+		// top/bottom density
+		0, 0, 0, 0.0,
+		0, 0, 0, 0.0,
+	};
+
+	const GLfloat vtx[] = {
+		bottomleft.x, bottomleft.y, bottomleft.z,
+		bottomright.x, bottomright.y, bottomright.z,
+		left.x, left.y, left.z,
+		right.x, right.y, right.z,
+		topleft.x, topleft.y, topleft.z,
+		topright.x, topright.y, topright.z,
+		vpoint1.x, vpoint1.y, vpoint1.z,
+		vpoint2.x, vpoint2.y, vpoint2.z,
+		vpoint3.x, vpoint3.y, vpoint3.z,
+		vpoint4.x, vpoint4.y, vpoint4.z,
+	};
+
+	glColor4fv (bottom_dens);
+	//glColorPointer(4, GL_FLOAT, 0, col+0);
+	glVertexPointer(3, GL_FLOAT, 0, vtx+0);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+	glColor4fv (top_dens);
+	//glColorPointer(4, GL_FLOAT, 0, col+8);
+	glVertexPointer(3, GL_FLOAT, 0, vtx+6);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+	glColor4fv (leftright_dens);
+	//glColorPointer(4, GL_FLOAT, 0, col+16);
+	glVertexPointer(3, GL_FLOAT, 0, vtx+12);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+	glColor4fv (top_bottom_dens);
+	//glColorPointer(4, GL_FLOAT, 0, col+24);
+	glVertexPointer(3, GL_FLOAT, 0, vtx+18);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    //glDisableClientState(GL_COLOR_ARRAY);
+
+#else
     glBegin (GL_QUAD_STRIP);
-	    glColor4fv (bottom_dens);
-	    glVertex3f (bottomleft.x, bottomleft.y, bottomleft.z);
+	glColor4fv (bottom_dens);
+	glVertex3f (bottomleft.x, bottomleft.y, bottomleft.z);
     	glVertex3f (bottomright.x, bottomright.y, bottomright.z);
-	    glVertex3f (left.x, left.y, left.z);
+	glVertex3f (left.x, left.y, left.z);
     	glVertex3f (right.x, right.y, right.z);
 
-	    glColor4fv (top_dens);
+	glColor4fv (top_dens);
     	glVertex3f (topleft.x, topleft.y, topleft.z);
     	glVertex3f (topright.x, topright.y, topright.z);
 	
-	    glColor4fv (leftright_dens);
-    	vpoint = AddVectors (topleft, leftvec);
-	    glVertex3f (vpoint.x, vpoint.y, vpoint.z);
-    	vpoint = AddVectors (topright, rightvec);
-	    glVertex3f (vpoint.x, vpoint.y, vpoint.z);
+	glColor4fv (leftright_dens);
+   	glVertex3f (vpoint1.x, vpoint1.y, vpoint1.z);
+	glVertex3f (vpoint2.x, vpoint2.y, vpoint2.z);
 		
-	    glColor4fv (top_bottom_dens);
-	    vpoint = AddVectors (topleft, ScaleVector (3.0, leftvec));
-    	glVertex3f (vpoint.x, vpoint.y, vpoint.z);
-	    vpoint = AddVectors (topright, ScaleVector (3.0, rightvec));
-    	glVertex3f (vpoint.x, vpoint.y, vpoint.z);
+	glColor4fv (top_bottom_dens);
+    	glVertex3f (vpoint3.x, vpoint3.y, vpoint3.z);
+    	glVertex3f (vpoint4.x, vpoint4.y, vpoint4.z);
     glEnd();
+
+#endif
 }
 
 
