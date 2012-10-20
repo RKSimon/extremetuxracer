@@ -33,7 +33,7 @@ GNU General Public License for more details.
 #define NO_INTERPOLATION_SPEED 2.0
 #define CAMERA_DISTANCE_INCREMENT 2
 
-static TMatrix stationary_matrix;
+static GLfloat stationary_matrix[4][4];
 static bool is_stationary = false;
 static bool shall_stationary = false;
 
@@ -177,14 +177,21 @@ void setup_view_matrix (CControl *ctrl, bool save_mat) {
     view_mat[3][1] = -viewpt_in_view_frame.y;
     view_mat[3][2] = -viewpt_in_view_frame.z;
     
-	if (save_mat) {
-		int xx, yy;
-		for (xx=0; xx<4; xx++) {
-			for (yy=0; yy<4; yy++) stationary_matrix[xx][yy] = view_mat[xx][yy];
-		}
+    if (save_mat) {
+	int xx, yy;
+	for (xx=0; xx<4; xx++) {
+		for (yy=0; yy<4; yy++) stationary_matrix[xx][yy] = view_mat[xx][yy];
 	}
-    glLoadIdentity();	
-	glMultMatrixd ((double*) view_mat);
+    }
+
+    glLoadIdentity();
+    {
+	GLfloat view_matf[16];
+        for ( int i = 0; i < 16; i++ ) {
+                view_matf[i] = ((const double*)view_mat)[i];
+        }
+        glMultMatrixf (view_matf);
+    }
 }
 
 TVector3 MakeViewVector () {
@@ -218,11 +225,11 @@ void update_view (CControl *ctrl, double dt) {
     TVector3 vel_cpy;
     double time_constant_mult;
 
-	if (is_stationary) {
-		glLoadIdentity();	
-		glMultMatrixd ((double*) stationary_matrix);
-		return;
-	}
+    if (is_stationary) {
+	glLoadIdentity();
+	glMultMatrixf ((float*) stationary_matrix);
+	return;
+    }
 
     vel_cpy = ctrl->cvel;
     speed = NormVector (&vel_cpy);

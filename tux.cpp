@@ -419,7 +419,11 @@ void CCharShape::DrawCharSphere (int num_divisions) {
 void CCharShape::DrawNodes (TCharNode *node) {
     TCharNode *child;
     glPushMatrix();
-    glMultMatrixd ((double *) node->trans);
+	GLfloat trans[16];
+	for ( int i = 0; i < 16; i++ ) {
+		trans[i] = ((const double*)node->trans)[i];
+	}
+	glMultMatrixf (trans);
 
 	if (node->node_name == highlight_node) highlighted = true;
 	TCharMaterial *mat; 
@@ -430,17 +434,18 @@ void CCharShape::DrawNodes (TCharNode *node) {
 		else mat = &TuxDefMat;
 	}
 
-    if (node->visible == true) {
+	if (node->visible == true) {
 		set_material (mat->diffuse, mat->specular, mat->exp);
 		DrawCharSphere (node->divisions);
-    } 
+	}
+ 
 // -------------- recursive loop -------------------------------------
-    child = node->child;
-    while (child != NULL) {
-        DrawNodes (child);
+	child = node->child;
+	while (child != NULL) {
+		DrawNodes (child);
 		if (child->node_name == highlight_node) highlighted = false;
-        child = child->next;
-    } 
+		child = child->next;
+	} 
 // -------------------------------------------------------------------
     glPopMatrix();
 } 
