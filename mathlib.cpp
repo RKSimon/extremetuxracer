@@ -596,13 +596,12 @@ bool IntersectPolyhedron (TPolyhedron p) {
 
 TVector3 MakeNormal (TPolygon p, TVector3 *v) {
     TVector3 normal, v1, v2;
-    double old_len;
 
     v1 = SubtractVectors (v[p.vertices[1]], v[p.vertices[0]]);
     v2 = SubtractVectors (v[p.vertices[p.num_vertices-1]], v[p.vertices[0]]);
     normal = CrossProduct (v1, v2);
 
-    old_len = NormVector (&normal);
+    NormVector (&normal);
     return normal;
 } 
 
