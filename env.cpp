@@ -421,22 +421,22 @@ void CEnvironment::DrawFog () {
 		vpoint4.x, vpoint4.y, vpoint4.z,
 	};
 
-	glColor4fv (bottom_dens);
+	glColor4f (bottom_dens[0], bottom_dens[1], bottom_dens[2], bottom_dens[3]);
 	//glColorPointer(4, GL_FLOAT, 0, col+0);
 	glVertexPointer(3, GL_FLOAT, 0, vtx+0);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-	glColor4fv (top_dens);
+	glColor4f (top_dens[0], top_dens[1], top_dens[2], top_dens[3]);
 	//glColorPointer(4, GL_FLOAT, 0, col+8);
 	glVertexPointer(3, GL_FLOAT, 0, vtx+6);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-	glColor4fv (leftright_dens);
+	glColor4f (leftright_dens[0], leftright_dens[1], leftright_dens[2], leftright_dens[3]);
 	//glColorPointer(4, GL_FLOAT, 0, col+16);
 	glVertexPointer(3, GL_FLOAT, 0, vtx+12);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-	glColor4fv (top_bottom_dens);
+	glColor4f (top_bottom_dens[0], top_bottom_dens[1], top_bottom_dens[2], top_bottom_dens[3]);
 	//glColorPointer(4, GL_FLOAT, 0, col+24);
 	glVertexPointer(3, GL_FLOAT, 0, vtx+18);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -446,21 +446,21 @@ void CEnvironment::DrawFog () {
 
 #else
     glBegin (GL_QUAD_STRIP);
-	glColor4fv (bottom_dens);
+	glColor4f (bottom_dens[0], bottom_dens[1], bottom_dens[2], bottom_dens[3]);
 	glVertex3f (bottomleft.x, bottomleft.y, bottomleft.z);
     	glVertex3f (bottomright.x, bottomright.y, bottomright.z);
 	glVertex3f (left.x, left.y, left.z);
     	glVertex3f (right.x, right.y, right.z);
 
-	glColor4fv (top_dens);
+	glColor4f (top_dens[0], top_dens[1], top_dens[2], top_dens[3]);
     	glVertex3f (topleft.x, topleft.y, topleft.z);
     	glVertex3f (topright.x, topright.y, topright.z);
 	
-	glColor4fv (leftright_dens);
+	glColor4f (leftright_dens[0], leftright_dens[1], leftright_dens[2], leftright_dens[3]);
    	glVertex3f (vpoint1.x, vpoint1.y, vpoint1.z);
 	glVertex3f (vpoint2.x, vpoint2.y, vpoint2.z);
 		
-	glColor4fv (top_bottom_dens);
+	glColor4f (top_bottom_dens[0], top_bottom_dens[1], top_bottom_dens[2], top_bottom_dens[3]);
     	glVertex3f (vpoint3.x, vpoint3.y, vpoint3.z);
     	glVertex3f (vpoint4.x, vpoint4.y, vpoint4.z);
     glEnd();
