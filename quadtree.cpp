@@ -55,7 +55,7 @@ typedef void (*make_tri_func_t)(int a, int b, int c, int terrain);
 
 GLuint quadsquare::TexId[MAX_TERR_TYPES];
 GLuint quadsquare::EnvmapTexId;
-GLuint *quadsquare::VertexArrayIndices = (GLuint*) NULL;
+GLushort *quadsquare::VertexArrayIndices = (GLushort*) NULL;
 GLuint quadsquare::VertexArrayCounter;
 GLuint quadsquare::VertexArrayMinIdx;
 GLuint quadsquare::VertexArrayMaxIdx;
@@ -796,11 +796,11 @@ void quadsquare::DrawTris() {
     }
 /*
     glDrawElements (GL_TRIANGLES, VertexArrayCounter,
-		    GL_UNSIGNED_INT, VertexArrayIndices );
+		    GL_UNSIGNED_SHORT, VertexArrayIndices );
     if (glUnlockArraysEXT_p && param.use_cva) glUnlockArraysEXT_p();
 */
     glDrawElements (GL_TRIANGLES, VertexArrayCounter,
-		    GL_UNSIGNED_INT, VertexArrayIndices );
+		    GL_UNSIGNED_SHORT, VertexArrayIndices );
     if (glUnlockArraysEXT_p) glUnlockArraysEXT_p();
 }
 
@@ -1122,7 +1122,7 @@ const HeightMapInfo& hm)
 	if  (VertexArrayIndices != NULL ) {
 	    delete VertexArrayIndices;
 	}
-	VertexArrayIndices = new GLuint[6 * RowSize * NumRows];
+	VertexArrayIndices = new GLushort[6 * RowSize * NumRows];
     }
     int	BlockSize = 2 << cd.Level;
     if (cd.xorg > hm.XOrigin + ((hm.XSize + 2) << hm.Scale) ||
