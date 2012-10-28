@@ -103,8 +103,6 @@ static void draw_time(){
 static void draw_herring_count (int herring_count){
 	string hcountstr;
 
-
-
 	hcountstr = Int_StrN (herring_count, 3);
 	if (param.use_papercut_font < 2) {
 		Tex.DrawNumStr (hcountstr.c_str(), param.x_resolution - 90, 10, 1, colWhite);
@@ -123,53 +121,46 @@ TVector2 calc_new_fan_pt (double angle) {
     return pt;
 }
 
-void start_tri_fan(){
-    TVector2 pt;
-
-    glBegin (GL_TRIANGLE_FAN);
-    glVertex2f (ENERGY_GAUGE_CENTER_X, 
-		ENERGY_GAUGE_CENTER_Y);
-    pt = calc_new_fan_pt (SPEEDBAR_BASE_ANGLE); 
-    glVertex2f (pt.x, pt.y);
-}
-
 void draw_partial_tri_fan (double fraction) {
-    int divs;
-    double angle, angle_incr, cur_angle;
     int i;
-    bool trifan = false;
     TVector2 pt;
 
-	angle = SPEEDBAR_BASE_ANGLE + 
-		(SPEEDBAR_MAX_ANGLE - SPEEDBAR_BASE_ANGLE) * fraction;
+    double cur_angle = SPEEDBAR_BASE_ANGLE;
+    double angle_incr = 360.0 / CIRCLE_DIVISIONS;
+    double angle = SPEEDBAR_BASE_ANGLE + (SPEEDBAR_MAX_ANGLE - SPEEDBAR_BASE_ANGLE) * fraction;
+    int divs = (int)((SPEEDBAR_BASE_ANGLE - angle) * CIRCLE_DIVISIONS / 360.0);
 
-    divs = (int)((SPEEDBAR_BASE_ANGLE - angle) * CIRCLE_DIVISIONS / 360.0);
-    cur_angle = SPEEDBAR_BASE_ANGLE;
-    angle_incr = 360.0 / CIRCLE_DIVISIONS;
+    int num_vertices = 0;
+    GLfloat vtx[ 2 * ( divs + 4 ) ];
+    GLfloat *pvtx = vtx;
+
+    // start tri fan
+    *pvtx++ = ENERGY_GAUGE_CENTER_X; *pvtx++ = ENERGY_GAUGE_CENTER_Y;
+    num_vertices++; 
+
+    pt = calc_new_fan_pt (SPEEDBAR_BASE_ANGLE);
+    *pvtx++ = pt.x; *pvtx++ = pt.y;
+    num_vertices++;
 
     for (i=0; i<divs; i++) {
-		if  (!trifan) {
-		    start_tri_fan();
-	    	trifan = true;
-		}
-		cur_angle -= angle_incr;
-		pt = calc_new_fan_pt (cur_angle);
-		glVertex2f (pt.x, pt.y);
+	cur_angle -= angle_incr;
+	pt = calc_new_fan_pt (cur_angle);
+	*pvtx++ = pt.x; *pvtx++ = pt.y;
+	num_vertices++;
     }
 
     if  (cur_angle > angle + EPS) {
-		cur_angle = angle;
-		if  (!trifan) {
-		    start_tri_fan();
-	    	trifan = true;
-		}
-		pt = calc_new_fan_pt (cur_angle);
-		glVertex2f (pt.x, pt.y);
+	cur_angle = angle;
+	pt = calc_new_fan_pt (cur_angle);
+	*pvtx++ = pt.x; *pvtx++ = pt.y;
+	num_vertices++;
     }
 
-    if  (trifan) {
-		glEnd();
-		trifan = false;
+    if  (num_vertices > 2) {
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(2, GL_FLOAT, 0, vtx);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, num_vertices);
+	glDisableClientState(GL_VERTEX_ARRAY);
     }
 }
 
