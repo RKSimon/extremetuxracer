@@ -136,6 +136,7 @@ GNU General Public License for more details.
 // --------------------------------------------------------------------
 
 #if defined ( HAVE_GL_GLES1 ) || defined ( HAVE_GL_GLES2 )
+	#define GL_CLAMP        GL_CLAMP_TO_EDGE
 	#define glOrtho         glOrthof
 	#define glFrustum       glFrustumf
 
