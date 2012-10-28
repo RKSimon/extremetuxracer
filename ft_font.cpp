@@ -757,6 +757,8 @@ void FTCharmap::InsertIndex (const unsigned int characterCode, const unsigned in
 //			FTPixmapGlyph
 // --------------------------------------------------------------------
 
+#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES1)
+
 FTPixmapGlyph::FTPixmapGlyph( FT_GlyphSlot glyph)
 :   FTGlyph( glyph),
     destWidth(0),
@@ -888,10 +890,4 @@ void FTGLPixmapFont::Render( const wchar_t* string) {
     glPopAttrib();
 }
 
-
-
-
-
-
-
-
+#endif
