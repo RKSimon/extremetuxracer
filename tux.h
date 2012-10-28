@@ -105,7 +105,7 @@ private:
 	bool CheckCollision (TPolyhedron ph);
 
 	// shadow
-	void DrawShadowVertex (double x, double y, double z, TMatrix mat);
+	void BuildShadowVertex (double x, double y, double z, TMatrix mat, TVector3* pnt, TVector3* nml);
 	void DrawShadowSphere (TMatrix mat);
 	void TraverseDagForShadow (TCharNode *node, TMatrix mat);
 

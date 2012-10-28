@@ -700,98 +700,122 @@ bool CCharShape::Collision (TVector3 pos, TPolyhedron ph) {
 //				shadow
 // --------------------------------------------------------------------
 
-void CCharShape::DrawShadowVertex (double x, double y, double z, TMatrix mat) {
-    TVector3 pt;
+void CCharShape::BuildShadowVertex (double x, double y, double z, TMatrix mat, TVector3* pt, TVector3* nml) {
     double old_y;
-    TVector3 nml;
-
-    pt = MakeVector (x, y, z);
-    pt = TransformPoint (mat, pt);
-    old_y = pt.y;
-    nml = Course.FindCourseNormal (pt.x, pt.z);
-    pt.y = Course.FindYCoord (pt.x, pt.z) + SHADOW_HEIGHT;
-    if  (pt.y > old_y) pt.y = old_y;
-    glNormal3f (nml.x, nml.y, nml.z);
-    glVertex3f (pt.x, pt.y, pt.z);
+    *pt = MakeVector (x, y, z);
+    *pt = TransformPoint (mat, *pt);
+    old_y = pt->y;
+    *nml = Course.FindCourseNormal (pt->x, pt->z);
+    pt->y = Course.FindYCoord (pt->x, pt->z) + SHADOW_HEIGHT;
+    if  (pt->y > old_y) pt->y = old_y;
 }
 
 void CCharShape::DrawShadowSphere (TMatrix mat) {
     double theta, phi, d_theta, d_phi, eps, twopi;
     double x, y, z;
     int div = param.tux_shadow_sphere_divisions;
-    
+    TVector3 pt, nml;
+
     eps = 1e-15;
     twopi = M_PI * 2.0;
     d_theta = d_phi = M_PI / div;
 
     for  (phi = 0.0; phi + eps < M_PI; phi += d_phi) {
-		double cos_theta, sin_theta;
-		double sin_phi, cos_phi;
-		double sin_phi_d_phi, cos_phi_d_phi;
+	double cos_theta, sin_theta;
+	double sin_phi, cos_phi;
+	double sin_phi_d_phi, cos_phi_d_phi;
 
-		sin_phi = sin (phi);
-		cos_phi = cos (phi);
-		sin_phi_d_phi = sin (phi + d_phi);
-		cos_phi_d_phi = cos (phi + d_phi);
+	sin_phi = sin (phi);
+	cos_phi = cos (phi);
+	sin_phi_d_phi = sin (phi + d_phi);
+	cos_phi_d_phi = cos (phi + d_phi);
         
         if  (phi <= eps) {
-			glBegin (GL_TRIANGLE_FAN);
-				DrawShadowVertex (0., 0., 1., mat);
+		glBegin (GL_TRIANGLE_FAN);
+			BuildShadowVertex (0., 0., 1., mat, &pt, &nml);
+			glNormal3f (nml.x, nml.y, nml.z);
+			glVertex3f (pt.x, pt.y, pt.z);
 
-				for  (theta = 0.0; theta + eps < twopi; theta += d_theta) {
-					sin_theta = sin (theta);
-					cos_theta = cos (theta);
+			for  (theta = 0.0; theta + eps < twopi; theta += d_theta) {
+				sin_theta = sin (theta);
+				cos_theta = cos (theta);
 
-					x = cos_theta * sin_phi_d_phi;
-					y = sin_theta * sin_phi_d_phi;
-					z = cos_phi_d_phi;
-					DrawShadowVertex (x, y, z, mat);
-				} 
-				x = sin_phi_d_phi;
-				y = 0.0;
+				x = cos_theta * sin_phi_d_phi;
+				y = sin_theta * sin_phi_d_phi;
 				z = cos_phi_d_phi;
-				DrawShadowVertex (x, y, z, mat);
-            glEnd();
-        } else if  (phi + d_phi + eps >= M_PI) {
-			glBegin (GL_TRIANGLE_FAN);
-				DrawShadowVertex (0., 0., -1., mat);
-                for  (theta = twopi; theta - eps > 0; theta -= d_theta) {
-					sin_theta = sin (theta);
-					cos_theta = cos (theta);
-                    x = cos_theta * sin_phi;
-                    y = sin_theta * sin_phi;
-                    z = cos_phi;
-					DrawShadowVertex (x, y, z, mat);
-                } 
-                x = sin_phi;
-                y = 0.0;
-                z = cos_phi;
-				DrawShadowVertex (x, y, z, mat);
-            glEnd();
-        } else {
-            glBegin (GL_TRIANGLE_STRIP);
-				for (theta = 0.0; theta + eps < twopi; theta += d_theta) {
-					sin_theta = sin (theta);
-					cos_theta = cos (theta);
-					x = cos_theta * sin_phi;
-					y = sin_theta * sin_phi;
-					z = cos_phi;
-					DrawShadowVertex (x, y, z, mat);
+				BuildShadowVertex (x, y, z, mat, &pt, &nml);
+				glNormal3f (nml.x, nml.y, nml.z);
+				glVertex3f (pt.x, pt.y, pt.z);
+			} 
 
-					x = cos_theta * sin_phi_d_phi;
-					y = sin_theta * sin_phi_d_phi;
-					z = cos_phi_d_phi;
-					DrawShadowVertex (x, y, z, mat);
-                } 
-                x = sin_phi;
-                y = 0.0;
-                z = cos_phi;
-				DrawShadowVertex (x, y, z, mat);
-                x = sin_phi_d_phi;
-                y = 0.0;
-                z = cos_phi_d_phi;
-				DrawShadowVertex (x, y, z, mat);
-            glEnd();
+			x = sin_phi_d_phi;
+			y = 0.0;
+			z = cos_phi_d_phi;
+			BuildShadowVertex (x, y, z, mat, &pt, &nml);
+			glNormal3f (nml.x, nml.y, nml.z);
+			glVertex3f (pt.x, pt.y, pt.z);
+	        glEnd();
+        } else if  (phi + d_phi + eps >= M_PI) {
+		glBegin (GL_TRIANGLE_FAN);
+			BuildShadowVertex (0., 0., -1., mat, &pt, &nml);
+			glNormal3f (nml.x, nml.y, nml.z);
+			glVertex3f (pt.x, pt.y, pt.z);
+
+			for  (theta = twopi; theta - eps > 0; theta -= d_theta) {
+				sin_theta = sin (theta);
+				cos_theta = cos (theta);
+
+				x = cos_theta * sin_phi;
+				y = sin_theta * sin_phi;
+				z = cos_phi;
+				BuildShadowVertex (x, y, z, mat, &pt, &nml);
+				glNormal3f (nml.x, nml.y, nml.z);
+				glVertex3f (pt.x, pt.y, pt.z);
+			}
+ 
+			x = sin_phi;
+			y = 0.0;
+			z = cos_phi;
+
+			BuildShadowVertex (x, y, z, mat, &pt, &nml);
+			glNormal3f (nml.x, nml.y, nml.z);
+			glVertex3f (pt.x, pt.y, pt.z);
+		glEnd();
+        } else {
+		glBegin (GL_TRIANGLE_STRIP);
+			for (theta = 0.0; theta + eps < twopi; theta += d_theta) {
+				sin_theta = sin (theta);
+				cos_theta = cos (theta);
+
+				x = cos_theta * sin_phi;
+				y = sin_theta * sin_phi;
+				z = cos_phi;
+				BuildShadowVertex (x, y, z, mat, &pt, &nml);
+				glNormal3f (nml.x, nml.y, nml.z);
+				glVertex3f (pt.x, pt.y, pt.z);
+
+				x = cos_theta * sin_phi_d_phi;
+				y = sin_theta * sin_phi_d_phi;
+				z = cos_phi_d_phi;
+				BuildShadowVertex (x, y, z, mat, &pt, &nml);
+				glNormal3f (nml.x, nml.y, nml.z);
+				glVertex3f (pt.x, pt.y, pt.z);
+			}
+ 
+	                x = sin_phi;
+	                y = 0.0;
+	                z = cos_phi;
+			BuildShadowVertex (x, y, z, mat, &pt, &nml);
+			glNormal3f (nml.x, nml.y, nml.z);
+			glVertex3f (pt.x, pt.y, pt.z);
+
+			x = sin_phi_d_phi;
+			y = 0.0;
+			z = cos_phi_d_phi;
+			BuildShadowVertex (x, y, z, mat, &pt, &nml);
+			glNormal3f (nml.x, nml.y, nml.z);
+			glVertex3f (pt.x, pt.y, pt.z);
+		glEnd();
         } 
     } 
 } 
