@@ -105,6 +105,7 @@ bool CImage::LoadPng (const char *dir, const char *filename, bool mirroring) {
 
 // ------------------ read framebuffer --------------------------------
 
+#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
 bool CImage::ReadFrameBuffer_PPM () {
 	int viewport[4];
 	glGetIntegerv (GL_VIEWPORT, viewport);
@@ -125,7 +126,9 @@ bool CImage::ReadFrameBuffer_PPM () {
 	
 	return true;
 }
+#endif
 
+#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
 void CImage::ReadFrameBuffer_TGA () {
 	nx = param.x_resolution;
 	ny = param.y_resolution;
@@ -137,7 +140,9 @@ void CImage::ReadFrameBuffer_TGA () {
 	glReadBuffer (GL_FRONT);
 	glReadPixels (0, 0, nx, ny, GL_BGR, GL_UNSIGNED_BYTE, data);	
 }
+#endif
 
+#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
 void CImage::ReadFrameBuffer_BMP () {
 	nx = param.x_resolution;
 	ny = param.y_resolution;
@@ -148,6 +153,7 @@ void CImage::ReadFrameBuffer_BMP () {
 	glReadBuffer (GL_FRONT);
 	glReadPixels (0, 0, nx, ny, GL_BGRA, GL_UNSIGNED_BYTE, data);	
 }
+#endif
 
 // ---------------------------
 
