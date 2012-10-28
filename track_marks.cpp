@@ -83,7 +83,7 @@ void init_track_marks (void) {
 // --------------------------------------------------------------------
 
 void DrawTrackmarks (void) {
-	if (param.perf_level < 3) return;	
+    if (param.perf_level < 3) return;	
 
     GLuint texid[NUM_TRACK_TYPES];
     int current_quad, num_quads;
@@ -96,16 +96,20 @@ void DrawTrackmarks (void) {
 
     glColor4f (0, 0, 0, 1);
 	
-	texid[TRACK_HEAD] = Tex.TexID (trackid1);
-	texid[TRACK_MARK] = Tex.TexID (trackid2);
-	texid[TRACK_TAIL] = Tex.TexID (trackid3);
+    texid[TRACK_HEAD] = Tex.TexID (trackid1);
+    texid[TRACK_MARK] = Tex.TexID (trackid2);
+    texid[TRACK_TAIL] = Tex.TexID (trackid3);
 
-	glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     set_material (colWhite, colBlack, 1.0);
 
     num_quads = min (track_marks.current_mark, MAX_TRACK_MARKS -
 		     track_marks.next_mark + track_marks.current_mark);
     first_quad = track_marks.current_mark - num_quads;
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	for  (current_quad = 0; current_quad < num_quads; current_quad++) {
 		q = &track_marks.quads[(first_quad + current_quad) % MAX_TRACK_MARKS];
@@ -134,56 +138,69 @@ void DrawTrackmarks (void) {
 				q->v3.x, q->v3.y, q->v3.z
 			};
 
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_NORMAL_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glNormalPointer(GL_FLOAT, 0, nrm);
+			glVertexPointer(3, GL_FLOAT, 0, vtx);
+			glTexCoordPointer(2, GL_FLOAT, 0, tex);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		} else {
+			GLfloat tex[2*(2+2*num_quads)];
+			GLfloat nrm[3*(2+2*num_quads)];
+			GLfloat vtx[3*(2+2*num_quads)];
+			GLfloat* ptex = tex;
+			GLfloat* pnrm = nrm;
+			GLfloat* pvtx = vtx;
+			int num_vertices = 0;
+
+			*pnrm++ = q->n2.x; *pnrm++ = q->n2.y; *pnrm++ = q->n2.z;
+			*ptex++ = q->t2.x; *ptex++ = q->t2.y;
+			*pvtx++ = q->v2.x; *pvtx++ = q->v2.y; *pvtx++ = q->v2.z;
+			num_vertices++;
+
+			*pnrm++ = q->n1.x; *pnrm++ = q->n1.y; *pnrm++ = q->n1.z;
+			*ptex++ = q->t1.x; *ptex++ = q->t1.y;
+			*pvtx++ = q->v1.x; *pvtx++ = q->v1.y; *pvtx++ = q->v1.z;
+			num_vertices++;
+
+			*pnrm++ = q->n4.x; *pnrm++ = q->n4.y; *pnrm++ = q->n4.z;
+			*ptex++ = q->t4.x; *ptex++ = q->t4.y;
+			*pvtx++ = q->v4.x; *pvtx++ = q->v4.y; *pvtx++ = q->v4.z;
+			num_vertices++;
+
+			*pnrm++ = q->n3.x; *pnrm++ = q->n3.y; *pnrm++ = q->n3.z;
+			*ptex++ = q->t3.x; *ptex++ = q->t3.y;
+			*pvtx++ = q->v3.x; *pvtx++ = q->v3.y; *pvtx++ = q->v3.z;
+			num_vertices++;
+
+			qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
+			while ( (qnext->track_type == TRACK_MARK) && (current_quad + 1 < num_quads)) {
+				current_quad++;
+				q = &track_marks.quads[(first_quad+current_quad) % MAX_TRACK_MARKS];
+				track_colour.a = qnext->alpha;
+				set_material (track_colour, colBlack, 1.0);
+
+				*pnrm++ = q->n4.x; *pnrm++ = q->n4.y; *pnrm++ = q->n4.z;
+				*ptex++ = q->t4.x; *ptex++ = q->t4.y;
+				*pvtx++ = q->v4.x; *pvtx++ = q->v4.y; *pvtx++ = q->v4.z;
+				num_vertices++;
+
+				*pnrm++ = q->n3.x; *pnrm++ = q->n3.y; *pnrm++ = q->n3.z;
+				*ptex++ = q->t3.x; *ptex++ = q->t3.y;
+				*pvtx++ = q->v3.x; *pvtx++ = q->v3.y; *pvtx++ = q->v3.z;
+				num_vertices++;
+				
+				qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
+			}
 
 			glNormalPointer(GL_FLOAT, 0, nrm);
 			glVertexPointer(3, GL_FLOAT, 0, vtx);
 			glTexCoordPointer(2, GL_FLOAT, 0, tex);
-			glDrawArrays(GL_TRIANGLE_FAN,0,4);
-
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_NORMAL_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
-		} else {
-			glBegin(GL_QUAD_STRIP);
-				glNormal3f (q->n2.x, q->n2.y, q->n2.z);
-				glTexCoord2f (q->t2.x, q->t2.y);
-				glVertex3f (q->v2.x, q->v2.y, q->v2.z);
-
-				glNormal3f (q->n1.x, q->n1.y, q->n1.z);
-				glTexCoord2f (q->t1.x, q->t1.y);
-				glVertex3f (q->v1.x, q->v1.y, q->v1.z);
-
-				glNormal3f (q->n4.x, q->n4.y, q->n4.z);
-				glTexCoord2f (q->t4.x, q->t4.y);
-				glVertex3f (q->v4.x, q->v4.y, q->v4.z);
-
-				glNormal3f (q->n3.x, q->n3.y, q->n3.z);
-				glTexCoord2f (q->t3.x, q->t3.y);
-				glVertex3f (q->v3.x, q->v3.y, q->v3.z);
-
-				qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
-				while ( (qnext->track_type == TRACK_MARK) && (current_quad + 1 < num_quads)) {
-					current_quad++;
-					q = &track_marks.quads[(first_quad+current_quad) % MAX_TRACK_MARKS];
-					track_colour.a = qnext->alpha;
-					set_material (track_colour, colBlack, 1.0);
-
-					glNormal3f (q->n4.x, q->n4.y, q->n4.z);
-					glTexCoord2f (q->t4.x, q->t4.y);
-					glVertex3f (q->v4.x, q->v4.y, q->v4.z);
-		
-					glNormal3f (q->n3.x, q->n3.y, q->n3.z);
-					glTexCoord2f (q->t3.x, q->t3.y);
-					glVertex3f (q->v3.x, q->v3.y, q->v3.z);
-				
-					qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
-				}
-			glEnd();
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, num_vertices);
 		}
     }
+
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void break_track_marks (void) {
