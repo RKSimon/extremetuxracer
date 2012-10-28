@@ -52,6 +52,7 @@ else
     #CFLAGS += -DHAVE_GL_GLES1 -I/usr/lib/pvr-omap4-egl/include
     LDFLAGS  = -lSDL -lSDL_image -lSDL_mixer -lfreetype 
     LDFLAGS += -lGL -lGLU
+    #LDFLAGS += -L/usr/lib/pvr-omap4-egl -lGLESv1_CM
   endif #Darwin
 endif #Windows_NT
 
