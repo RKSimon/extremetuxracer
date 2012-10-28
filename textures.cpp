@@ -298,7 +298,12 @@ void CImage::WriteBMP (const char *dir, const char *filename) {
 CTexture Tex;
 
 CTexture::CTexture () {
-	for (int i=0; i<MAX_COMMON_TEX; i++) CommonTex[i] = 0;
+	for (int i=0; i<MAX_COMMON_TEX; i++) {
+		CommonTex[i].id = 0;
+		CommonTex[i].width = 0;
+		CommonTex[i].height = 0;
+	}
+
 	numTextures = 0;
 	TextureIndex = "";	
 	forientation = OR_TOP;
@@ -306,80 +311,80 @@ CTexture::CTexture () {
 
 CTexture::~CTexture () {}
 
-int CTexture::LoadTexture (const char *filename) {
-    CImage texImage;
+int CTexture::LoadTexture (const char *filename, GLuint *width, GLuint *height) {
+	CImage texImage;
 	GLuint texid;
 
 	if (texImage.LoadPng (filename, true) == false) return 0;
 	glGenTextures (1, &texid);
 	glBindTexture (GL_TEXTURE_2D, texid);		
-    glPixelStorei (GL_UNPACK_ALIGNMENT, 4); 
+	glPixelStorei (GL_UNPACK_ALIGNMENT, 4); 
 	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	GLenum format;
-	if (texImage.depth == 3) format = GL_RGB; 
-		else format = GL_RGBA;
+	GLenum format = (texImage.depth == 3 ? GL_RGB : GL_RGBA);
+	if (width) *width = texImage.nx;
+	if (height) *height = texImage.ny;
 
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
 
 	glTexImage2D 
 		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
 		texImage.ny, 0, format, GL_UNSIGNED_BYTE, texImage.data);
 
 	texImage.DisposeData();
-    return texid;    
+	return texid;
 }
 
-int CTexture::LoadTexture (const char *dir, const char *filename) {
+int CTexture::LoadTexture (const char *dir, const char *filename, GLuint *width, GLuint *height) {
 	string path = dir;
 	path += SEP;
 	path += filename;
-	return LoadTexture (path.c_str());
+	return LoadTexture (path.c_str(), width, height);
 }
 
-int CTexture::LoadTexture (const string dir, const string filename) {
-	return LoadTexture (dir.c_str(), filename.c_str ());
+int CTexture::LoadTexture (const string dir, const string filename, GLuint *width, GLuint *height) {
+	return LoadTexture (dir.c_str(), filename.c_str (), width, height);
 }
 
-int CTexture::LoadMipmapTexture (const char *filename, bool repeatable) {
-    CImage texImage;
+int CTexture::LoadMipmapTexture (const char *filename, bool repeatable, GLuint *width, GLuint *height) {
+	CImage texImage;
 	GLuint texid;
 
 	if (texImage.LoadPng (filename, true) == false) return 0;
 	glGenTextures (1, &texid);
 	glBindTexture (GL_TEXTURE_2D, texid);		
-    glPixelStorei (GL_UNPACK_ALIGNMENT, 4);
+	glPixelStorei (GL_UNPACK_ALIGNMENT, 4);
  
-   if  (repeatable) {
+	if  (repeatable) {
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    } else {
+	} else {
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    }
+	}
 
-	GLenum format;
-	if (texImage.depth == 3) format = GL_RGB; 
-	else format = GL_RGBA;
+	GLenum format = (texImage.depth == 3 ? GL_RGB : GL_RGBA);
+	if (width) *width = texImage.nx;
+	if (height) *height = texImage.ny;
 
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
 
 	gluBuild2DMipmaps 
 		(GL_TEXTURE_2D, texImage.depth, texImage.nx,
 		texImage.ny, format, GL_UNSIGNED_BYTE, texImage.data);
 	
 	texImage.DisposeData();
-    return texid;    
+	return texid;    
 }
 
-int CTexture::LoadMipmapTexture (const char *dir, const char *filename, bool repeatable) {
+int CTexture::LoadMipmapTexture (const char *dir, const char *filename, bool repeatable, GLuint *width, GLuint *height) {
 	string path = dir;
 	path += SEP;
 	path += filename;
-	return LoadMipmapTexture (path.c_str(), repeatable);
+	return LoadMipmapTexture (path.c_str(), repeatable, width, height);
 }
 
 void CTexture::LoadTextureList () {
@@ -396,31 +401,48 @@ void CTexture::LoadTextureList () {
 			texfile = SPStrN (line, "file", "");
 			rep = SPIntN (line, "repeat", 0);
 			if (id >= 0 && id < MAX_COMMON_TEX) {
-				if (rep>0) CommonTex[id] = 
-					LoadMipmapTexture (param.tex_dir.c_str(), texfile.c_str(), rep);
-				else CommonTex[id] = 
-					LoadTexture (param.tex_dir.c_str(), texfile.c_str());
-				if (CommonTex[id] > 0) {
-					TextureIndex = TextureIndex + "[" + name + "]" + Int_StrN (CommonTex[id]);
+				GLuint w, h;
+				if (rep>0) CommonTex[id].id = 
+					LoadMipmapTexture (param.tex_dir.c_str(), texfile.c_str(), rep, &w, &h);
+				else CommonTex[id].id = 
+					LoadTexture (param.tex_dir.c_str(), texfile.c_str(), &w, &h);
+				if (CommonTex[id].id > 0) {
+					CommonTex[id].width = w;
+					CommonTex[id].height = h;
+					TextureIndex = TextureIndex + "[" + name + "]" + Int_StrN (CommonTex[id].id);
 					numTextures++;
 				}
 			} else Message ("wrong texture id in textures.lst");	
+		}
+	} else {
+		Message ("failed to load common textures");
 	}
-	} else Message ("failed to load common textures");
 }
 
 void CTexture::FreeTextureList () {
 	for (int i=0; i<MAX_COMMON_TEX; i++) {
-		if (CommonTex[i] > 0) {
-			glDeleteTextures (1, &CommonTex[i]);
-			CommonTex[i] = 0;
+		if (CommonTex[i].id > 0) {
+			glDeleteTextures (1, &CommonTex[i].id);
+			CommonTex[i].id = 0;
+			CommonTex[i].width = 0;
+			CommonTex[i].height = 0;
 		}
 	}
 }
 
+GLuint CTexture::TexWidth (int idx) {
+	if (idx >= MAX_COMMON_TEX || idx < 0) return 0;
+	return CommonTex[idx].width;
+}
+
+GLuint CTexture::TexHeight (int idx) {
+	if (idx >= MAX_COMMON_TEX || idx < 0) return 0;
+	return CommonTex[idx].height;
+}
+
 GLuint CTexture::TexID (int idx) {
 	if (idx >= MAX_COMMON_TEX || idx < 0) return 0;
-	return CommonTex[idx];
+	return CommonTex[idx].id;
 }
 
 GLuint CTexture::TexID (string name) {
@@ -429,7 +451,7 @@ GLuint CTexture::TexID (string name) {
 
 bool CTexture::BindTex (int idx) {
 	if (idx < 0 || idx >= MAX_COMMON_TEX) return false;
-	glBindTexture (GL_TEXTURE_2D, CommonTex[idx]);
+	glBindTexture (GL_TEXTURE_2D, CommonTex[idx].id);
 	return true;
 }
 

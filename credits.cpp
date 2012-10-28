@@ -148,15 +148,15 @@ void DrawCreditsText (double time_step){
 }
 
 void DrawBackLogo (int x, int y, double size) {
-    GLint w, h;
+    GLuint w, h;
     GLfloat width, height, top, bott, left, right;
 
     glEnable (GL_TEXTURE_2D);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture (GL_TEXTURE_2D, Tex.TexID (T_TITLE));
 
-    glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-    glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
+    w = Tex.TexWidth (T_TITLE);
+    h = Tex.TexHeight (T_TITLE);
 
     width  = w * size;
     height = h * size;

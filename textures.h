@@ -154,7 +154,11 @@ public:
 
 class CTexture {
 private:
-	GLuint CommonTex [MAX_COMMON_TEX];
+	struct Details {
+		GLuint id, width, height;
+	};
+
+	Details CommonTex [MAX_COMMON_TEX];
 	int numTextures;
 	string TextureIndex;
 	int forientation;
@@ -163,14 +167,16 @@ private:
 public:
     CTexture ();
 	~CTexture ();
-	int LoadTexture (const char *filename);
-	int LoadTexture (const char *dir, const char *filename);
-	int LoadTexture (const string dir, const string filename);
-	int LoadMipmapTexture (const char *filename, bool repeatable);
-	int LoadMipmapTexture (const char *dir, const char *filename, bool repeatable);
+	int LoadTexture (const char *filename, GLuint *width = NULL, GLuint *height = NULL);
+	int LoadTexture (const char *dir, const char *filename, GLuint *width = NULL, GLuint *height = NULL);
+	int LoadTexture (const string dir, const string filename, GLuint *width = NULL, GLuint *height = NULL);
+	int LoadMipmapTexture (const char *filename, bool repeatable, GLuint *width = NULL, GLuint *height = NULL);
+	int LoadMipmapTexture (const char *dir, const char *filename, bool repeatable, GLuint *width = NULL, GLuint *height = NULL);
 	void LoadTextureList ();
 	void FreeTextureList ();
 
+	GLuint TexWidth (int idx);
+	GLuint TexHeight (int idx);
 	GLuint TexID (int idx);
 	GLuint TexID (string name);
 	bool BindTex (int idx);
