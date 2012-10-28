@@ -38,11 +38,12 @@ void setup_course_tex_gen () {
 //							render course
 // --------------------------------------------------------------------	
 void RenderCourse () {
-	set_gl_options (COURSE);
+    set_gl_options (COURSE);
     setup_course_tex_gen ();
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     set_material (colWhite, colBlack, 1.0);
-	CControl *ctrl = Players.GetCtrl (g_game.player_id);
+
+    CControl *ctrl = Players.GetCtrl (g_game.player_id);
     UpdateQuadtree (ctrl->viewpos, param.course_detail_level);
     RenderQuadtree ();
 }
@@ -55,13 +56,13 @@ void DrawTrees() {
     int       	numTrees;
     TItem    	*itemLocs;
     int       	numItems;
-	double  	treeRadius;
+    double  	treeRadius;
     double  	treeHeight;
     int       	i;
     TVector3  	normal;
     double  	fwd_clip_limit, bwd_clip_limit;
-	double		fwd_tree_detail_limit;
-    int			tree_type = -1;
+    double	fwd_tree_detail_limit;
+    int		tree_type = -1;
     double  	itemRadius;
     double  	itemHeight;
     int       	item_type = -1;
@@ -77,102 +78,111 @@ void DrawTrees() {
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     set_material (colWhite, colBlack, 1.0);
 
+    const GLfloat tex[] = {
+	0,0,  1,0,  1,1,  0,1
+    };
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 //	-------------- trees ------------------------
     treeLocs = Course.CollArr;
     numTrees = Course.numColl;
 
     for (i = 0; i< numTrees; i++) {
-		if (clip_course) {
-			if (ctrl->viewpos.z - treeLocs[i].pt.z > fwd_clip_limit) continue;
-		    if (treeLocs[i].pt.z - ctrl->viewpos.z > bwd_clip_limit) continue;
-		}
+	if (clip_course) {
+		if (ctrl->viewpos.z - treeLocs[i].pt.z > fwd_clip_limit) continue;
+		if (treeLocs[i].pt.z - ctrl->viewpos.z > bwd_clip_limit) continue;
+	}
 
-		if (treeLocs[i].tree_type != tree_type) {
-		    tree_type = treeLocs[i].tree_type;
-		    glBindTexture (GL_TEXTURE_2D, object_types[tree_type].texid);
-		}
+	if (treeLocs[i].tree_type != tree_type) {
+		tree_type = treeLocs[i].tree_type;
+		glBindTexture (GL_TEXTURE_2D, object_types[tree_type].texid);
+	}
 
-        glPushMatrix();
-        glTranslatef (treeLocs[i].pt.x, treeLocs[i].pt.y, treeLocs[i].pt.z);
+	glPushMatrix();
+        	glTranslatef (treeLocs[i].pt.x, treeLocs[i].pt.y, treeLocs[i].pt.z);
 		if (param.perf_level > 1) glRotatef (1, 0, 1, 0);
 
-        treeRadius = treeLocs[i].diam / 2.0;
-        treeHeight = treeLocs[i].height;
+        	treeRadius = treeLocs[i].diam / 2.0;
+        	treeHeight = treeLocs[i].height;
 		normal = MakeVector (0, 0, 1);
+
+		// slower but better method of setting the normals
+/*		normal = SubtractVectors (ctrl->viewpos, treeLocs[i].pt);
+		NormVector (&normal); */
 		glNormal3f (normal.x, normal.y, normal.z);
-/*		// slower but better method of setting the normals
-		normal = SubtractVectors (ctrl->viewpos, treeLocs[i].pt);
-		NormVector (&normal);
-		glNormal3f (normal.x, normal.y, normal.z); */
 
-		glBegin (GL_QUADS);
-			glTexCoord2f (0.0, 0.0);
-    	    glVertex3f (-treeRadius, 0.0, 0.0);
-    	    glTexCoord2f (1.0, 0.0);
-    	    glVertex3f (treeRadius, 0.0, 0.0);
-    	    glTexCoord2f (1.0, 1.0);
-    	    glVertex3f (treeRadius, treeHeight, 0.0);
-    	    glTexCoord2f (0.0, 1.0);
-    	    glVertex3f (-treeRadius, treeHeight, 0.0);
+		const GLfloat vtx1[] = {
+			-treeRadius, 0.0, 0.0,
+			+treeRadius, 0.0, 0.0,
+			+treeRadius, treeHeight, 0.0,
+			-treeRadius, treeHeight, 0.0
+		};
+		const GLfloat vtx2[] = {
+			0.0, 0.0, -treeRadius,
+			0.0, 0.0, +treeRadius,
+			0.0, treeHeight, +treeRadius,
+			0.0, treeHeight, -treeRadius
+		};
 
-//			if  (!clip_course || ctrl->viewpos.z - treeLocs[i].pt.z < fwd_tree_detail_limit) {
-			    glTexCoord2f  (0., 0.);
-			    glVertex3f  (0.0, 0.0, -treeRadius);
-			    glTexCoord2f  (1., 0.);
-			    glVertex3f  (0.0, 0.0, treeRadius);
-			    glTexCoord2f  (1., 1.);
-			    glVertex3f  (0.0, treeHeight, treeRadius);
-			    glTexCoord2f  (0., 1.);
-			    glVertex3f  (0.0, treeHeight, -treeRadius);
-//			}
-		glEnd();
-        glPopMatrix();
-	}
+		glVertexPointer(3, GL_FLOAT, 0, vtx1);
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+//		if  (!clip_course || ctrl->viewpos.z - treeLocs[i].pt.z < fwd_tree_detail_limit) {
+			glVertexPointer(3, GL_FLOAT, 0, vtx2);
+			glTexCoordPointer(2, GL_FLOAT, 0, tex);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+//		}
+	glPopMatrix();
+    }
 	
 //  items -----------------------------
-	itemLocs = Course.NocollArr;
+    itemLocs = Course.NocollArr;
     numItems = Course.numNocoll;
 
     for (i = 0; i< numItems; i++) {
 		if (itemLocs[i].collectable == 0 || itemLocs[i].drawable == false) continue;
 		if (clip_course) {
 		    if (ctrl->viewpos.z - itemLocs[i].pt.z > fwd_clip_limit) continue;
-		    if (itemLocs[i].pt.z - ctrl->viewpos.z > bwd_clip_limit)	continue;
+		    if (itemLocs[i].pt.z - ctrl->viewpos.z > bwd_clip_limit) continue;
 		}
 	
 		if (itemLocs[i].item_type != item_type) {
 		    item_type = itemLocs[i].item_type;
 		    glBindTexture (GL_TEXTURE_2D, object_types[item_type].texid);
 		}
-        
-		glPushMatrix();
-		    glTranslatef (itemLocs[i].pt.x, itemLocs[i].pt.y,  itemLocs[i].pt.z);
-		    itemRadius = itemLocs[i].diam / 2;
-		    itemHeight = itemLocs[i].height;
 
-		    if (object_types[item_type].use_normal) {
-				normal = object_types[item_type].normal;
-		    } else {
-//				normal = MakeVector (0, 0, 1);
-				normal = SubtractVectors (ctrl->viewpos, itemLocs[i].pt);
-				NormVector (&normal);
-		    }
-		    glNormal3f (normal.x, normal.y, normal.z);
-		    normal.y = 0.0;
-		    NormVector (&normal);
-		    glBegin (GL_QUADS);
-				glTexCoord2f (0., 0.);
-				glVertex3f (-itemRadius*normal.z, 0.0,  itemRadius*normal.x);
-				glTexCoord2f (1., 0.);
-				glVertex3f (itemRadius*normal.z, 0.0, -itemRadius*normal.x);
-				glTexCoord2f (1., 1.);
-				glVertex3f (itemRadius*normal.z, itemHeight, -itemRadius*normal.x);
-				glTexCoord2f (0., 1.);
-				glVertex3f (-itemRadius*normal.z, itemHeight, itemRadius*normal.x);
-	    	glEnd();
-        glPopMatrix();
+		itemRadius = itemLocs[i].diam / 2;
+		itemHeight = itemLocs[i].height;
+
+		if (object_types[item_type].use_normal) {
+			normal = object_types[item_type].normal;
+		} else {
+//			normal = MakeVector (0, 0, 1);
+			normal = SubtractVectors (ctrl->viewpos, itemLocs[i].pt);
+			NormVector (&normal);
+		}
+
+		glNormal3f (normal.x, normal.y, normal.z);
+		normal.y = 0.0;
+		NormVector (&normal);
+
+		const GLfloat vtx[] = {
+			itemLocs[i].pt.x-itemRadius*normal.z, itemLocs[i].pt.y, itemLocs[i].pt.z+itemRadius*normal.x,
+			itemLocs[i].pt.x+itemRadius*normal.z, itemLocs[i].pt.y, itemLocs[i].pt.z-itemRadius*normal.x,
+			itemLocs[i].pt.x+itemRadius*normal.z, itemLocs[i].pt.y+itemHeight, itemLocs[i].pt.z-itemRadius*normal.x,
+			itemLocs[i].pt.x-itemRadius*normal.z, itemLocs[i].pt.y+itemHeight, itemLocs[i].pt.z+itemRadius*normal.x
+		};
+
+		glVertexPointer(3, GL_FLOAT, 0, vtx);
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     } 
+
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 } 
 
 
