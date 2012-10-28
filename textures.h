@@ -182,15 +182,8 @@ public:
 	bool BindTex (int idx);
 	bool BindTex (string name);
 
-	void DrawDirect (GLuint texid);
-	void Draw (int idx);
-	void Draw (string name);
-
-	void DrawDirect (GLuint texid, int x, int y, float size);
-	void Draw (int idx, int x, int y, float size);
-	void Draw (string name, int x, int y, float size);
-
 	void DrawDirect (GLuint texid, int x, int y, float width, float height);
+	void Draw (int idx, int x, int y, float size);
 	void Draw (int idx, int x, int y, int width, int height);
 	void Draw (string name, int x, int y, int width, int height);
 

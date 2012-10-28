@@ -470,52 +470,12 @@ bool CTexture::BindTex (string name) {
 
 // ---------------------------- Draw ----------------------------------
 
-void CTexture::DrawDirect (GLuint texid) {
-	GLint w, h;
+void CTexture::DrawDirect (GLuint texid, int x, int y, float width, float height) {
+	GLfloat top, bott, left, right;
 
 	glEnable (GL_TEXTURE_2D);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindTexture (GL_TEXTURE_2D, texid);
-
-	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
-
-	const GLfloat tex[] = { 0,0, 1,0, 1,1, 0,1 };
-	const GLfloat vtx[] = { 0,0, w,0, w,h, 0,h };
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
- 
-	glColor4f (1.0, 1.0, 1.0, 1.0);
-	glVertexPointer (2, GL_FLOAT, 0, vtx);
-	glTexCoordPointer (2, GL_FLOAT, 0, tex);
-	glDrawArrays (GL_TRIANGLE_FAN,0,4);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-}
-
-void CTexture::Draw (int idx) {
-	DrawDirect (TexID (idx));
-}
-
-void CTexture::Draw (string name) {
-	DrawDirect (TexID (name));
-}
-
-void CTexture::DrawDirect (GLuint texid, int x, int y, float size) {
-	GLint w, h;
-	GLfloat width, height, top, bott, left, right;
-
-	glEnable (GL_TEXTURE_2D);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBindTexture (GL_TEXTURE_2D, texid);
-
-	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
-
-	width  = w * size;
-	height = h * size;
 
 	if (forientation == OR_TOP) {
 		top = param.y_resolution - y;
@@ -549,65 +509,15 @@ void CTexture::DrawDirect (GLuint texid, int x, int y, float size) {
 }
 
 void CTexture::Draw (int idx, int x, int y, float size) {
-	DrawDirect (TexID (idx), x, y, size);
-}
-
-void CTexture::Draw (string name, int x, int y, float size) {
-	DrawDirect (TexID (name), x, y, size);
-}
-
-void CTexture::DrawDirect (GLuint texid, int x, int y, float width, float height) {
-	GLint w, h;
-	GLfloat top, bott, left, right;
-
-	glEnable (GL_TEXTURE_2D);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBindTexture (GL_TEXTURE_2D, texid);
-
-	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-	glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
-
-	if (forientation == OR_TOP) {
-		top = param.y_resolution - y;
-		bott = top - height;
-	} else {
-		bott = y;
-		top = bott + height;
-	}
-
-	left = (x >= 0 ? x : (param.x_resolution - width) / 2 );
-	right = left + width;
-
-	const GLfloat tex[] = { 0,0, 1,0, 1,1, 0,1 };
-	const GLfloat vtx[] = {
-		 left, bott,
-		right, bott,
-		right, top,
-		 left, top
-	};
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
- 
-	glColor4f (1.0, 1.0, 1.0, 1.0);
-	glVertexPointer (2, GL_FLOAT, 0, vtx);
-	glTexCoordPointer (2, GL_FLOAT, 0, tex);
-	glDrawArrays (GL_TRIANGLE_FAN,0,4);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	DrawDirect (TexID (idx), x, y, size * TexWidth (idx), size * TexHeight (idx) );
 }
 
 void CTexture::Draw (int idx, int x, int y, int width, int height) {
 	DrawDirect (TexID (idx), x, y, width, height);
 }
 
-void CTexture::Draw (string name, int x, int y, int width, int height) {
-	DrawDirect (TexID (name), x, y, width, height);
-}
-
 void CTexture::DrawDirectFrame (GLuint texid, int x, int y, double w, double h, int frame, TColor col) {
-    GLint ww = GLint (w);
+	GLint ww = GLint (w);
 	GLint hh = GLint (h);
 	GLint xx = x;
 	GLint yy = param.y_resolution - hh - y;
@@ -616,9 +526,6 @@ void CTexture::DrawDirectFrame (GLuint texid, int x, int y, double w, double h, 
 	glBindTexture (GL_TEXTURE_2D, texid);
 
 	if (frame > 0) {
-		if (w < 1) glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &ww);
-		if (h < 1) glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &hh);
-
 		const GLfloat vtx[] = {
 		    xx - frame, yy - frame,
 		    xx + ww + frame, yy - frame,
