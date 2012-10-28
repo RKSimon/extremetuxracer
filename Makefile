@@ -42,7 +42,8 @@ else
     LD = g++
     CFLAGS  = -Wall -Wextra -O2 -DOS_MAC -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype
     CFLAGS += -framework OpenGL
-    LDFLAGS = -framework Cocoa
+    LDFLAGS  = -framework Cocoa -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype 
+    LDFLAGS += -framework OpenGL
     OBJ += SDLMain.o
   else
     # ----------------- Linux (Default) -----------------------------------
@@ -57,7 +58,7 @@ else
 endif #Windows_NT
 
 $(BIN) : $(OBJ)
-	$(LD) -o $(BIN) $(OBJ) $(LDFLAGS) $(CFLAGS)
+	$(LD) -o $(BIN) $(OBJ) $(LDFLAGS)
 
 clean :
 	rm -f $(BIN) $(OBJ)
