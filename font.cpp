@@ -23,6 +23,10 @@ GNU General Public License for more details.
 #define USE_UNICODE true
 //#define USE_TEXTURE_FONT true
 
+#if defined(HAVE_GL_GLES1) || defined(HAVE_GL_GLES2)
+#define USE_TEXTURE_FONT true
+#endif
+
 // --------------------------------------------------------------------
 // First some common function used for textboxes and called by
 // CFont::MakeLineList. This bundle of functions generates
