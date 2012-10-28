@@ -85,7 +85,6 @@ void CCamera::Update (float timestep) {
 	glTranslatef (-xview, -yview, -zview);		
 }
 
-
 CGluCamera::CGluCamera () {
  	angle = 0.0;
 	distance = 3.0;
@@ -102,8 +101,47 @@ void CGluCamera::Update (double timestep) {
 	if (farther) distance += timestep * 100;
 	double xx = distance * sin (angle * M_PI / 180);
 	double zz = distance * sin ((90 - angle) * M_PI / 180);
+
+	double eyex = xx, eyey = 0.0, eyez = zz;
+	double centerx = 0.0, centery = 0.0, centerz = 0.0;
+	double upx = 0.0, upy = 1.0, upz = 0.0;
+
 	glLoadIdentity ();
-	gluLookAt (xx, 0, zz, 0, 0, 0, 0, 1, 0);
+#if 0
+	gluLookAt (eyex, eyey, eyez, centerx, centery, centerz, upx, upy, upz);
+#else
+	{
+		TVector3 c = MakeVector3( centerx, centery, centerz );
+		TVector3 e = MakeVector3( eyex, eyey, eyez );
+		TVector3 u = MakeVector3( upx, upy, upz );
+
+		TVector3 f = SubtractVectors( c, e );
+		NormVector( &f );
+
+		TVector3 s = CrossProduct( f, u );
+
+		GLfloat m[4][4];
+		m[0][0] = s.x;
+		m[1][0] = s.y;
+		m[2][0] = s.z;
+		m[3][0] = 0.0;
+		m[0][1] = u.x;
+		m[1][1] = u.y;
+		m[2][1] = u.z;
+		m[3][1] = 0.0;
+		m[0][2] = -f.x;
+		m[1][2] = -f.y;
+		m[2][2] = -f.z;
+		m[3][2] = 0.0;
+		m[0][3] = 0.0;
+		m[1][3] = 0.0;
+		m[2][3] = 0.0;
+		m[3][3] = 1.0;
+
+		glMultMatrixf(&m[0][0]);
+		glTranslatef(-eyex, -eyey, -eyez);
+	}
+#endif
 }
 
 // --------------------------------------------------------------------
