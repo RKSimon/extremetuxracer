@@ -647,6 +647,7 @@ void CTexture::DrawNumStr (const char *s, int x, int y, float size, TColor col) 
 #define SCREENSHOT_PROC 3
 
 void ScreenshotN () {
+#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
 	CImage image;
 	string path = param.screenshot_dir;
 	path += SEP;
@@ -681,5 +682,6 @@ void ScreenshotN () {
 			image.DisposeData ();
 			break;
 	}
+#endif
 } 
 
