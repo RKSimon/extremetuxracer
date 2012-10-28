@@ -135,8 +135,8 @@ void IntroTerm () {
 
 // -----------------------------------------------------------------------
 
-void IntroKeys (unsigned int key, bool special, bool release, int x, int y) {
-	CControl *ctrl = Players.GetCtrl (g_game.player_id);
+void IntroKeys (unsigned int /*key*/, bool /*special*/, bool release, int /*x*/, int /*y*/) {
+    CControl *ctrl = Players.GetCtrl (g_game.player_id);
     if (release) return;
     abort_intro (ctrl);
 }

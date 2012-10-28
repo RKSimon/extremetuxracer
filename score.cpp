@@ -199,7 +199,7 @@ static TCourse *CourseList;
 static int lastCourse = 0;
 static int curr_course = 0;
 
-void ChangeScoreSelection (int focus, int dir) {
+void ChangeScoreSelection (int /*focus*/, int dir) {
 	if (dir == 0) {
 		if (curr_course > 0) curr_course--;
 	} else {
@@ -208,7 +208,7 @@ void ChangeScoreSelection (int focus, int dir) {
 }
 
 static TScore aaa;
-void ScoreKeys (unsigned int key, bool special, bool release, int x, int y) {
+void ScoreKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
 	if (release) return;
 	switch (key) {
 		case 27: Winsys.SetMode (GAME_TYPE_SELECT); break;
@@ -223,7 +223,7 @@ void ScoreKeys (unsigned int key, bool special, bool release, int x, int y) {
 	}
 }
 
-void ScoreMouseFunc (int button, int state, int x, int y) {
+void ScoreMouseFunc (int /*button*/, int state, int x, int y) {
 	int foc, dir;
 	if (state == 1) {
 		GetFocus (x, y, &foc, &dir);

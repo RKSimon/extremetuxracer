@@ -866,7 +866,7 @@ void CCurtain::CurtainVec (float angle, float zdist, float &x, float &z) {
 	else z = -sqrt (zdist * zdist - x * x);
 }
 
-void CCurtain::Draw (CControl *ctrl) {
+void CCurtain::Draw (CControl* /*ctrl*/) {
     TVector3 *pt;
 
 	if (g_game.snow_id < 1) return;
@@ -1260,7 +1260,7 @@ void InitWind () {
 	Wind.Init (g_game.wind_id);
 }
 
-void UpdateWind (double timestep, CControl *ctrl) {
+void UpdateWind (double timestep, CControl* /*ctrl*/) {
 	Wind.Update (timestep);
 }
 

@@ -471,7 +471,7 @@ void ChangeLanguage (int val) {
 	paramchanged = true; 
 }
 
-void GameConfigKeys (unsigned int key, bool special, bool release, int x, int y) {
+void GameConfigKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
     if (release) return;
 	switch (key) {
 		case SDLK_q: Winsys.Quit (); break;
@@ -526,7 +526,7 @@ void ChangeConfigSelection (int focus, int dir) {
 	}
 }
 
-void GameConfigMouseFunc (int button, int state, int x, int y) {
+void GameConfigMouseFunc (int /*button*/, int state, int x, int y) {
 	int focus, dr;
 	if (state == 1) {
 		GetFocus (x, y, &focus, &dr);

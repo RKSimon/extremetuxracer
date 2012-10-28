@@ -24,11 +24,11 @@ ifeq ($(OS),Windows_NT)
     LD = g++
 
     # ----------------- Windows with mingw --------------------------------
-    CFLAGS = -Wall -O2 -DOS_WIN32_MINGW -mwindows -I/usr/include -I/usr/include/freetype2
+    CFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -mwindows -I/usr/include -I/usr/include/freetype2
     LDFLAGS = -L/usr/lib -lopengl32 -lGLU32 -lSDL -lSDL_image -lSDL_mixer -lfreetype
 
     # ----------------- Windows, erins mingw environment ;-) --------------
-    # CFLAGS = -Wall -O2 -DOS_WIN32_MINGW -Ic:/mingw/include/freetype2
+    # CFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -Ic:/mingw/include/freetype2
     # LDFLAGS = -Lc:/mingw/lib/sdl -lmingw32 -mwindows -lSDLmain -lSDL -lopengl32 -lglu32 \
     # -l:SDL_image.lib -l:SDL_mixer.lib -lfreetype
   endif #SystemRoot
@@ -39,14 +39,14 @@ else
     # ----------------- MAC OS --------------------------------------------
     CC = g++
     LD = g++
-    CFLAGS = -Wall -O2 -DOS_MAC -framework OpenGL -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype
+    CFLAGS = -Wall -Wextra -O2 -DOS_MAC -framework OpenGL -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype
     LDFLAGS = -framework Cocoa
     OBJ += SDLMain.o
   else
     # ----------------- Linux (Default) -----------------------------------
     CC ?= g++
     LD ?= g++
-    CFLAGS = -Wall -O2 -DOS_LINUX -I/usr/include/freetype2
+    CFLAGS = -Wall -Wextra -O2 -DOS_LINUX -I/usr/include/freetype2
     LDFLAGS = -lGL -lGLU -lSDL -lSDL_image -lSDL_mixer -lfreetype 
   endif #Darwin
 endif #Windows_NT

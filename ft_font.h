@@ -610,7 +610,7 @@ class FTGL_EXPORT FTFont {
         FT_Encoding* CharMapList();
         virtual bool FaceSize(const unsigned int size, const unsigned int res = 72);
         unsigned int FaceSize() const;
-        virtual void Depth(float depth){}
+        virtual void Depth(float /*depth*/){}
         float Ascender() const;
         float Descender() const;
         float LineHeight() const;

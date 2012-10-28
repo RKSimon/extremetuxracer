@@ -30,7 +30,7 @@ GNU General Public License for more details.
 #include "translation.h"
 #include "score.h"
 
-void SplashKeys (unsigned int key, bool special, bool release, int x, int y) {
+void SplashKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
 	if (release) return;
 	switch (key) {
 		case 27: Winsys.Quit (); break;
@@ -48,12 +48,12 @@ void SplashInit (void) {
 
 static string fontnam[6] = {"normal", "italic", "bold", "outline", "pc20", "pcoutline"};
 
-void SplashLoop (double timestep ){
+void SplashLoop (double /*timestep*/){
 	Music.Update ();    
 	check_gl_error();
-    ClearRenderContext ();
-    set_gl_options (GUI);
-    SetupGuiDisplay ();
+	ClearRenderContext ();
+	set_gl_options (GUI);
+	SetupGuiDisplay ();
 
 
 //	FT.SetFont ("normal");
