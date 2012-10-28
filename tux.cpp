@@ -732,10 +732,23 @@ void CCharShape::DrawShadowSphere (TMatrix mat) {
     twopi = M_PI * 2.0;
     d_theta = d_phi = M_PI / div;
 
+    GLfloat vtx[3*2*(div+4)];
+    GLfloat nrm[3*2*(div+4)];
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+
+    glVertexPointer(3, GL_FLOAT, 0, vtx);
+    glNormalPointer(GL_FLOAT, 0, nrm);
+
     for  (phi = 0.0; phi + eps < M_PI; phi += d_phi) {
 	double cos_theta, sin_theta;
 	double sin_phi, cos_phi;
 	double sin_phi_d_phi, cos_phi_d_phi;
+
+	int num_vertices = 0;
+	GLfloat *pvtx = vtx;
+	GLfloat *pnrm = nrm;
 
 	sin_phi = sin (phi);
 	cos_phi = cos (phi);
@@ -743,93 +756,106 @@ void CCharShape::DrawShadowSphere (TMatrix mat) {
 	cos_phi_d_phi = cos (phi + d_phi);
         
         if  (phi <= eps) {
-		glBegin (GL_TRIANGLE_FAN);
-			BuildShadowVertex (0., 0., 1., mat, &pt, &nml);
-			glNormal3f (nml.x, nml.y, nml.z);
-			glVertex3f (pt.x, pt.y, pt.z);
+		BuildShadowVertex (0., 0., 1., mat, &pt, &nml);
+		*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+		*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+		num_vertices++;
 
-			for  (theta = 0.0; theta + eps < twopi; theta += d_theta) {
-				sin_theta = sin (theta);
-				cos_theta = cos (theta);
+		for  (theta = 0.0; theta + eps < twopi; theta += d_theta) {
+			sin_theta = sin (theta);
+			cos_theta = cos (theta);
 
-				x = cos_theta * sin_phi_d_phi;
-				y = sin_theta * sin_phi_d_phi;
-				z = cos_phi_d_phi;
-				BuildShadowVertex (x, y, z, mat, &pt, &nml);
-				glNormal3f (nml.x, nml.y, nml.z);
-				glVertex3f (pt.x, pt.y, pt.z);
-			} 
-
-			x = sin_phi_d_phi;
-			y = 0.0;
+			x = cos_theta * sin_phi_d_phi;
+			y = sin_theta * sin_phi_d_phi;
 			z = cos_phi_d_phi;
 			BuildShadowVertex (x, y, z, mat, &pt, &nml);
-			glNormal3f (nml.x, nml.y, nml.z);
-			glVertex3f (pt.x, pt.y, pt.z);
-	        glEnd();
+			*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+			*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+			num_vertices++;
+		} 
+
+		x = sin_phi_d_phi;
+		y = 0.0;
+		z = cos_phi_d_phi;
+		BuildShadowVertex (x, y, z, mat, &pt, &nml);
+		*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+		*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+		num_vertices++;
+
+		glDrawArrays(GL_TRIANGLE_FAN, 0, num_vertices);
         } else if  (phi + d_phi + eps >= M_PI) {
-		glBegin (GL_TRIANGLE_FAN);
-			BuildShadowVertex (0., 0., -1., mat, &pt, &nml);
-			glNormal3f (nml.x, nml.y, nml.z);
-			glVertex3f (pt.x, pt.y, pt.z);
+		BuildShadowVertex (0., 0., -1., mat, &pt, &nml);
+		*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+		*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+		num_vertices++;
 
-			for  (theta = twopi; theta - eps > 0; theta -= d_theta) {
-				sin_theta = sin (theta);
-				cos_theta = cos (theta);
+		for  (theta = twopi; theta - eps > 0; theta -= d_theta) {
+			sin_theta = sin (theta);
+			cos_theta = cos (theta);
 
-				x = cos_theta * sin_phi;
-				y = sin_theta * sin_phi;
-				z = cos_phi;
-				BuildShadowVertex (x, y, z, mat, &pt, &nml);
-				glNormal3f (nml.x, nml.y, nml.z);
-				glVertex3f (pt.x, pt.y, pt.z);
-			}
- 
-			x = sin_phi;
-			y = 0.0;
+			x = cos_theta * sin_phi;
+			y = sin_theta * sin_phi;
 			z = cos_phi;
-
 			BuildShadowVertex (x, y, z, mat, &pt, &nml);
-			glNormal3f (nml.x, nml.y, nml.z);
-			glVertex3f (pt.x, pt.y, pt.z);
-		glEnd();
-        } else {
-		glBegin (GL_TRIANGLE_STRIP);
-			for (theta = 0.0; theta + eps < twopi; theta += d_theta) {
-				sin_theta = sin (theta);
-				cos_theta = cos (theta);
-
-				x = cos_theta * sin_phi;
-				y = sin_theta * sin_phi;
-				z = cos_phi;
-				BuildShadowVertex (x, y, z, mat, &pt, &nml);
-				glNormal3f (nml.x, nml.y, nml.z);
-				glVertex3f (pt.x, pt.y, pt.z);
-
-				x = cos_theta * sin_phi_d_phi;
-				y = sin_theta * sin_phi_d_phi;
-				z = cos_phi_d_phi;
-				BuildShadowVertex (x, y, z, mat, &pt, &nml);
-				glNormal3f (nml.x, nml.y, nml.z);
-				glVertex3f (pt.x, pt.y, pt.z);
-			}
+			*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+			*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+			num_vertices++;
+		}
  
-	                x = sin_phi;
-	                y = 0.0;
-	                z = cos_phi;
-			BuildShadowVertex (x, y, z, mat, &pt, &nml);
-			glNormal3f (nml.x, nml.y, nml.z);
-			glVertex3f (pt.x, pt.y, pt.z);
+		x = sin_phi;
+		y = 0.0;
+		z = cos_phi;
 
-			x = sin_phi_d_phi;
-			y = 0.0;
+		BuildShadowVertex (x, y, z, mat, &pt, &nml);
+		*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+		*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+		num_vertices++;
+
+		glDrawArrays(GL_TRIANGLE_FAN, 0, num_vertices);
+        } else {
+		for (theta = 0.0; theta + eps < twopi; theta += d_theta) {
+			sin_theta = sin (theta);
+			cos_theta = cos (theta);
+
+			x = cos_theta * sin_phi;
+			y = sin_theta * sin_phi;
+			z = cos_phi;
+			BuildShadowVertex (x, y, z, mat, &pt, &nml);
+			*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+			*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+			num_vertices++;
+
+			x = cos_theta * sin_phi_d_phi;
+			y = sin_theta * sin_phi_d_phi;
 			z = cos_phi_d_phi;
 			BuildShadowVertex (x, y, z, mat, &pt, &nml);
-			glNormal3f (nml.x, nml.y, nml.z);
-			glVertex3f (pt.x, pt.y, pt.z);
-		glEnd();
-        } 
+			*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+			*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+			num_vertices++;
+		}
+ 
+                x = sin_phi;
+                y = 0.0;
+                z = cos_phi;
+		BuildShadowVertex (x, y, z, mat, &pt, &nml);
+		*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+		*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+		num_vertices++;
+
+		x = sin_phi_d_phi;
+		y = 0.0;
+		z = cos_phi_d_phi;
+		BuildShadowVertex (x, y, z, mat, &pt, &nml);
+		*pnrm++ = nml.x; *pnrm++ = nml.y; *pnrm++ = nml.z;
+		*pvtx++ =  pt.x; *pvtx++ =  pt.y; *pvtx++ =  pt.z;
+		num_vertices++;
+
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, num_vertices);
+        }
     } 
+
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 } 
 
 void CCharShape::TraverseDagForShadow (TCharNode *node, TMatrix mat) {
