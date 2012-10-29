@@ -520,16 +520,10 @@ FTTextureGlyph::FTTextureGlyph (FT_GlyphSlot glyph, int id, int xOffset,
     destHeight = bitmap.rows;
     
     if (destWidth && destHeight) {
-        glPushClientAttrib (GL_CLIENT_PIXEL_STORE_BIT);
-        glPixelStorei (GL_UNPACK_LSB_FIRST, GL_FALSE);
-        glPixelStorei (GL_UNPACK_ROW_LENGTH, 0);
         glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-
         glBindTexture (GL_TEXTURE_2D, glTextureID);
         glTexSubImage2D (GL_TEXTURE_2D, 0, xOffset, yOffset, 
 			destWidth, destHeight, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
-
-        glPopClientAttrib();
     }
 
     uv[0].X (static_cast<float>(xOffset) / static_cast<float>(width));
@@ -701,22 +695,54 @@ bool FTGLTextureFont::FaceSize (const unsigned int size, const unsigned int res)
     return FTFont::FaceSize (size, res);
 }
 
-void FTGLTextureFont::Render (const char* string) {   
-    glPushAttrib (GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
-    glEnable(GL_BLEND);
+void FTGLTextureFont::Render (const char* string) {
+    // pre render    
+    GLint blend_src = 0;
+    GLint blend_dst = 0;
+    bool blend_wasEnabled = glIsEnabled(GL_BLEND);
+    if (blend_wasEnabled) {
+	glGetIntegerv(GL_BLEND_SRC, &blend_src);
+	glGetIntegerv(GL_BLEND_DST, &blend_dst);
+    } else {
+	glEnable(GL_BLEND);
+    }
+
+    // render
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // GL_ONE
     FTTextureGlyph::ResetActiveTexture();
     FTFont::Render (string);
-    glPopAttrib();
+
+    // post render
+    if (blend_wasEnabled) {
+	glBlendFunc (blend_src, blend_dst);
+    } else {
+	glDisable(GL_BLEND);
+    }
 }
 
 void FTGLTextureFont::Render (const wchar_t* string) {   
-    glPushAttrib (GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
-    glEnable(GL_BLEND);
+    // pre render    
+    GLint blend_src = 0;
+    GLint blend_dst = 0;
+    bool blend_wasEnabled = glIsEnabled(GL_BLEND);
+    if (blend_wasEnabled) {
+	glGetIntegerv(GL_BLEND_SRC, &blend_src);
+	glGetIntegerv(GL_BLEND_DST, &blend_dst);
+    } else {
+	glEnable(GL_BLEND);
+    }
+
+    // render
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // GL_ONE
     FTTextureGlyph::ResetActiveTexture();
     FTFont::Render (string);
-    glPopAttrib();
+
+    // post render
+    if (blend_wasEnabled) {
+	glBlendFunc (blend_src, blend_dst);
+    } else {
+	glDisable(GL_BLEND);
+    }
 }
 
 // --------------------------------------------------------------------
