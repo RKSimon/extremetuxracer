@@ -732,8 +732,8 @@ void CCharShape::DrawShadowSphere (TMatrix mat) {
     twopi = M_PI * 2.0;
     d_theta = d_phi = M_PI / div;
 
-    GLfloat vtx[3*2*(div+4)];
-    GLfloat nrm[3*2*(div+4)];
+    GLfloat* vtx = (GLfloat*) alloca(3*2*(div+4)*sizeof(GLfloat));
+    GLfloat* nrm = (GLfloat*) alloca(3*2*(div+4)*sizeof(GLfloat));
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);

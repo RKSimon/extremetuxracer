@@ -143,9 +143,9 @@ void DrawTrackmarks (void) {
 			glTexCoordPointer(2, GL_FLOAT, 0, tex);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 		} else {
-			GLfloat tex[2*(2+2*num_quads)];
-			GLfloat nrm[3*(2+2*num_quads)];
-			GLfloat vtx[3*(2+2*num_quads)];
+			GLfloat* tex = (GLfloat*) alloca(2*(2+2*num_quads)*sizeof(GLfloat));
+			GLfloat* nrm = (GLfloat*) alloca(3*(2+2*num_quads)*sizeof(GLfloat));
+			GLfloat* vtx = (GLfloat*) alloca(3*(2+2*num_quads)*sizeof(GLfloat));
 			GLfloat* ptex = tex;
 			GLfloat* pnrm = nrm;
 			GLfloat* pvtx = vtx;

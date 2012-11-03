@@ -131,7 +131,7 @@ void draw_partial_tri_fan (double fraction) {
     int divs = (int)((SPEEDBAR_BASE_ANGLE - angle) * CIRCLE_DIVISIONS / 360.0);
 
     int num_vertices = 0;
-    GLfloat vtx[ 2 * ( divs + 4 ) ];
+    GLfloat* vtx = (GLfloat*) alloca(2*(divs+4)*sizeof(GLfloat));
     GLfloat *pvtx = vtx;
 
     // start tri fan
