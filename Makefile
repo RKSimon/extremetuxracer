@@ -1,35 +1,28 @@
 # This universal Makefile is prepared for different platforms. 
 
-BIN = etr
-OBJ = main.o game_config.o ogl.o tux.o audio.o winsys.o \
-particles.o mathlib.o splash_screen.o intro.o racing.o \
-game_over.o paused.o reset.o game_type_select.o event_select.o \
-race_select.o credits.o loading.o course.o keyframe.o env.o event.o \
-spx.o common.o course_render.o game_ctrl.o physics.o \
-track_marks.o hud.o view.o gui.o translation.o tools.o \
-quadtree.o font.o ft_font.o textures.o help.o regist.o tool_frame.o \
-tool_char.o newplayer.o score.o ogl_test.o
-
+# Platform Specific Settings
 ifeq ($(OS),Windows_NT)
   ifdef SystemRoot
     # ----------------- Windows native ------------------------------------
-    # CFLAGS = -Wall -O2 -DOS_WIN32_NATIVE .....
+    # CXXFLAGS = -Wall -O2 -DOS_WIN32_NATIVE .....
     # LDFLAGS = .....
+    # OBJ_EXT = o
 
     # ----------------- Windows with Microsoft compiler -------------------
-    # CFLAGS = -Wall -O2 -DOS_WIN32_MSC .....
+    # CXXFLAGS = -Wall -O2 -DOS_WIN32_MSC .....
     # LDFLAGS = .....
   else
-    CC = g++
-    LD = g++
+    CXX ?= g++
+    LD = $(CXX)
+    OBJ_EXT = o
 
     # ----------------- Windows with mingw --------------------------------
-    CFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -mwindows -I/usr/include -I/usr/include/freetype2
+    CXXFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -mwindows -I/usr/include -I/usr/include/freetype2
     LDFLAGS  = -L/usr/lib -lSDL -lSDL_image -lSDL_mixer -lfreetype
     LDFLAGS += -lopengl32 -lGLU32
 
     # ----------------- Windows, erins mingw environment ;-) --------------
-    # CFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -Ic:/mingw/include/freetype2
+    # CXXFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -Ic:/mingw/include/freetype2
     # LDFLAGS = -Lc:/mingw/lib/sdl -lmingw32 -mwindows -lSDLmain -lSDL -lopengl32 -lglu32 \
     # -l:SDL_image.lib -l:SDL_mixer.lib -lfreetype
   endif #SystemRoot
@@ -38,25 +31,41 @@ else
 
   ifeq ($(UNAME), Darwin)
     # ----------------- MAC OS --------------------------------------------
-    CC = g++
-    LD = g++
-    CFLAGS  = -Wall -Wextra -O2 -DOS_MAC -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype
-    CFLAGS += -framework OpenGL
+    CXX ?= g++
+    LD = $(CXX)
+    OBJ_EXT = o
+
+    CXXFLAGS  = -Wall -Wextra -O2 -DOS_MAC -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype
+    CXXFLAGS += -framework OpenGL
     LDFLAGS  = -framework Cocoa -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype 
     LDFLAGS += -framework OpenGL
-    OBJ += SDLMain.o
+    OBJ += SDLMain.$(OBJ_EXT)
   else
     # ----------------- Linux (Default) -----------------------------------
-    CC ?= g++
-    LD ?= g++
-    CFLAGS  = -Wall -Wextra -O2 -DOS_LINUX -I/usr/include/freetype2
-    #CFLAGS += -DHAVE_GL_GLES1 -I/usr/lib/pvr-omap4-egl/include
+    CXX ?= g++
+    LD = $(CXX)
+    OBJ_EXT = o
+
+    CXXFLAGS  = -Wall -Wextra -O2 -DOS_LINUX -I/usr/include/freetype2
+    #CXXFLAGS += -DHAVE_GL_GLES1 -I/usr/lib/pvr-omap4-egl/include
     LDFLAGS  = -lSDL -lSDL_image -lSDL_mixer -lfreetype 
     LDFLAGS += -lGL -lGLU
     #LDFLAGS += -L/usr/lib/pvr-omap4-egl -lGLESv1_CM
   endif #Darwin
 endif #Windows_NT
 
+# Targets
+BIN = etr
+OBJ += main.$(OBJ_EXT) game_config.$(OBJ_EXT) ogl.$(OBJ_EXT) tux.$(OBJ_EXT) audio.$(OBJ_EXT) \
+winsys.$(OBJ_EXT) particles.$(OBJ_EXT) mathlib.$(OBJ_EXT) splash_screen.$(OBJ_EXT) intro.$(OBJ_EXT) racing.$(OBJ_EXT) \
+game_over.$(OBJ_EXT) paused.$(OBJ_EXT) reset.$(OBJ_EXT) game_type_select.$(OBJ_EXT) event_select.$(OBJ_EXT) \
+race_select.$(OBJ_EXT) credits.$(OBJ_EXT) loading.$(OBJ_EXT) course.$(OBJ_EXT) keyframe.$(OBJ_EXT) env.$(OBJ_EXT) \
+event.$(OBJ_EXT) spx.$(OBJ_EXT) common.$(OBJ_EXT) course_render.$(OBJ_EXT) game_ctrl.$(OBJ_EXT) physics.$(OBJ_EXT) \
+track_marks.$(OBJ_EXT) hud.$(OBJ_EXT) view.$(OBJ_EXT) gui.$(OBJ_EXT) translation.$(OBJ_EXT) tools.$(OBJ_EXT) \
+quadtree.$(OBJ_EXT) font.$(OBJ_EXT) ft_font.$(OBJ_EXT) textures.$(OBJ_EXT) help.$(OBJ_EXT) regist.$(OBJ_EXT) \
+tool_frame.$(OBJ_EXT) tool_char.$(OBJ_EXT) newplayer.$(OBJ_EXT) score.$(OBJ_EXT) ogl_test.$(OBJ_EXT)
+
+# Rules
 $(BIN) : $(OBJ)
 	$(LD) -o $(BIN) $(OBJ) $(LDFLAGS)
 
@@ -65,146 +74,146 @@ clean :
 
 # use this template and rename it if you want to add a module
 
-# mmmm.o : mmmm.cpp mmmm.h
-#	$(CC) -c mmmm.cpp $(CFLAGS)
+# mmmm.$(OBJ_EXT) : mmmm.cpp mmmm.h
+#	$(CXX) -c mmmm.cpp $(CXXFLAGS)
 
 # MAC OS
-SDLMain.o : SDLMain.m SDLMain.h
-	$(CC) -c SDLMain.m
+SDLMain.$(OBJ_EXT) : SDLMain.m SDLMain.h
+	$(CXX) -c SDLMain.m
 
 # General
-ogl_test.o : ogl_test.cpp ogl_test.h
-	$(CC) -c ogl_test.cpp $(CFLAGS)
+ogl_test.$(OBJ_EXT) : ogl_test.cpp ogl_test.h
+	$(CXX) -c ogl_test.cpp $(CXXFLAGS)
 
-score.o : score.cpp score.h
-	$(CC) -c score.cpp $(CFLAGS)
+score.$(OBJ_EXT) : score.cpp score.h
+	$(CXX) -c score.cpp $(CXXFLAGS)
 
-newplayer.o : newplayer.cpp newplayer.h
-	$(CC) -c newplayer.cpp $(CFLAGS)
+newplayer.$(OBJ_EXT) : newplayer.cpp newplayer.h
+	$(CXX) -c newplayer.cpp $(CXXFLAGS)
 
-tool_char.o : tool_char.cpp tool_char.h
-	$(CC) -c tool_char.cpp $(CFLAGS)
+tool_char.$(OBJ_EXT) : tool_char.cpp tool_char.h
+	$(CXX) -c tool_char.cpp $(CXXFLAGS)
 
-tool_frame.o : tool_frame.cpp tool_frame.h
-	$(CC) -c tool_frame.cpp $(CFLAGS)
+tool_frame.$(OBJ_EXT) : tool_frame.cpp tool_frame.h
+	$(CXX) -c tool_frame.cpp $(CXXFLAGS)
 
-regist.o : regist.cpp regist.h
-	$(CC) -c regist.cpp $(CFLAGS)
+regist.$(OBJ_EXT) : regist.cpp regist.h
+	$(CXX) -c regist.cpp $(CXXFLAGS)
 
-tools.o : tools.cpp tools.h
-	$(CC) -c tools.cpp $(CFLAGS)
+tools.$(OBJ_EXT) : tools.cpp tools.h
+	$(CXX) -c tools.cpp $(CXXFLAGS)
 
-help.o : help.cpp help.h
-	$(CC) -c help.cpp $(CFLAGS)
+help.$(OBJ_EXT) : help.cpp help.h
+	$(CXX) -c help.cpp $(CXXFLAGS)
 
-translation.o : translation.cpp translation.h
-	$(CC) -c translation.cpp $(CFLAGS)
+translation.$(OBJ_EXT) : translation.cpp translation.h
+	$(CXX) -c translation.cpp $(CXXFLAGS)
 
-physics.o : physics.cpp physics.h
-	$(CC) -c physics.cpp $(CFLAGS)
+physics.$(OBJ_EXT) : physics.cpp physics.h
+	$(CXX) -c physics.cpp $(CXXFLAGS)
 
-winsys.o : winsys.cpp winsys.h
-	$(CC) -c winsys.cpp $(CFLAGS)
+winsys.$(OBJ_EXT) : winsys.cpp winsys.h
+	$(CXX) -c winsys.cpp $(CXXFLAGS)
 
-game_ctrl.o : game_ctrl.cpp game_ctrl.h
-	$(CC) -c game_ctrl.cpp $(CFLAGS)
+game_ctrl.$(OBJ_EXT) : game_ctrl.cpp game_ctrl.h
+	$(CXX) -c game_ctrl.cpp $(CXXFLAGS)
 
-textures.o : textures.cpp textures.h
-	$(CC) -c textures.cpp $(CFLAGS)
+textures.$(OBJ_EXT) : textures.cpp textures.h
+	$(CXX) -c textures.cpp $(CXXFLAGS)
 
-ft_font.o : ft_font.cpp ft_font.h
-	$(CC) -c ft_font.cpp $(CFLAGS)
+ft_font.$(OBJ_EXT) : ft_font.cpp ft_font.h
+	$(CXX) -c ft_font.cpp $(CXXFLAGS)
 
-font.o : font.cpp font.h
-	$(CC) -c font.cpp $(CFLAGS)
+font.$(OBJ_EXT) : font.cpp font.h
+	$(CXX) -c font.cpp $(CXXFLAGS)
 
-event.o : event.cpp event.h
-	$(CC) -c event.cpp $(CFLAGS)
+event.$(OBJ_EXT) : event.cpp event.h
+	$(CXX) -c event.cpp $(CXXFLAGS)
 
-gui.o : gui.cpp gui.h
-	$(CC) -c gui.cpp $(CFLAGS)
+gui.$(OBJ_EXT) : gui.cpp gui.h
+	$(CXX) -c gui.cpp $(CXXFLAGS)
 
-common.o : common.cpp common.h
-	$(CC) -c common.cpp $(CFLAGS)
+common.$(OBJ_EXT) : common.cpp common.h
+	$(CXX) -c common.cpp $(CXXFLAGS)
 
-spx.o : spx.cpp spx.h
-	$(CC) -c spx.cpp $(CFLAGS)
+spx.$(OBJ_EXT) : spx.cpp spx.h
+	$(CXX) -c spx.cpp $(CXXFLAGS)
 
-quadtree.o : quadtree.cpp quadtree.h
-	$(CC) -c quadtree.cpp $(CFLAGS)
+quadtree.$(OBJ_EXT) : quadtree.cpp quadtree.h
+	$(CXX) -c quadtree.cpp $(CXXFLAGS)
 
-view.o : view.cpp view.h
-	$(CC) -c view.cpp $(CFLAGS)
+view.$(OBJ_EXT) : view.cpp view.h
+	$(CXX) -c view.cpp $(CXXFLAGS)
 
-hud.o : hud.cpp hud.h
-	$(CC) -c hud.cpp $(CFLAGS)
+hud.$(OBJ_EXT) : hud.cpp hud.h
+	$(CXX) -c hud.cpp $(CXXFLAGS)
 
-track_marks.o : track_marks.cpp track_marks.h
-	$(CC) -c track_marks.cpp $(CFLAGS)
+track_marks.$(OBJ_EXT) : track_marks.cpp track_marks.h
+	$(CXX) -c track_marks.cpp $(CXXFLAGS)
 
-course_render.o : course_render.cpp course_render.h
-	$(CC) -c course_render.cpp $(CFLAGS)
+course_render.$(OBJ_EXT) : course_render.cpp course_render.h
+	$(CXX) -c course_render.cpp $(CXXFLAGS)
 
-env.o : env.cpp env.h
-	$(CC) -c env.cpp $(CFLAGS)
+env.$(OBJ_EXT) : env.cpp env.h
+	$(CXX) -c env.cpp $(CXXFLAGS)
 
-keyframe.o : keyframe.cpp keyframe.h
-	$(CC) -c keyframe.cpp $(CFLAGS)
+keyframe.$(OBJ_EXT) : keyframe.cpp keyframe.h
+	$(CXX) -c keyframe.cpp $(CXXFLAGS)
 
-course.o : course.cpp course.h
-	$(CC) -c course.cpp $(CFLAGS)
+course.$(OBJ_EXT) : course.cpp course.h
+	$(CXX) -c course.cpp $(CXXFLAGS)
 
-loading.o : loading.cpp loading.h
-	$(CC) -c loading.cpp $(CFLAGS)
+loading.$(OBJ_EXT) : loading.cpp loading.h
+	$(CXX) -c loading.cpp $(CXXFLAGS)
 
-credits.o : credits.cpp credits.h
-	$(CC) -c credits.cpp $(CFLAGS)
+credits.$(OBJ_EXT) : credits.cpp credits.h
+	$(CXX) -c credits.cpp $(CXXFLAGS)
 
-race_select.o : race_select.cpp race_select.h
-	$(CC) -c race_select.cpp $(CFLAGS)
+race_select.$(OBJ_EXT) : race_select.cpp race_select.h
+	$(CXX) -c race_select.cpp $(CXXFLAGS)
 
-event_select.o : event_select.cpp event_select.h
-	$(CC) -c event_select.cpp $(CFLAGS)
+event_select.$(OBJ_EXT) : event_select.cpp event_select.h
+	$(CXX) -c event_select.cpp $(CXXFLAGS)
 
-game_type_select.o : game_type_select.cpp game_type_select.h
-	$(CC) -c game_type_select.cpp $(CFLAGS)
+game_type_select.$(OBJ_EXT) : game_type_select.cpp game_type_select.h
+	$(CXX) -c game_type_select.cpp $(CXXFLAGS)
 
-game_over.o : game_over.cpp game_over.h
-	$(CC) -c game_over.cpp $(CFLAGS)
+game_over.$(OBJ_EXT) : game_over.cpp game_over.h
+	$(CXX) -c game_over.cpp $(CXXFLAGS)
 
-paused.o : paused.cpp paused.h
-	$(CC) -c paused.cpp $(CFLAGS)
+paused.$(OBJ_EXT) : paused.cpp paused.h
+	$(CXX) -c paused.cpp $(CXXFLAGS)
 
-reset.o : reset.cpp reset.h
-	$(CC) -c reset.cpp $(CFLAGS)
+reset.$(OBJ_EXT) : reset.cpp reset.h
+	$(CXX) -c reset.cpp $(CXXFLAGS)
 
-racing.o : racing.cpp racing.h
-	$(CC) -c racing.cpp $(CFLAGS)
+racing.$(OBJ_EXT) : racing.cpp racing.h
+	$(CXX) -c racing.cpp $(CXXFLAGS)
 
-intro.o : intro.cpp intro.h
-	$(CC) -c intro.cpp $(CFLAGS)
+intro.$(OBJ_EXT) : intro.cpp intro.h
+	$(CXX) -c intro.cpp $(CXXFLAGS)
 
-splash_screen.o : splash_screen.cpp splash_screen.h
-	$(CC) -c splash_screen.cpp $(CFLAGS)
+splash_screen.$(OBJ_EXT) : splash_screen.cpp splash_screen.h
+	$(CXX) -c splash_screen.cpp $(CXXFLAGS)
 
-mathlib.o : mathlib.cpp mathlib.h
-	$(CC) -c mathlib.cpp $(CFLAGS)
+mathlib.$(OBJ_EXT) : mathlib.cpp mathlib.h
+	$(CXX) -c mathlib.cpp $(CXXFLAGS)
 
-particles.o : particles.cpp particles.h
-	$(CC) -c particles.cpp $(CFLAGS)
+particles.$(OBJ_EXT) : particles.cpp particles.h
+	$(CXX) -c particles.cpp $(CXXFLAGS)
 
-audio.o : audio.cpp audio.h
-	$(CC) -c audio.cpp $(CFLAGS)
+audio.$(OBJ_EXT) : audio.cpp audio.h
+	$(CXX) -c audio.cpp $(CXXFLAGS)
 
-tux.o : tux.cpp tux.h
-	$(CC) -c tux.cpp $(CFLAGS)
+tux.$(OBJ_EXT) : tux.cpp tux.h
+	$(CXX) -c tux.cpp $(CXXFLAGS)
 
-ogl.o : ogl.cpp ogl.h
-	$(CC) -c ogl.cpp $(CFLAGS)
+ogl.$(OBJ_EXT) : ogl.cpp ogl.h
+	$(CXX) -c ogl.cpp $(CXXFLAGS)
 
-game_config.o : game_config.cpp game_config.h
-	$(CC) -c game_config.cpp $(CFLAGS)
+game_config.$(OBJ_EXT) : game_config.cpp game_config.h
+	$(CXX) -c game_config.cpp $(CXXFLAGS)
 
-main.o : main.cpp bh.h etr_types.h
-	$(CC) -c main.cpp $(CFLAGS)
+main.$(OBJ_EXT) : main.cpp bh.h etr_types.h
+	$(CXX) -c main.cpp $(CXXFLAGS)
 
