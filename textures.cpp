@@ -377,7 +377,7 @@ int CTexture::LoadMipmapTexture (const char *filename, bool repeatable, GLuint *
 	if (width) *width = texImage.nx;
 	if (height) *height = texImage.ny;
 
-#if defined(GL_VERSION_1_4) && GL_VERSION_1_4
+#if defined(HAVE_GL_GLES1) || (defined(GL_VERSION_1_4) && GL_VERSION_1_4)
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D
 		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
