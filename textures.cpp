@@ -327,13 +327,12 @@ int CTexture::LoadTexture (const char *filename, GLuint *width, GLuint *height) 
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 4); 
 	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
 
 	GLenum format = (texImage.depth == 3 ? GL_RGB : GL_RGBA);
 	if (width) *width = texImage.nx;
 	if (height) *height = texImage.ny;
-
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
 
 	glTexImage2D 
 		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
@@ -371,17 +370,24 @@ int CTexture::LoadMipmapTexture (const char *filename, bool repeatable, GLuint *
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	}
 
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
+
 	GLenum format = (texImage.depth == 3 ? GL_RGB : GL_RGBA);
 	if (width) *width = texImage.nx;
 	if (height) *height = texImage.ny;
 
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
-
+#if defined(GL_VERSION_1_4) && GL_VERSION_1_4
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D
+		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
+		texImage.ny, 0, format, GL_UNSIGNED_BYTE, texImage.data);
+#else
 	gluBuild2DMipmaps 
 		(GL_TEXTURE_2D, texImage.depth, texImage.nx,
 		texImage.ny, format, GL_UNSIGNED_BYTE, texImage.data);
-	
+#endif	
+
 	texImage.DisposeData();
 	return texid;    
 }
