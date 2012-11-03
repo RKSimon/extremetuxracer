@@ -23,7 +23,7 @@ GNU General Public License for more details.
 #define USE_UNICODE true
 //#define USE_TEXTURE_FONT true
 
-#if defined(HAVE_GL_GLES1) || defined(HAVE_GL_GLES2)
+#if defined(HAVE_GL_GLES1)
 #define USE_TEXTURE_FONT true
 #endif
 

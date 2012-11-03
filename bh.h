@@ -33,7 +33,6 @@ GNU General Public License for more details.
 #define HAVE_GL_GLEXT_H 
 #define HAVE_GL_GLX_H 
 //#define HAVE_GL_GLES1
-//#define HAVE_GL_GLES2
 #define HAVE_SYS_TIME_H 
 #define USE_STENCIL_BUFFER
 
@@ -99,10 +98,6 @@ GNU General Public License for more details.
 	#include <GL/glext.h>
 #elif defined ( HAVE_GL_GLES1 )
 	#include <GLES/gl.h>
-	//#include <GL/glu.h>
-#elif defined ( HAVE_GL_GLES2 )
-	#include <GLES2/gl2.h>
-	//#include <GL/glu.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glu.h>
@@ -134,7 +129,7 @@ GNU General Public License for more details.
 //			GLES -> GL conversion
 // --------------------------------------------------------------------
 
-#if defined ( HAVE_GL_GLES1 ) || defined ( HAVE_GL_GLES2 )
+#if defined ( HAVE_GL_GLES1 )
 	#define GL_CLAMP        GL_CLAMP_TO_EDGE
 	#define glOrtho         glOrthof
 	#define glFrustum       glFrustumf

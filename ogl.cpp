@@ -29,7 +29,7 @@ gl_value_t gl_values[] = {
     { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_SHORT },
     { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_SHORT },
     { "max texture size", GL_MAX_TEXTURE_SIZE, GL_SHORT },
-#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2)
+#if !defined(HAVE_GL_GLES1)
     { "double buffering", GL_DOUBLEBUFFER, GL_UNSIGNED_BYTE },
 #endif
     { "red bits", GL_RED_BITS, GL_SHORT },

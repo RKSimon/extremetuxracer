@@ -105,7 +105,7 @@ bool CImage::LoadPng (const char *dir, const char *filename, bool mirroring) {
 
 // ------------------ read framebuffer --------------------------------
 
-#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
+#if !defined(HAVE_GL_GLES1) // TODO
 bool CImage::ReadFrameBuffer_PPM () {
 	int viewport[4];
 	glGetIntegerv (GL_VIEWPORT, viewport);
@@ -128,7 +128,7 @@ bool CImage::ReadFrameBuffer_PPM () {
 }
 #endif
 
-#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
+#if !defined(HAVE_GL_GLES1) // TODO
 void CImage::ReadFrameBuffer_TGA () {
 	nx = param.x_resolution;
 	ny = param.y_resolution;
@@ -142,7 +142,7 @@ void CImage::ReadFrameBuffer_TGA () {
 }
 #endif
 
-#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
+#if !defined(HAVE_GL_GLES1) //TODO
 void CImage::ReadFrameBuffer_BMP () {
 	nx = param.x_resolution;
 	ny = param.y_resolution;
@@ -653,7 +653,7 @@ void CTexture::DrawNumStr (const char *s, int x, int y, float size, TColor col) 
 #define SCREENSHOT_PROC 3
 
 void ScreenshotN () {
-#if !defined(HAVE_GL_GLES1) && !defined(HAVE_GL_GLES2) // TODO
+#if !defined(HAVE_GL_GLES1) // TODO
 	CImage image;
 	string path = param.screenshot_dir;
 	path += SEP;
