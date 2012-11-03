@@ -229,6 +229,10 @@ void CWinsys::PrintJoystickInfo () {
 	printf ("Joystick has %d ax%ss\n\n", num_axes, num_axes == 1 ? "i" : "e");
 }
 
+void CWinsys::SwapBuffers() {
+	SDL_GL_SwapBuffers();
+}
+
 // ------------ modes -------------------------------------------------
 
 void CWinsys::SetModeFuncs (

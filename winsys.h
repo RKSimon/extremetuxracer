@@ -88,7 +88,7 @@ public:
 	void SetFonttype ();
 	void PrintJoystickInfo ();
 	void ShowCursor (bool visible) {SDL_ShowCursor (visible);}
-	void SwapBuffers () {SDL_GL_SwapBuffers ();}
+	void SwapBuffers ();
 	void Quit ();
 	void InitJoystick ();
 	void CloseJoystick ();
