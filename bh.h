@@ -26,7 +26,6 @@ GNU General Public License for more details.
 #define HAVE_SDL_MIXER
 #define HAVE_SDL_IMAGE
 #define HAVE_SDL_JOYSTICK
-#define STDC_HEADERS 		
 #define TIME_WITH_SYS_TIME	
 #define HAVE_GETCWD 
 #define HAVE_GETTIMEOFDAY 
