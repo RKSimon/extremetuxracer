@@ -264,7 +264,7 @@ class FTGL_EXPORT FTCharToGlyphIndexMap {
             }
         }
 
-        const GlyphIndex find(CharacterCode c) {
+        GlyphIndex find(CharacterCode c) {
             if(!this->Indices) {return 0;}
         
             div_t pos = div(c, FTCharToGlyphIndexMap::BucketSize);
@@ -299,7 +299,7 @@ class FTGL_EXPORT FTCharToGlyphIndexMap {
 class FTGL_EXPORT FTLibrary {
 public:
     static const FTLibrary &Instance();
-    const FT_Library* const GetLibrary() const { return library;}
+    const FT_Library* GetLibrary() const { return library;}
     FT_Error Error() const { return err;}
     ~FTLibrary();
 private:
@@ -559,7 +559,7 @@ class FTGL_EXPORT FTGlyphContainer {
         bool CharMap(FT_Encoding encoding);
         unsigned int FontIndex(const unsigned int characterCode ) const;
         void Add(FTGlyph* glyph, const unsigned int characterCode);
-        const FTGlyph* const Glyph(const unsigned int characterCode) const;
+        const FTGlyph* Glyph(const unsigned int characterCode) const;
         FTBBox BBox(const unsigned int characterCode) const;
         float Advance(const unsigned int characterCode, const unsigned int nextCharacterCode);
         FTPoint Render(const unsigned int characterCode, 
