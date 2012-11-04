@@ -46,8 +46,13 @@ else
     LD = $(CXX)
     OBJ_EXT = o
 
-    CXXFLAGS  = -Wall -Wextra -O2 -DOS_LINUX -I/usr/include/freetype2
+    CXXFLAGS = -Wall -Wextra -O2 -DOS_LINUX -I/usr/include/freetype2
     LDFLAGS  = -lSDL -lSDL_image -lSDL_mixer -lfreetype 
+
+    ifdef PROFILE
+      CXXFLAGS += -pg
+      LDFLAGS += -pg
+    endif #PROFILE
 
     ifdef GLES
       CXXFLAGS += -DHAVE_GL_GLES1 -I/usr/lib/pvr-omap4-egl/include
