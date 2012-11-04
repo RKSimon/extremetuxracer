@@ -356,8 +356,8 @@ void set_gl_options (TRenderMode mode)
 		glDisable (GL_ALPHA_TEST);
         glEnable (GL_BLEND);
 		glDisable (GL_STENCIL_TEST);
-		glEnable (GL_TEXTURE_GEN_S);
-		glEnable (GL_TEXTURE_GEN_T);
+		glDisable (GL_TEXTURE_GEN_S);
+		glDisable (GL_TEXTURE_GEN_T);
 		glDisable (GL_COLOR_MATERIAL);
 		glDepthMask (GL_TRUE);
 		glShadeModel (GL_SMOOTH);

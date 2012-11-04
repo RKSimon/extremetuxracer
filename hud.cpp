@@ -132,20 +132,25 @@ void draw_partial_tri_fan (double fraction) {
 
     int num_vertices = 0;
     GLfloat* vtx = (GLfloat*) alloca(2*(divs+4)*sizeof(GLfloat));
+    GLfloat* tex = (GLfloat*) alloca(2*(divs+4)*sizeof(GLfloat));
     GLfloat *pvtx = vtx;
+    GLfloat *ptex = tex;
 
     // start tri fan
     *pvtx++ = ENERGY_GAUGE_CENTER_X; *pvtx++ = ENERGY_GAUGE_CENTER_Y;
+    *ptex++ = ENERGY_GAUGE_CENTER_X / GAUGE_IMG_SIZE; *ptex++ = ENERGY_GAUGE_CENTER_Y / GAUGE_IMG_SIZE;
     num_vertices++; 
 
     pt = calc_new_fan_pt (SPEEDBAR_BASE_ANGLE);
     *pvtx++ = pt.x; *pvtx++ = pt.y;
+    *ptex++ = pt.x / GAUGE_IMG_SIZE; *ptex++ = pt.y / GAUGE_IMG_SIZE;
     num_vertices++;
 
     for (i=0; i<divs; i++) {
 	cur_angle -= angle_incr;
 	pt = calc_new_fan_pt (cur_angle);
 	*pvtx++ = pt.x; *pvtx++ = pt.y;
+	*ptex++ = pt.x / GAUGE_IMG_SIZE; *ptex++ = pt.y / GAUGE_IMG_SIZE;
 	num_vertices++;
     }
 
@@ -153,32 +158,32 @@ void draw_partial_tri_fan (double fraction) {
 	cur_angle = angle;
 	pt = calc_new_fan_pt (cur_angle);
 	*pvtx++ = pt.x; *pvtx++ = pt.y;
+	*ptex++ = pt.x / GAUGE_IMG_SIZE; *ptex++ = pt.y / GAUGE_IMG_SIZE;
 	num_vertices++;
     }
 
     if  (num_vertices > 2) {
 	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, vtx);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, num_vertices);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
     }
 }
 
 void draw_gauge (double speed, double energy) {
-    GLfloat xplane[4] = {1.0 / GAUGE_IMG_SIZE, 0.0, 0.0, 0.0 };
-    GLfloat yplane[4] = {0.0, 1.0 / GAUGE_IMG_SIZE, 0.0, 0.0 };
     double y;
     double speedbar_frac;
 
     set_gl_options (GAUGE_BARS);
 
-	if (Tex.TexID (GAUGE_ENERGY) < 1) return;
-	if (Tex.TexID (GAUGE_SPEED) < 1) return;
-	if (Tex.TexID (GAUGE_OUTLINE) < 1) return;
+    if (Tex.TexID (GAUGE_ENERGY) < 1) return;
+    if (Tex.TexID (GAUGE_SPEED) < 1) return;
+    if (Tex.TexID (GAUGE_OUTLINE) < 1) return;
 	
-	Tex.BindTex (GAUGE_ENERGY);
-    glTexGenfv (GL_S, GL_OBJECT_PLANE, xplane);
-    glTexGenfv (GL_T, GL_OBJECT_PLANE, yplane);
+    Tex.BindTex (GAUGE_ENERGY);
 
     glPushMatrix();
 	glTranslatef (param.x_resolution - GAUGE_WIDTH, 0, 0);
@@ -186,6 +191,7 @@ void draw_gauge (double speed, double energy) {
 	y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
 
 	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	const GLfloat vtx_bg[] = {
 	    0.0, y,
@@ -193,21 +199,36 @@ void draw_gauge (double speed, double energy) {
 	    GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
 	    0.0, GAUGE_IMG_SIZE
 	};
+	const GLfloat tex_bg[] = {
+	    0.0, y / GAUGE_IMG_SIZE,
+	    1.0, y / GAUGE_IMG_SIZE,
+	    1.0, 1.0,
+	    0.0, 1.0
+	};	
 	const GLfloat vtx_fg[] = {
 	    0.0, 0.0,
 	    GAUGE_IMG_SIZE, 0.0,
 	    GAUGE_IMG_SIZE, y,
 	    0.0, y
 	};
+	const GLfloat tex_fg[] = {
+	    0.0, 0.0,
+	    1.0, 0.0,
+	    1.0, y / GAUGE_IMG_SIZE,
+	    0.0, y / GAUGE_IMG_SIZE
+	};
 
 	glColor4f (energy_background_color.r, energy_background_color.g, energy_background_color.b, energy_background_color.a);
 	glVertexPointer(2, GL_FLOAT, 0, vtx_bg);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex_bg);
 	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 	glColor4f (energy_foreground_color.r, energy_foreground_color.g, energy_foreground_color.b, energy_foreground_color.a);
 	glVertexPointer(2, GL_FLOAT, 0, vtx_fg);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex_fg);
 	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
 	speedbar_frac = 0.0;
@@ -243,12 +264,21 @@ void draw_gauge (double speed, double energy) {
 	    GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
 	    0.0, GAUGE_IMG_SIZE
 	};
+	const GLfloat tex_ol[] = {
+	    0.0, 0.0,
+	    1.0, 0.0,
+	    1.0, 1.0,
+	    0.0, 1.0
+	};
 
 	Tex.BindTex (GAUGE_OUTLINE);
 	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glColor4f (hud_white.r, hud_white.g, hud_white.b, hud_white.a);
 	glVertexPointer(2, GL_FLOAT, 0, vtx_ol);
-	glDrawArrays(GL_TRIANGLE_FAN,0,4);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex_ol);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
     glPopMatrix();
