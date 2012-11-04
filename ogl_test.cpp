@@ -47,17 +47,17 @@ void SetTestLight () {
 }
 
 
-void TestKeys (unsigned int key, bool special, bool release, int x, int y) {
+void TestKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
 	if (release) return;
 	switch (key) {
 		case 27: Winsys.Quit (); break;
 	}
 }
 
-void TestMouse (int button, int state, int x, int y) {
+void TestMouse (int /*button*/, int /*state*/, int /*x*/, int /*y*/) {
 }
 
-void TestMotion (int x, int y) {
+void TestMotion (int /*x*/, int /*y*/) {
 }
 
 void TestInit (void) {
@@ -66,12 +66,12 @@ void TestInit (void) {
  	g_game.loopdelay = 1;
 }
 
-void TestLoop (double timestep) {
+void TestLoop (double /*timestep*/) {
 	check_gl_error();
 
 	// ------------- 3d scenery ---------------------------------------
 	set_gl_options (TUX);
-    ClearRenderContext (colDDBackgr);
+	ClearRenderContext (colDDBackgr);
 
 	glLoadIdentity ();
 	glPushMatrix ();
@@ -93,7 +93,7 @@ void TestLoop (double timestep) {
 	FT.SetColor (colWhite);
 	FT.DrawString (CENTER, 10, "Test screen");
 	Reshape (param.x_resolution, param.y_resolution);
-    Winsys.SwapBuffers ();
+	Winsys.SwapBuffers ();
 } 
 
 void TestTerm () {}
