@@ -97,7 +97,9 @@ GNU General Public License for more details.
 	#include <GL/glu.h>
 	#include <GL/glext.h>
 #elif defined ( HAVE_GL_GLES1 )
+	#include <EGL/egl.h>
 	#include <GLES/gl.h>
+	#include "SDL/SDL_syswm.h"
 #else
 	#include <GL/gl.h>
 	#include <GL/glu.h>
