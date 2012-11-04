@@ -781,33 +781,26 @@ void quadsquare::InitVert(int i, int x, int z) {
 
 GLubyte *VNCArray;
 
-void quadsquare::DrawTris() {
-    int tmp_min_idx = VertexArrayMinIdx;
+void quadsquare::DrawTris()
+{
+    if  (glLockArraysEXT_p) {
+        int tmp_min_idx = VertexArrayMinIdx;
+        tmp_min_idx = (tmp_min_idx == 0 ? 1 : tmp_min_idx);
+        glLockArraysEXT_p (tmp_min_idx, VertexArrayMaxIdx - tmp_min_idx + 1 ); 
+    }
 
-/*    
-	if  (glLockArraysEXT_p && param.use_cva) {
-	    if (tmp_min_idx == 0) tmp_min_idx = 1;
-		glLockArraysEXT_p (tmp_min_idx, VertexArrayMaxIdx - tmp_min_idx + 1 ); 
-    }
-*/
-	if  (glLockArraysEXT_p) {
-	    if (tmp_min_idx == 0) tmp_min_idx = 1;
-		glLockArraysEXT_p (tmp_min_idx, VertexArrayMaxIdx - tmp_min_idx + 1 ); 
-    }
-/*
     glDrawElements (GL_TRIANGLES, VertexArrayCounter,
 		    GL_UNSIGNED_SHORT, VertexArrayIndices );
-    if (glUnlockArraysEXT_p && param.use_cva) glUnlockArraysEXT_p();
-*/
-    glDrawElements (GL_TRIANGLES, VertexArrayCounter,
-		    GL_UNSIGNED_SHORT, VertexArrayIndices );
-    if (glUnlockArraysEXT_p) glUnlockArraysEXT_p();
+
+    if (glUnlockArraysEXT_p) {
+        glUnlockArraysEXT_p();
+    }
 }
 
 void quadsquare::DrawEnvmapTris() 
 {
-    if  (VertexArrayCounter > 0 && EnvmapTexId != 0 ) {
-	
+    if  (VertexArrayCounter > 0 && EnvmapTexId != 0 )
+    {
 	glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 	glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 
@@ -817,7 +810,6 @@ void quadsquare::DrawEnvmapTris()
 
 	glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 	glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-
     } 
 }
 
