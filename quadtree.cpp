@@ -1240,7 +1240,6 @@ static void TVector3o_float_array (float dest[3], TVector3 src)
     dest[2] = src.z;
 }
 
-
 void InitQuadtree (double *elevation, int nx, int nz, 
 double scalex, double scalez, TVector3 view_pos, double detail){
     HeightMapInfo hm;
@@ -1269,14 +1268,13 @@ double scalex, double scalez, TVector3 view_pos, double detail){
     root->AddHeightMap (root_corner_data, hm);
     root->SetScale (scalex, scalez);
     root->SetTerrain (Course.terrain);
-
-	root->StaticCullData (root_corner_data, CULL_DETAIL_FACTOR);
+    root->StaticCullData (root_corner_data, CULL_DETAIL_FACTOR);
 
     float ViewerLoc[3];
     TVector3o_float_array (ViewerLoc, view_pos);
 
     for (i = 0; i < 10; i++) {
-		root->Update(root_corner_data, (const float*) ViewerLoc, detail);
+	root->Update(root_corner_data, (const float*) ViewerLoc, detail);
     }
 }
 

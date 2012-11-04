@@ -347,150 +347,147 @@ void set_gl_options (TRenderMode mode)
 		glDisable (GL_FOG);
         break;
     
-	case GAUGE_BARS:
+    case GAUGE_BARS:
         glEnable (GL_TEXTURE_2D);
-        glDisable (GL_DEPTH_TEST);
-        glDisable (GL_CULL_FACE);
-		glDisable (GL_LIGHTING);
-		glDisable (GL_NORMALIZE);
-		glDisable (GL_ALPHA_TEST);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_LIGHTING);
+	glDisable (GL_NORMALIZE);
+	glDisable (GL_ALPHA_TEST);
         glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+	glDisable (GL_STENCIL_TEST);
 		glDisable (GL_TEXTURE_GEN_S);
 		glDisable (GL_TEXTURE_GEN_T);
-		glDisable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_TRUE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LESS);
-
-		glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-		glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_TRUE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LESS);
         break;
 
     case TEXFONT:
         glEnable (GL_TEXTURE_2D);
         glDisable (GL_DEPTH_TEST);
         glDisable (GL_CULL_FACE);
-		glDisable (GL_LIGHTING);
-		glDisable (GL_NORMALIZE);
-		glDisable (GL_ALPHA_TEST);
+	glDisable (GL_LIGHTING);
+	glDisable (GL_NORMALIZE);
+	glDisable (GL_ALPHA_TEST);
         glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+	glDisable (GL_STENCIL_TEST);
 		glDisable (GL_TEXTURE_GEN_S);
 		glDisable (GL_TEXTURE_GEN_T);
-		glDisable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_TRUE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LESS);
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_TRUE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LESS);
         break;
     
-	case COURSE:
-		glEnable (GL_TEXTURE_2D);
-		glEnable (GL_DEPTH_TEST);
-		glEnable (GL_CULL_FACE);
-		glEnable (GL_LIGHTING);
-		glDisable (GL_NORMALIZE);
-		glDisable (GL_ALPHA_TEST);
-		glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+    case COURSE:
+	glEnable (GL_TEXTURE_2D);
+	glEnable (GL_DEPTH_TEST);
+	glEnable (GL_CULL_FACE);
+	glEnable (GL_LIGHTING);
+	glDisable (GL_NORMALIZE);
+	glDisable (GL_ALPHA_TEST);
+	glEnable (GL_BLEND);
+	glDisable (GL_STENCIL_TEST);
 		glEnable (GL_TEXTURE_GEN_S);
 		glEnable (GL_TEXTURE_GEN_T);
-		glEnable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_TRUE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LEQUAL);
+	glEnable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_TRUE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LEQUAL);
 
 		glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
 		glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-		break;
+	break;
 
     case TREES:
-		glEnable (GL_TEXTURE_2D);
-		glEnable (GL_DEPTH_TEST);
+	glEnable (GL_TEXTURE_2D);
+	glEnable (GL_DEPTH_TEST);
         glDisable (GL_CULL_FACE);
-		glEnable (GL_LIGHTING);
-		glDisable (GL_NORMALIZE);
+	glEnable (GL_LIGHTING);
+	glDisable (GL_NORMALIZE);
         glEnable (GL_ALPHA_TEST);
-		glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+	glEnable (GL_BLEND);
+	glDisable (GL_STENCIL_TEST);
 		glDisable (GL_TEXTURE_GEN_S);
 		glDisable (GL_TEXTURE_GEN_T);
-		glDisable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_TRUE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LESS);
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_TRUE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LESS);
 
         glAlphaFunc (GL_GEQUAL, 0.5);
         break;
         
     case PARTICLES:
         glEnable (GL_TEXTURE_2D);
-		glEnable (GL_DEPTH_TEST);
+	glEnable (GL_DEPTH_TEST);
         glDisable (GL_CULL_FACE);
-		glDisable (GL_LIGHTING);
-		glDisable (GL_NORMALIZE);
-		glEnable (GL_ALPHA_TEST);
+	glDisable (GL_LIGHTING);
+	glDisable (GL_NORMALIZE);
+	glEnable (GL_ALPHA_TEST);
         glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+	glDisable (GL_STENCIL_TEST);
 		glDisable (GL_TEXTURE_GEN_S);
 		glDisable (GL_TEXTURE_GEN_T);
-		glDisable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_TRUE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LESS);
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_TRUE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LESS);
 
         glAlphaFunc (GL_GEQUAL, 0.5);
         break;
     
-	case SKY:
-		glEnable (GL_TEXTURE_2D);
-		glDisable (GL_DEPTH_TEST);
-		glDisable (GL_CULL_FACE); 
-		glDisable (GL_LIGHTING);
-		glDisable (GL_NORMALIZE);
-		glDisable (GL_ALPHA_TEST);
-		glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+    case SKY:
+	glEnable (GL_TEXTURE_2D);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE); 
+	glDisable (GL_LIGHTING);
+	glDisable (GL_NORMALIZE);
+	glDisable (GL_ALPHA_TEST);
+	glEnable (GL_BLEND);
+	glDisable (GL_STENCIL_TEST);
 		glDisable (GL_TEXTURE_GEN_S);
 		glDisable (GL_TEXTURE_GEN_T);
-		glDisable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_FALSE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LESS);
-		break;
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_FALSE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LESS);
+	break;
  	
     case FOG_PLANE:
-		glDisable (GL_TEXTURE_2D);
-		glEnable (GL_DEPTH_TEST);
-		glDisable (GL_CULL_FACE); 
-		glDisable (GL_LIGHTING);
-		glDisable (GL_NORMALIZE);
-		glDisable (GL_ALPHA_TEST);
-		glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+	glDisable (GL_TEXTURE_2D);
+	glEnable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE); 
+	glDisable (GL_LIGHTING);
+	glDisable (GL_NORMALIZE);
+	glDisable (GL_ALPHA_TEST);
+	glEnable (GL_BLEND);
+	glDisable (GL_STENCIL_TEST);
 		glDisable (GL_TEXTURE_GEN_S);
 		glDisable (GL_TEXTURE_GEN_T);
-		glDisable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_TRUE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LESS);
-		break;
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_TRUE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LESS);
+	break;
 
     case TUX:
-	    glDisable (GL_TEXTURE_2D);
-		glEnable (GL_DEPTH_TEST);
-		glEnable (GL_CULL_FACE);
+	glDisable (GL_TEXTURE_2D);
+	glEnable (GL_DEPTH_TEST);
+	glEnable (GL_CULL_FACE);
     	glEnable (GL_LIGHTING);
-		glEnable (GL_NORMALIZE);
-		glDisable (GL_ALPHA_TEST);
-		glEnable (GL_BLEND);
-		glDisable (GL_STENCIL_TEST);
+	glEnable (GL_NORMALIZE);
+	glDisable (GL_ALPHA_TEST);
+	glEnable (GL_BLEND);
+	glDisable (GL_STENCIL_TEST);
 		glDisable (GL_TEXTURE_GEN_S);
 		glDisable (GL_TEXTURE_GEN_T);
-		glDisable (GL_COLOR_MATERIAL);
-		glDepthMask (GL_TRUE);
-		glShadeModel (GL_SMOOTH);
-		glDepthFunc (GL_LESS);
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_TRUE);
+	glShadeModel (GL_SMOOTH);
+	glDepthFunc (GL_LESS);
     	break;
 
     case TUX_SHADOW:
