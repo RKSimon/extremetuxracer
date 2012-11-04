@@ -258,10 +258,8 @@ void RaceSelectLoop (double timestep){
  		FT.DrawString (CENTER, AutoYPosN (90), sizevar);
 	}
 
-
-
 	if (param.ice_cursor) DrawCursor ();
-    SDL_GL_SwapBuffers ();
+	Winsys.SwapBuffers();
 } 
 
 void RaceSelectTerm () {}

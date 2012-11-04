@@ -205,7 +205,7 @@ void EventSelectLoop (double timestep) {
 	PrintTextButton (1, curr_focus);
 
 	if (param.ice_cursor) DrawCursor ();
-    SDL_GL_SwapBuffers ();
+	Winsys.SwapBuffers();
 }
 
 void EventSelectTerm () {

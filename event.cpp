@@ -259,7 +259,7 @@ void EventLoop (double timestep) {
 	} else PrintTextButton (2, curr_focus);
 
 	if (param.ice_cursor) DrawCursor ();
-    SDL_GL_SwapBuffers ();
+	Winsys.SwapBuffers();
 }
 
 void EventTerm () {
