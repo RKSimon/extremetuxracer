@@ -106,11 +106,11 @@ void CCourse::EnableGLArrays() {
     glEnableClientState (GL_NORMAL_ARRAY);
     glNormalPointer (GL_FLOAT, STRIDE_GL_ARRAY, 
 		     vnc_array + 3*sizeof(GLfloat));
-/*
+
     glEnableClientState (GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer (2, GL_FLOAT, STRIDE_GL_ARRAY, 
 		     vnc_array + 6*sizeof(GLfloat));
-*/
+
     glEnableClientState (GL_COLOR_ARRAY);
     glColorPointer (4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, 
 		    vnc_array + 8*sizeof(GLfloat));
@@ -119,7 +119,7 @@ void CCourse::EnableGLArrays() {
 void CCourse::DisableGLArrays() {
     glDisableClientState (GL_VERTEX_ARRAY);
     glDisableClientState (GL_NORMAL_ARRAY);
-    //glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
     glDisableClientState (GL_COLOR_ARRAY);
 }
 
@@ -283,7 +283,7 @@ void CCourse::MakeCourseNormals () {
 void CCourse::FillGlArrays() {
     int x,y;
     TVector3 *normals = nmls;
-    TVector3 nml;
+    TVector3 pt, nml;
     int idx;
 
     vnc_array = (GLubyte*) malloc (STRIDE_GL_ARRAY * nx * ny);
@@ -291,19 +291,23 @@ void CCourse::FillGlArrays() {
     for (x=0; x<nx; x++) {
 		for (y=0; y<ny; y++) {
 			idx = STRIDE_GL_ARRAY * (y * nx + x);
-		
-			FLOATVAL(0) = (GLfloat)x / (nx-1.0) * width;
-			FLOATVAL(1) = elevation[(x) + nx*(y)]; 
-			FLOATVAL(2) = -(GLfloat)y / (ny-1.0) * length;
-	
+
+			pt.x = (GLfloat)x / (nx-1.0) * width;
+			pt.y = elevation[(x) + nx*(y)]; 
+			pt.z = -(GLfloat)y / (ny-1.0) * length;
+
+			FLOATVAL(0) = pt.x;
+			FLOATVAL(1) = pt.y;
+			FLOATVAL(2) = pt.z;
+
 			nml = normals[ x + y * nx ];
 			FLOATVAL(3) = nml.x;
 			FLOATVAL(4) = nml.y;
 			FLOATVAL(5) = nml.z;
 
-			FLOATVAL(6) = 0.0f;
-			FLOATVAL(7) = 0.0f;
-			
+			FLOATVAL(6) = pt.x / COURSE_TEX_SCALE;
+			FLOATVAL(7) = pt.z / COURSE_TEX_SCALE;
+
 			BYTEVAL(0) = 255;
 			BYTEVAL(1) = 255;
 			BYTEVAL(2) = 255;
@@ -378,7 +382,7 @@ void CCourse::FreeTerrainTextures () {
 		if (TerrList[i].texid > 0) {
 			glDeleteTextures (1, &TerrList[i].texid);
 			TerrList[i].texid = 0;
-		}	
+		}
 	}
 }
 
@@ -912,7 +916,7 @@ bool CCourse::LoadCourse (int idx) {
 	}
 
 	MakeCourseNormals ();
-    FillGlArrays ();
+	FillGlArrays ();
 
 	if (!LoadTerrainMap ()) {
 		Message ("could not load course terrain map");

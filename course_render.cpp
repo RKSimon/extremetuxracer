@@ -24,22 +24,13 @@ GNU General Public License for more details.
 #include "env.h"
 #include "game_ctrl.h"
 
-#define TEX_SCALE 6
-static bool clip_course = true;
-
-void setup_course_tex_gen () {
-    static GLfloat xplane[4] = {1.0 / TEX_SCALE, 0.0, 0.0, 0.0 };
-    static GLfloat zplane[4] = {0.0, 0.0, 1.0 / TEX_SCALE, 0.0 };
-    glTexGenfv (GL_S, GL_OBJECT_PLANE, xplane);
-    glTexGenfv (GL_T, GL_OBJECT_PLANE, zplane);
-}
+static const bool clip_course = true;
 
 // --------------------------------------------------------------------	
 //							render course
 // --------------------------------------------------------------------	
 void RenderCourse () {
     set_gl_options (COURSE);
-    setup_course_tex_gen ();
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     set_material (colWhite, colBlack, 1.0);
 

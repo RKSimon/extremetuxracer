@@ -799,18 +799,24 @@ void quadsquare::DrawTris()
 
 void quadsquare::DrawEnvmapTris() 
 {
-    if  (VertexArrayCounter > 0 && EnvmapTexId != 0 )
+#if !defined(HAVE_GL_GLES1)
+    if  (VertexArrayCounter > 0 && EnvmapTexId != 0)
     {
+	static const GLfloat xplane[4] = { 1.0 / COURSE_TEX_SCALE, 0.0, 0.0, 0.0 };
+	static const GLfloat zplane[4] = { 0.0, 0.0, 1.0 / COURSE_TEX_SCALE, 0.0 };
+
+	glEnable (GL_TEXTURE_GEN_S);
+	glEnable (GL_TEXTURE_GEN_T);
+	glTexGenfv (GL_S, GL_OBJECT_PLANE, xplane);
+	glTexGenfv (GL_T, GL_OBJECT_PLANE, zplane);
 	glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 	glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
-
 	glBindTexture (GL_TEXTURE_2D, EnvmapTexId );
-
 	DrawTris();
-
-	glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-	glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-    } 
+	glDisable (GL_TEXTURE_GEN_S);
+	glDisable (GL_TEXTURE_GEN_T);
+    }
+#endif
 }
 
 void quadsquare::InitArrayCounters()
@@ -842,10 +848,12 @@ void quadsquare::Render (const quadcornerdata& cd, GLubyte *vnc_array) {
 			DrawTris ();
 				
 			if (TerrList[j].shiny && param.perf_level > 1) {
-				glDisableClientState (GL_COLOR_ARRAY );
+				glDisableClientState (GL_COLOR_ARRAY);
+				glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 				glColor4f (1.0, 1.0, 1.0, ENV_MAP_ALPHA / 255.0 );
 				DrawEnvmapTris();
-				glEnableClientState (GL_COLOR_ARRAY );
+				glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+				glEnableClientState (GL_COLOR_ARRAY);
 			}
 		
 		}

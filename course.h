@@ -30,7 +30,6 @@ GNU General Public License for more details.
 #define ZCD(y) (-(double)(y) / (ny-1.0) * length)
 #define NMLPOINT(x,y) MakeVector (XCD(x), ELEV(x,y), ZCD(y) )
 
-
 #define MAX_COURSES 64
 #define MAX_TERR_TYPES 64
 #define MAX_COLL 12192
@@ -39,6 +38,7 @@ GNU General Public License for more details.
 #define MAX_OBJECT_TYPES 128
 #define MAX_POLY 128
 #define MAX_DESCRIPTION_LINES 8
+#define COURSE_TEX_SCALE 6
 
 typedef struct {
 	string name;
