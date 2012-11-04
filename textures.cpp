@@ -26,10 +26,11 @@ GNU General Public License for more details.
 
 CImage::CImage () { 
 	data = NULL;
-	nx = 0;	
-    ny = 0; 
-    depth = 0;
-    pitch = 0;
+	nx = 0;
+	ny = 0;
+	depth = 0;
+	pitch = 0;
+	format = 0;
 }
 
 CImage::~CImage () {
@@ -53,10 +54,11 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 		return false;
    	}
 
-	nx    = sdlImage->w;
-	ny    = sdlImage->h;
-	depth = sdlImage->format->BytesPerPixel;
-	pitch = sdlImage->pitch;
+	nx     = sdlImage->w;
+	ny     = sdlImage->h;
+	depth  = sdlImage->format->BytesPerPixel;
+	pitch  = sdlImage->pitch;
+	format = ( 3 == depth ? GL_RGB : GL_RGBA );
 	DisposeData ();
 	data  = (unsigned char *) malloc (pitch * ny * sizeof (unsigned char));
 
@@ -113,6 +115,7 @@ bool CImage::ReadFrameBuffer_PPM () {
 	nx = viewport[2];
 	ny = viewport[3];
 	depth = 3;
+	format = GL_RGB;
 
 	DisposeData ();
 	data  = (unsigned char *) malloc (nx * ny * depth * sizeof (unsigned char));
@@ -121,7 +124,7 @@ bool CImage::ReadFrameBuffer_PPM () {
 	
 	for (int i=0; i<viewport[3]; i++){
 		glReadPixels (viewport[0], viewport[1] + viewport[3] - 1 - i,
-			viewport[2], 1, GL_RGB, GL_UNSIGNED_BYTE, data + viewport[2] * i * 3);
+			viewport[2], 1, format, GL_UNSIGNED_BYTE, data + viewport[2] * i * 3);
 	}
 	
 	return true;
@@ -133,12 +136,13 @@ void CImage::ReadFrameBuffer_TGA () {
 	nx = param.x_resolution;
 	ny = param.y_resolution;
 	depth = 3;
+	format = GL_BGR;
 
 	DisposeData ();
 	data  = (unsigned char *) malloc (nx * ny * depth * sizeof (unsigned char));
 
 	glReadBuffer (GL_FRONT);
-	glReadPixels (0, 0, nx, ny, GL_BGR, GL_UNSIGNED_BYTE, data);	
+	glReadPixels (0, 0, nx, ny, format, GL_UNSIGNED_BYTE, data);	
 }
 #endif
 
@@ -147,11 +151,12 @@ void CImage::ReadFrameBuffer_BMP () {
 	nx = param.x_resolution;
 	ny = param.y_resolution;
 	depth = 4;
+	format = GL_BGRA;
 
 	DisposeData ();
 	data  = (unsigned char *) malloc (nx * ny * depth * sizeof (unsigned char));
 	glReadBuffer (GL_FRONT);
-	glReadPixels (0, 0, nx, ny, GL_BGRA, GL_UNSIGNED_BYTE, data);	
+	glReadPixels (0, 0, nx, ny, format, GL_UNSIGNED_BYTE, data);	
 }
 #endif
 
@@ -330,13 +335,12 @@ int CTexture::LoadTexture (const char *filename, GLuint *width, GLuint *height) 
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
 
-	GLenum format = (texImage.depth == 3 ? GL_RGB : GL_RGBA);
 	if (width) *width = texImage.nx;
 	if (height) *height = texImage.ny;
 
 	glTexImage2D 
 		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
-		texImage.ny, 0, format, GL_UNSIGNED_BYTE, texImage.data);
+		texImage.ny, 0, texImage.format, GL_UNSIGNED_BYTE, texImage.data);
 
 	texImage.DisposeData();
 	return texid;
@@ -373,7 +377,6 @@ int CTexture::LoadMipmapTexture (const char *filename, bool repeatable, GLuint *
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
 
-	GLenum format = (texImage.depth == 3 ? GL_RGB : GL_RGBA);
 	if (width) *width = texImage.nx;
 	if (height) *height = texImage.ny;
 
@@ -381,11 +384,11 @@ int CTexture::LoadMipmapTexture (const char *filename, bool repeatable, GLuint *
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D
 		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
-		texImage.ny, 0, format, GL_UNSIGNED_BYTE, texImage.data);
+		texImage.ny, 0, texImage.format, GL_UNSIGNED_BYTE, texImage.data);
 #else
 	gluBuild2DMipmaps 
 		(GL_TEXTURE_2D, texImage.depth, texImage.nx,
-		texImage.ny, format, GL_UNSIGNED_BYTE, texImage.data);
+		texImage.ny, texImage.format, GL_UNSIGNED_BYTE, texImage.data);
 #endif	
 
 	texImage.DisposeData();

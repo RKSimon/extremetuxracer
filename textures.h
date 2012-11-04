@@ -118,9 +118,10 @@ public:
 
 	unsigned char *data;
 	int nx;	
-    int ny; 
-    int depth;
-    int pitch;
+	int ny; 
+	int depth;
+	int pitch;
+	int format;
 
 	void DisposeData ();
 
