@@ -54,6 +54,13 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 		return false;
 	}
 
+	if( ( sdlImage->w & ( sdlImage->w - 1 ) ) || ( sdlImage->h & ( sdlImage->h - 1 ) ) ) {
+		char str[256]; sprintf(str, "%s [%d][%d]", filepath, sdlImage->w, sdlImage->h); 
+		Message ("unsupported image size", str);
+		//SDL_FreeSurface (sdlImage);
+		//return false;
+	}
+
 	if( 3 != sdlImage->format->BytesPerPixel && 4 != sdlImage->format->BytesPerPixel ) {
 		Message ("unsupported image format", filepath);
 		SDL_FreeSurface (sdlImage);
