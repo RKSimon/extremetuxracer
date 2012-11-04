@@ -45,9 +45,9 @@ void check_gl_error(const char *title) {
     if (error != GL_NO_ERROR) {
 	char str[256];
 	if (NULL != title) {
-		snprintf (str, sizeof(str), "%d [%s]", title);
+		snprintf (str, sizeof(str), "%d [%s]", error, title);
 	} else {
-		snprintf (str, sizeof(str), "%d");
+		snprintf (str, sizeof(str), "%d", error);
 	}
 	Message ("OpenGL Error: ", str);
     }
