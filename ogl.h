@@ -62,6 +62,6 @@ void ClearRenderContext ();
 void ClearRenderContext (TColor col);
 void SetupGuiDisplay ();
 void Reshape (int w, int h);
-
+void DrawStdSphere (int num_divisions);
 
 #endif

@@ -204,6 +204,124 @@ void Reshape (int w, int h) {
     glMatrixMode (GL_MODELVIEW );
 } 
 
+void DrawStdSphere (int num_divisions) {
+    double theta, phi, d_theta, d_phi, eps, twopi;
+    double x, y, z;
+    int div = num_divisions;
+    eps = 1e-15;
+    twopi = M_PI * 2.0;
+    d_theta = d_phi = M_PI / div;
+
+    int max_vertices = 2+2*2*(num_divisions+2);
+    GLfloat* vtx = (GLfloat*) alloca(3*max_vertices*sizeof(GLfloat));
+    GLfloat* nrm = (GLfloat*) alloca(3*max_vertices*sizeof(GLfloat));
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+
+    for  (phi = 0.0; phi + eps < M_PI; phi += d_phi) {
+	double cos_theta, sin_theta;
+	double sin_phi, cos_phi;
+	double sin_phi_d_phi, cos_phi_d_phi;
+	sin_phi = sin (phi);
+	cos_phi = cos (phi);
+	sin_phi_d_phi = sin (phi + d_phi);
+	cos_phi_d_phi = cos (phi + d_phi);
+
+	GLint drawMode;
+	GLfloat *pvtx = vtx;
+	GLfloat *pnrm = nrm;
+	GLsizei num_vertices = 0;
+
+	if  (phi <= eps) {
+		drawMode = GL_TRIANGLE_FAN;
+		*pnrm++ = 0.0; *pnrm++ = 0.0; *pnrm++ = 1.0;
+		*pvtx++ = 0.0; *pvtx++ = 0.0; *pvtx++ = 1.0;
+		num_vertices++;
+
+		for  (theta = 0.0; theta + eps < twopi; theta += d_theta) {
+			sin_theta = sin (theta);
+			cos_theta = cos (theta);
+			x = cos_theta * sin_phi_d_phi;
+			y = sin_theta * sin_phi_d_phi;
+			z = cos_phi_d_phi;
+			*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+			*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+			num_vertices++;
+		}
+
+		x = sin_phi_d_phi;
+		y = 0.0;
+		z = cos_phi_d_phi;
+		*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+		*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+		num_vertices++;
+	} else if  (phi + d_phi + eps >= M_PI) {
+		drawMode = GL_TRIANGLE_FAN;
+		*pnrm++ = 0.0; *pnrm++ = 0.0; *pnrm++ = -1.0;
+		*pvtx++ = 0.0; *pvtx++ = 0.0; *pvtx++ = -1.0;
+		num_vertices++;
+
+                for  (theta = twopi; theta - eps > 0; theta -= d_theta) {
+			sin_theta = sin (theta);
+			cos_theta = cos (theta);
+			x = cos_theta * sin_phi;
+			y = sin_theta * sin_phi;
+			z = cos_phi;
+			*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+			*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+			num_vertices++;
+		} 
+
+                x = sin_phi;
+                y = 0.0;
+                z = cos_phi;
+		*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+		*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+		num_vertices++;
+        } else {
+		drawMode = GL_TRIANGLE_STRIP;
+		for  (theta = 0.0; theta + eps < twopi; theta += d_theta) {
+			sin_theta = sin (theta);
+			cos_theta = cos (theta);
+			x = cos_theta * sin_phi;
+			y = sin_theta * sin_phi;
+			z = cos_phi;
+			*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+			*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+			num_vertices++;
+			x = cos_theta * sin_phi_d_phi;
+			y = sin_theta * sin_phi_d_phi;
+			z = cos_phi_d_phi;
+			*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+			*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+			num_vertices++;
+                } 
+
+		x = sin_phi;
+		y = 0.0;
+		z = cos_phi;
+		*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+		*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+		num_vertices++;
+
+		x = sin_phi_d_phi;
+		y = 0.0;
+		z = cos_phi_d_phi;
+		*pnrm++ = x; *pnrm++ = y; *pnrm++ = z;
+		*pvtx++ = x; *pvtx++ = y; *pvtx++ = z;
+		num_vertices++;
+        } 
+
+	glNormalPointer(GL_FLOAT, 0, nrm);
+	glVertexPointer(3, GL_FLOAT, 0, vtx);
+	glDrawArrays(drawMode, 0, num_vertices);
+    }
+
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+} 
+
 // ====================================================================
 //					GL options
 // ====================================================================
