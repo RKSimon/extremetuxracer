@@ -49,16 +49,28 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 	unsigned char *sdlData;
 	
 	sdlImage = IMG_Load (filepath);
-   	if (sdlImage == 0) {
-   		Message ("could not load image", filepath);
+	if (sdlImage == 0) {
+		Message ("could not load image", filepath);
 		return false;
-   	}
+	}
+
+	if( 3 != sdlImage->format->BytesPerPixel && 4 != sdlImage->format->BytesPerPixel ) {
+		Message ("unsupported image format", filepath);
+		SDL_FreeSurface (sdlImage);
+		return false;
+	}
 
 	nx     = sdlImage->w;
 	ny     = sdlImage->h;
 	depth  = sdlImage->format->BytesPerPixel;
 	pitch  = sdlImage->pitch;
-	format = ( 3 == depth ? GL_RGB : GL_RGBA );
+
+	if ( sdlImage->format->Rmask == 0x000000ff ) {
+		format = ( 3 == depth ? GL_RGB : GL_RGBA );
+	} else {
+		format = ( 3 == depth ? GL_BGR : GL_BGRA );
+	}
+
 	DisposeData ();
 	data  = (unsigned char *) malloc (pitch * ny * sizeof (unsigned char));
 
