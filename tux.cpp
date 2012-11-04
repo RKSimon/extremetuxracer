@@ -407,25 +407,10 @@ void CCharShape::CreateMaterial (const char *line) {
 // --------------------------------------------------------------------
 
 void CCharShape::DrawCharSphere (int num_divisions) {
-    if (num_divisions < 1) {
+    if (num_divisions > 1) {
+	DrawStdSphere( num_divisions );
 	return;
     }
-
-    double radius = 1.0;
-    int slices = 2 * num_divisions;
-    int stacks = num_divisions;
-
-#if 1
-    GLUquadricObj *qobj;
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle (qobj, GLU_FILL);
-    gluQuadricOrientation (qobj, GLU_OUTSIDE);
-    gluQuadricNormals (qobj, GLU_SMOOTH);
-    gluSphere (qobj, radius, slices, stacks);
-    gluDeleteQuadric (qobj);
-#else
-    // TODO - no GLU SPHERE DRAW CODE
-#endif
 }
 
 void CCharShape::DrawNodes (TCharNode *node) {
