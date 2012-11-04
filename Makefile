@@ -47,10 +47,14 @@ else
     OBJ_EXT = o
 
     CXXFLAGS  = -Wall -Wextra -O2 -DOS_LINUX -I/usr/include/freetype2
-    #CXXFLAGS += -DHAVE_GL_GLES1 -I/usr/lib/pvr-omap4-egl/include
     LDFLAGS  = -lSDL -lSDL_image -lSDL_mixer -lfreetype 
-    LDFLAGS += -lGL -lGLU
-    #LDFLAGS += -L/usr/lib/pvr-omap4-egl -lGLESv1_CM
+
+    ifdef GLES
+      CXXFLAGS += -DHAVE_GL_GLES1 -I/usr/lib/pvr-omap4-egl/include
+      LDFLAGS += -L/usr/lib/pvr-omap4-egl -lGLESv1_CM -lEGL
+    else
+      LDFLAGS += -lGL -lGLU
+    endif #GLES
   endif #Darwin
 endif #Windows_NT
 
