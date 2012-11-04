@@ -20,6 +20,12 @@ GNU General Public License for more details.
 #include <fstream>
 #include "course.h"
 
+static int nextPowerOf2(int val) {
+  int i = 1;
+  while(i < val) { i <<= 1; }
+  return i;
+}
+
 // --------------------------------------------------------------------
 //				class CImage
 // --------------------------------------------------------------------
@@ -55,7 +61,7 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 	}
 
 	if( ( sdlImage->w & ( sdlImage->w - 1 ) ) || ( sdlImage->h & ( sdlImage->h - 1 ) ) ) {
-		char str[256]; sprintf(str, "%s [%d][%d]", filepath, sdlImage->w, sdlImage->h); 
+		char str[256]; snprintf(str, sizeof(str), "%s: [%d][%d] vs [%d][%d]", filepath, sdlImage->w, sdlImage->h, nextPowerOf2(sdlImage->w), nextPowerOf2(sdlImage->h)); 
 		Message ("unsupported image size", str);
 		//SDL_FreeSurface (sdlImage);
 		//return false;
