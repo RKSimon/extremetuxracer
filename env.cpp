@@ -377,14 +377,7 @@ void CEnvironment::DrawFog () {
     set_gl_options (FOG_PLANE);
     glEnable (GL_FOG);
 
-    // only the alpha channel is used
-    float bottom_dens[4]     = {0, 0, 0, 1.0};
-    float top_dens[4]        = {0, 0, 0, 0.9};
-    float leftright_dens[4]  = {0, 0, 0, 0.3};
-    float top_bottom_dens[4] = {0, 0, 0, 0.0};
-
-#if 0
-    //glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
 
 	// only the alpha channel is used
@@ -405,7 +398,7 @@ void CEnvironment::DrawFog () {
 
 		// top/bottom density
 		0, 0, 0, 0.0,
-		0, 0, 0, 0.0,
+		0, 0, 0, 0.0
 	};
 
 	const GLfloat vtx[] = {
@@ -418,54 +411,15 @@ void CEnvironment::DrawFog () {
 		vpoint1.x, vpoint1.y, vpoint1.z,
 		vpoint2.x, vpoint2.y, vpoint2.z,
 		vpoint3.x, vpoint3.y, vpoint3.z,
-		vpoint4.x, vpoint4.y, vpoint4.z,
+		vpoint4.x, vpoint4.y, vpoint4.z
 	};
 
-	glColor4f (bottom_dens[0], bottom_dens[1], bottom_dens[2], bottom_dens[3]);
-	//glColorPointer(4, GL_FLOAT, 0, col+0);
-	glVertexPointer(3, GL_FLOAT, 0, vtx+0);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-	glColor4f (top_dens[0], top_dens[1], top_dens[2], top_dens[3]);
-	//glColorPointer(4, GL_FLOAT, 0, col+8);
-	glVertexPointer(3, GL_FLOAT, 0, vtx+6);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-	glColor4f (leftright_dens[0], leftright_dens[1], leftright_dens[2], leftright_dens[3]);
-	//glColorPointer(4, GL_FLOAT, 0, col+16);
-	glVertexPointer(3, GL_FLOAT, 0, vtx+12);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-	glColor4f (top_bottom_dens[0], top_bottom_dens[1], top_bottom_dens[2], top_bottom_dens[3]);
-	//glColorPointer(4, GL_FLOAT, 0, col+24);
-	glVertexPointer(3, GL_FLOAT, 0, vtx+18);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	glColorPointer(4, GL_FLOAT, 0, col);
+	glVertexPointer(3, GL_FLOAT, 0, vtx);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glDisableClientState(GL_VERTEX_ARRAY);
-    //glDisableClientState(GL_COLOR_ARRAY);
-
-#else
-    glBegin (GL_QUAD_STRIP);
-	glColor4f (bottom_dens[0], bottom_dens[1], bottom_dens[2], bottom_dens[3]);
-	glVertex3f (bottomleft.x, bottomleft.y, bottomleft.z);
-    	glVertex3f (bottomright.x, bottomright.y, bottomright.z);
-	glVertex3f (left.x, left.y, left.z);
-    	glVertex3f (right.x, right.y, right.z);
-
-	glColor4f (top_dens[0], top_dens[1], top_dens[2], top_dens[3]);
-    	glVertex3f (topleft.x, topleft.y, topleft.z);
-    	glVertex3f (topright.x, topright.y, topright.z);
-	
-	glColor4f (leftright_dens[0], leftright_dens[1], leftright_dens[2], leftright_dens[3]);
-   	glVertex3f (vpoint1.x, vpoint1.y, vpoint1.z);
-	glVertex3f (vpoint2.x, vpoint2.y, vpoint2.z);
-		
-	glColor4f (top_bottom_dens[0], top_bottom_dens[1], top_bottom_dens[2], top_bottom_dens[3]);
-    	glVertex3f (vpoint3.x, vpoint3.y, vpoint3.z);
-    	glVertex3f (vpoint4.x, vpoint4.y, vpoint4.z);
-    glEnd();
-
-#endif
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
