@@ -64,12 +64,13 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 	ny     = sdlImage->h;
 	depth  = sdlImage->format->BytesPerPixel;
 	pitch  = sdlImage->pitch;
+	format = ( 3 == depth ? GL_RGB : GL_RGBA );
 
-	if ( sdlImage->format->Rmask == 0x000000ff ) {
-		format = ( 3 == depth ? GL_RGB : GL_RGBA );
-	} else {
+#if defined(GL_BGR) && defined(GL_BGRA)
+	if ( sdlImage->format->Rmask != 0x000000ff ) {
 		format = ( 3 == depth ? GL_BGR : GL_BGRA );
 	}
+#endif
 
 	DisposeData ();
 	data  = (unsigned char *) malloc (pitch * ny * sizeof (unsigned char));
