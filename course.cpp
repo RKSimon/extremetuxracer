@@ -105,8 +105,12 @@ void CCourse::EnableGLArrays() {
 
     glEnableClientState (GL_NORMAL_ARRAY);
     glNormalPointer (GL_FLOAT, STRIDE_GL_ARRAY, 
-		     vnc_array + 4*sizeof(GLfloat));
-
+		     vnc_array + 3*sizeof(GLfloat));
+/*
+    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+    glTexCoordPointer (2, GL_FLOAT, STRIDE_GL_ARRAY, 
+		     vnc_array + 6*sizeof(GLfloat));
+*/
     glEnableClientState (GL_COLOR_ARRAY);
     glColorPointer (4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, 
 		    vnc_array + 8*sizeof(GLfloat));
@@ -115,6 +119,7 @@ void CCourse::EnableGLArrays() {
 void CCourse::DisableGLArrays() {
     glDisableClientState (GL_VERTEX_ARRAY);
     glDisableClientState (GL_NORMAL_ARRAY);
+    //glDisableClientState (GL_TEXTURE_COORD_ARRAY);
     glDisableClientState (GL_COLOR_ARRAY);
 }
 
@@ -292,10 +297,12 @@ void CCourse::FillGlArrays() {
 			FLOATVAL(2) = -(GLfloat)y / (ny-1.0) * length;
 	
 			nml = normals[ x + y * nx ];
-			FLOATVAL(4) = nml.x;
-			FLOATVAL(5) = nml.y;
-			FLOATVAL(6) = nml.z;
-			FLOATVAL(7) = 1.0f;
+			FLOATVAL(3) = nml.x;
+			FLOATVAL(4) = nml.y;
+			FLOATVAL(5) = nml.z;
+
+			FLOATVAL(6) = 0.0f;
+			FLOATVAL(7) = 0.0f;
 			
 			BYTEVAL(0) = 255;
 			BYTEVAL(1) = 255;
