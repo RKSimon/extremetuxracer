@@ -39,11 +39,17 @@ gl_value_t gl_values[] = {
     { "depth bits", GL_DEPTH_BITS, GL_SHORT },
     { "stencil bits", GL_STENCIL_BITS, GL_SHORT } };
 
-void check_gl_error() {
+void check_gl_error(const char *title) {
     GLenum error;
     error = glGetError();
     if (error != GL_NO_ERROR) {
-		Message ("OpenGL Error: ", "");
+	char str[256];
+	if (NULL != title) {
+		snprintf (str, sizeof(str), "%d [%s]", title);
+	} else {
+		snprintf (str, sizeof(str), "%d");
+	}
+	Message ("OpenGL Error: ", str);
     }
 }
 

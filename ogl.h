@@ -48,7 +48,7 @@ typedef void (* PFNGLUNLOCKARRAYSEXTPROC) (void);
 extern PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p;
 extern PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p;
 
-void check_gl_error();
+void check_gl_error( const char *title = NULL );
 void init_glfloat_array( int num, GLfloat arr[], ... );
 void InitOpenglExtensions();
 void PrintGLInfo();
