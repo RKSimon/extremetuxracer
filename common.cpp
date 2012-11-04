@@ -172,11 +172,7 @@ void Message (const char *msg, const char *desc) {
 
 	string aa = msg;
 	string bb = desc;
-	char item[128];
-	strcpy (item, msg);
-	strcat (item, "  ");
-	strcat (item, desc);
-	printf ("%s \n", item);
+	printf ("%s  %s \n", msg, desc);
 	msg_list.Add (aa + bb);
 }
 
@@ -185,9 +181,7 @@ void Message (const char *msg) {
 		printf (" \n");
 		return;
 	}
-	char item[128];
-	strcpy (item, msg);
-	printf ("%s \n", item);
+	printf ("%s \n", msg);
 	msg_list.Add (msg);
 }
 
