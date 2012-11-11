@@ -108,23 +108,21 @@ bool CImage::LoadPng (const char *filepath, bool mirroring, bool stretchToPow2) 
 		};
    	}
 
+	float scaleW = (float)sdlImage->w / (float)nx;
+	float scaleH = (float)sdlImage->h / (float)ny;
 	for (int y=0; y<ny; y++) {
 		unsigned char* line = data + y * pitch;
 		int y_src = ( mirroring ? ny - 1 - y : y );
-		y_src = (int)((float)y_src * (float)sdlImage->h / (float) ny);
+		y_src = (int)(scaleH * y_src);
 		for (int x = 0; x<nx; x++) {
-			int x_src = (int)((float)x * (float)sdlImage->w / (float)nx);
-
-			unsigned char r, g, b, a;
+			int x_src = (int)(scaleW * x);
 			unsigned int p = SDL_GetPixel (sdlImage, x_src, y_src);
-			SDL_GetRGBA(p, sdlImage->format, &r, &g, &b, &a);
-
-			*line++ = r;
-			*line++ = g;
-			*line++ = b;
-
 			if( 3 != depth ) {
-				*line++ = a;
+				SDL_GetRGBA(p, sdlImage->format, line+0, line+1, line+2, line+3);
+				line+=4;
+			} else {
+				SDL_GetRGB(p, sdlImage->format, line+0, line+1, line+2);
+				line+=3;
 			}
 		}
 	}
