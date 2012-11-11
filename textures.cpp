@@ -26,6 +26,33 @@ static int nextPowerOf2(int val) {
   return i;
 }
 
+Uint32 SDL_GetPixel(SDL_Surface *surface, int x, int y)
+{
+     int bpp = surface->format->BytesPerPixel;
+     /* Here p is the address to the pixel we want to retrieve */
+     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+     switch (bpp) {
+     case 1:
+	return *p;
+
+     case 2:
+	return *(Uint16 *)p;
+
+     case 3:   
+#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+	return p[0] << 16 | p[1] << 8 | p[2];
+#else
+	return p[0] | p[1] << 8 | p[2] << 16;
+#endif
+     case 4:
+	return *(Uint32 *)p;
+
+     default:
+	return 0;       /* shouldn't happen, but avoids warnings */
+     } // switch
+}
+
 // --------------------------------------------------------------------
 //				class CImage
 // --------------------------------------------------------------------
@@ -50,21 +77,13 @@ void CImage::DisposeData () {
 	}
 }
 
-bool CImage::LoadPng (const char *filepath, bool mirroring) {
+bool CImage::LoadPng (const char *filepath, bool mirroring, bool stretchToPow2) {
 	SDL_Surface *sdlImage;
-	unsigned char *sdlData;
 	
 	sdlImage = IMG_Load (filepath);
 	if (sdlImage == 0) {
 		Message ("could not load image", filepath);
 		return false;
-	}
-
-	if( ( sdlImage->w & ( sdlImage->w - 1 ) ) || ( sdlImage->h & ( sdlImage->h - 1 ) ) ) {
-		char str[256]; snprintf(str, sizeof(str), "%s: [%d][%d] vs [%d][%d]", filepath, sdlImage->w, sdlImage->h, nextPowerOf2(sdlImage->w), nextPowerOf2(sdlImage->h)); 
-		Message ("unsupported image size", str);
-		//SDL_FreeSurface (sdlImage);
-		//return false;
 	}
 
 	if( 3 != sdlImage->format->BytesPerPixel && 4 != sdlImage->format->BytesPerPixel ) {
@@ -73,17 +92,11 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 		return false;
 	}
 
-	nx     = sdlImage->w;
-	ny     = sdlImage->h;
+	nx     = ( stretchToPow2 ? nextPowerOf2(sdlImage->w) : sdlImage->w );
+	ny     = ( stretchToPow2 ? nextPowerOf2(sdlImage->h) : sdlImage->h );
 	depth  = sdlImage->format->BytesPerPixel;
-	pitch  = sdlImage->pitch;
+	pitch  = ( 3 == depth ? 3 * nx : 4 * nx );
 	format = ( 3 == depth ? GL_RGB : GL_RGBA );
-
-#if defined(GL_BGR) && defined(GL_BGRA)
-	if ( sdlImage->format->Rmask != 0x000000ff ) {
-		format = ( 3 == depth ? GL_BGR : GL_BGRA );
-	}
-#endif
 
 	DisposeData ();
 	data  = (unsigned char *) malloc (pitch * ny * sizeof (unsigned char));
@@ -95,28 +108,25 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 		};
    	}
 
-	sdlData = (unsigned char *) sdlImage->pixels;
+	for (int y=0; y<ny; y++) {
+		unsigned char* line = data + y * pitch;
+		int y_src = ( mirroring ? ny - 1 - y : y );
+		y_src = (int)((float)y_src * (float)sdlImage->h / (float) ny);
+		for (int x = 0; x<nx; x++) {
+			int x_src = (int)((float)x * (float)sdlImage->w / (float)nx);
 
-	if (mirroring) {
-		for (int y=0; y<ny; y++) {
-#if 1
-			memcpy( data + y * pitch, sdlData + ( ny - 1 - y ) * pitch, pitch*sizeof(sdlData[0]) );
-#else
-			for (int x=0; x<pitch; x++) {
-				data [y * pitch + x] = sdlData [(ny-1-y) * pitch + x];	
-			}
-#endif
-		}
-	} else {
-#if 1
-		memcpy( data, sdlData, ny*pitch*sizeof(sdlData[0]) );
-#else
-		for (int y=0; y<ny; y++) {
-			for (int x=0; x<pitch; x++) {
-				data [y * pitch + x] = sdlData [y * pitch + x];	
+			unsigned char r, g, b, a;
+			unsigned int p = SDL_GetPixel (sdlImage, x_src, y_src);
+			SDL_GetRGBA(p, sdlImage->format, &r, &g, &b, &a);
+
+			*line++ = r;
+			*line++ = g;
+			*line++ = b;
+
+			if( 3 != depth ) {
+				*line++ = a;
 			}
 		}
-#endif
 	}
 
 	if (SDL_MUSTLOCK (sdlImage)) SDL_UnlockSurface (sdlImage);
@@ -124,11 +134,11 @@ bool CImage::LoadPng (const char *filepath, bool mirroring) {
 	return true;
 }
 
-bool CImage::LoadPng (const char *dir, const char *filename, bool mirroring) {
+bool CImage::LoadPng (const char *dir, const char *filename, bool mirroring, bool stretchToPow2) {
 	string path = dir;
 	path += SEP;
 	path += filename;
-	return LoadPng (path.c_str(), mirroring);
+	return LoadPng (path.c_str(), mirroring, stretchToPow2);
 }
 
 // ------------------ read framebuffer --------------------------------
@@ -352,7 +362,7 @@ int CTexture::LoadTexture (const char *filename, GLuint *width, GLuint *height) 
 	CImage texImage;
 	GLuint texid;
 
-	if (texImage.LoadPng (filename, true) == false) return 0;
+	if (texImage.LoadPng (filename, true, true) == false) return 0;
 	glGenTextures (1, &texid);
 	glBindTexture (GL_TEXTURE_2D, texid);		
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 4); 
@@ -387,7 +397,7 @@ int CTexture::LoadMipmapTexture (const char *filename, bool repeatable, GLuint *
 	CImage texImage;
 	GLuint texid;
 
-	if (texImage.LoadPng (filename, true) == false) return 0;
+	if (texImage.LoadPng (filename, true, true) == false) return 0;
 	glGenTextures (1, &texid);
 	glBindTexture (GL_TEXTURE_2D, texid);		
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 4);
