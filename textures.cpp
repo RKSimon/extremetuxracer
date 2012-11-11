@@ -375,7 +375,7 @@ int CTexture::LoadTexture (const char *filename, GLuint *width, GLuint *height) 
 	if (height) *height = texImage.ny;
 
 	glTexImage2D 
-		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
+		(GL_TEXTURE_2D, 0, texImage.format, texImage.nx,
 		texImage.ny, 0, texImage.format, GL_UNSIGNED_BYTE, texImage.data);
 
 	texImage.DisposeData();
@@ -419,7 +419,7 @@ int CTexture::LoadMipmapTexture (const char *filename, bool repeatable, GLuint *
 #if defined(HAVE_GL_GLES1) || (defined(GL_VERSION_1_4) && GL_VERSION_1_4)
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D
-		(GL_TEXTURE_2D, 0, texImage.depth, texImage.nx,
+		(GL_TEXTURE_2D, 0, texImage.format, texImage.nx,
 		texImage.ny, 0, texImage.format, GL_UNSIGNED_BYTE, texImage.data);
 #else
 	gluBuild2DMipmaps 
