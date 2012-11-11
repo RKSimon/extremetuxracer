@@ -420,10 +420,10 @@ void DrawBonusExt (int y, int numraces, int num) {
 	double bott, top;
 	int i;
 
-	TColor col1 = MakeColor (0.3, 0.5, 0.7, 1);
+	//TColor col1 = MakeColor (0.3, 0.5, 0.7, 1);
 	TColor col2 = MakeColor (0.45, 0.65, 0.85, 1);
-	TColor col3 = MakeColor (0.6, 0.8, 1.0, 1);
-	TColor gold = MakeColor (1, 1, 0, 1);
+	//TColor col3 = MakeColor (0.6, 0.8, 1.0, 1);
+	//TColor gold = MakeColor (1, 1, 0, 1);
 
 	int lleft[3];
 	int majr, minr;
