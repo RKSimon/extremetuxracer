@@ -82,7 +82,7 @@ void SplashLoop (double /*timestep*/){
 	Players.LoadAvatars (); // before LoadPlayers !!!
 	Players.LoadPlayers ();
 
-	SDL_Delay (10);
+	Winsys.Delay (10);
 	Winsys.SetMode (REGIST);
 } 
 

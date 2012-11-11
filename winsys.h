@@ -89,6 +89,7 @@ public:
 	void PrintJoystickInfo ();
 	void ShowCursor (bool visible) {SDL_ShowCursor (visible);}
 	void SwapBuffers ();
+	void Delay (unsigned int ms);
 	void Quit ();
 	void InitJoystick ();
 	void CloseJoystick ();

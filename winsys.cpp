@@ -352,6 +352,10 @@ void CWinsys::SwapBuffers() {
 #endif
 }
 
+void CWinsys::Delay(unsigned int ms) {
+    SDL_Delay (ms);
+}
+
 // ------------ modes -------------------------------------------------
 
 void CWinsys::SetModeFuncs (
@@ -495,10 +499,10 @@ void CWinsys::CallLoopFunction () {
 
 void CWinsys::EventLoop () {
     while (true) {
-		PollEvent ();
-	    if (ModePending()) ChangeMode ();
-		CallLoopFunction ();
-		SDL_Delay (g_game.loopdelay);
+	PollEvent ();
+	if (ModePending()) ChangeMode ();
+	CallLoopFunction ();
+	Delay (g_game.loopdelay);
     }
 }
 
