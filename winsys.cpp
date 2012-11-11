@@ -25,6 +25,30 @@ GNU General Public License for more details.
 
 #define USE_JOYSTICK true
 
+#define COLOURDEPTH_RED_SIZE   5
+#define COLOURDEPTH_GREEN_SIZE 6
+#define COLOURDEPTH_BLUE_SIZE  5
+#define COLOURDEPTH_DEPTH_SIZE 16
+
+#if defined(HAVE_GL_GLES1)
+EGLDisplay g_eglDisplay = 0;
+EGLConfig  g_eglConfig  = 0;
+EGLContext g_eglContext = 0;
+EGLSurface g_eglSurface = 0;
+Display*   g_x11Display = NULL;
+
+static const EGLint g_configAttribs[] = {
+  EGL_RED_SIZE,              COLOURDEPTH_RED_SIZE,
+  EGL_GREEN_SIZE,            COLOURDEPTH_GREEN_SIZE,
+  EGL_BLUE_SIZE,             COLOURDEPTH_BLUE_SIZE,
+  EGL_DEPTH_SIZE,            COLOURDEPTH_DEPTH_SIZE,
+  EGL_SURFACE_TYPE,          EGL_WINDOW_BIT,
+  EGL_RENDERABLE_TYPE,       EGL_OPENGL_ES_BIT,
+  EGL_BIND_TO_TEXTURE_RGBA,  EGL_TRUE,
+  EGL_NONE
+};
+#endif
+
 CWinsys Winsys;
 
 CWinsys::CWinsys () {
@@ -111,14 +135,18 @@ typedef struct SDL_Surface {
 
 void CWinsys::SetupVideoMode (TScreenRes resolution) {
     int bpp = 0;
-    Uint32 video_flags = SDL_OPENGL;
-    if (param.fullscreen) video_flags |= SDL_FULLSCREEN;
-	switch (param.bpp_mode ) {
+    switch (param.bpp_mode) {
 		case 0:	bpp = 0; break;
 		case 1:	bpp = 16; break;
 		case 2:	bpp = 32; break;
 		default: param.bpp_mode = 0; bpp = 0;
     }
+
+    Uint32 video_flags = ( param.fullscreen ? SDL_FULLSCREEN : 0 );
+#if !defined(HAVE_GL_GLES1)
+    video_flags |= SDL_OPENGL;
+#endif
+
 	if ((screen = SDL_SetVideoMode 
 	(resolution.width, resolution.height, bpp, video_flags)) == NULL) {
 		Message ("couldn't initialize video",  SDL_GetError()); 
@@ -149,70 +177,157 @@ void CWinsys::SetupVideoMode (int width, int height) {
 
 void CWinsys::InitJoystick () {
     if (SDL_InitSubSystem (SDL_INIT_JOYSTICK) < 0) {
-		Message ("Could not initialize SDL_joystick: %s", SDL_GetError());
-		return;
-	}
-	numJoysticks = SDL_NumJoysticks ();
-	if (numJoysticks < 1) {
-		joystick = NULL;
-		return;		
-	}	
-	SDL_JoystickEventState (SDL_ENABLE);
-	joystick = SDL_JoystickOpen (0);	// first stick with number 0
-    if (joystick == NULL) {
-		Message ("Cannot open joystick %s", SDL_GetError ());
-		return;
+	Message ("Could not initialize SDL_joystick: %s", SDL_GetError());
+	return;
     }
-	joystick_active = true;
+
+    numJoysticks = SDL_NumJoysticks ();
+    if (numJoysticks < 1) {
+	joystick = NULL;
+	return;		
+    }	
+
+    SDL_JoystickEventState (SDL_ENABLE);
+    joystick = SDL_JoystickOpen (0);	// first stick with number 0
+    if (joystick == NULL) {
+	Message ("Cannot open joystick %s", SDL_GetError ());
+	return;
+    }
+
+    joystick_active = true;
 }
 
 void CWinsys::Init () {
     Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE | SDL_INIT_TIMER;
     if (SDL_Init (sdl_flags) < 0) Message ("Could not initialize SDL");
+
+#if !defined(HAVE_GL_GLES1)
     SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
 
-	#if defined (USE_STENCIL_BUFFER)
-	    SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 8);
-	#endif
+    #if defined (USE_STENCIL_BUFFER)
+	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 8);
+    #endif
+#endif
 	
-	SetupVideoMode (GetResolution (param.res_type));
-	Reshape (param.x_resolution, param.y_resolution);
+    SetupVideoMode (GetResolution (param.res_type));
+
+#if defined(HAVE_GL_GLES1)
+    // use EGL to initialise GLES
+    g_x11Display = XOpenDisplay(NULL);
+    if (!g_x11Display)
+    {
+        fprintf(stderr, "ERROR: unable to get display!n");
+        exit(-1);
+    }
+
+    g_eglDisplay = eglGetDisplay((EGLNativeDisplayType)g_x11Display);
+    if (g_eglDisplay == EGL_NO_DISPLAY)
+    {
+        printf("Unable to initialise EGL display.");
+        exit(-1);
+    }
+
+    // Initialise egl
+    if (!eglInitialize(g_eglDisplay, NULL, NULL))
+    {
+        printf("Unable to initialise EGL display.");
+        exit(-1);
+    }
+
+    // Find a matching config
+    EGLint numConfigsOut = 0;
+    if (eglChooseConfig(g_eglDisplay, g_configAttribs, &g_eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0)
+    {
+        fprintf(stderr, "Unable to find appropriate EGL config.");
+        exit(-1);
+    }
+
+    // Get the SDL window handle
+    SDL_SysWMinfo sysInfo; //Will hold our Window information
+    SDL_VERSION(&sysInfo.version); //Set SDL version
+    if(SDL_GetWMInfo(&sysInfo) <= 0)
+    {
+        printf("Unable to get window handle");
+        exit(-1);
+    }
+
+    g_eglSurface = eglCreateWindowSurface(g_eglDisplay, g_eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
+    if (g_eglSurface == EGL_NO_SURFACE)
+    {
+        printf("Unable to create EGL surface!");
+        exit(-1);
+    }
+
+    // Bind GLES and create the context
+    eglBindAPI(EGL_OPENGL_ES_API);
+    EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};             // Use GLES version 1.x
+    g_eglContext = eglCreateContext(g_eglDisplay, g_eglConfig, NULL, contextParams);
+    if (g_eglContext == EGL_NO_CONTEXT)
+    {
+        printf("Unable to create GLES context!");
+        exit(-1);
+    }
+
+    if (eglMakeCurrent(g_eglDisplay,  g_eglSurface,  g_eglSurface, g_eglContext) == EGL_FALSE)
+    {
+        printf("Unable to make GLES context current");
+        exit(-1);
+    }
+#else
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, COLOURDEPTH_RED_SIZE);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, COLOURDEPTH_GREEN_SIZE);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, COLOURDEPTH_BLUE_SIZE);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, COLOURDEPTH_DEPTH_SIZE);
+#endif
+
+    Reshape (param.x_resolution, param.y_resolution);
 
     SDL_WM_SetCaption (WINDOW_TITLE, WINDOW_TITLE);
-	KeyRepeat (false);
-	if (USE_JOYSTICK) InitJoystick ();
-//	SDL_EnableUNICODE (1);
+    KeyRepeat (false);
+    if (USE_JOYSTICK) InitJoystick ();
+//  SDL_EnableUNICODE (1);
 }
 
 void CWinsys::KeyRepeat (bool repeat) {
-	if (repeat) 
-		SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	else SDL_EnableKeyRepeat (0, 0);
+    int delay = ( repeat ? SDL_DEFAULT_REPEAT_DELAY : 0 );
+    int interval = ( repeat ? SDL_DEFAULT_REPEAT_INTERVAL : 0 );
+    SDL_EnableKeyRepeat (delay, interval);
 }
 
 void CWinsys::SetFonttype () {
-	if (param.use_papercut_font > 0) {
-		FT.SetFont ("pc20");
-	} else {
-		FT.SetFont ("bold");
-	}
+    const char* font = (param.use_papercut_font > 0 ? "pc20" : "bold");
+    FT.SetFont (font);
 }
 
 void CWinsys::CloseJoystick () {
-	if (joystick_active) SDL_JoystickClose (joystick);	
+    if (joystick_active) SDL_JoystickClose (joystick);	
 }
 
 void CWinsys::Quit () {
-	CloseJoystick ();
-	Tex.FreeTextureList ();
-	Course.FreeCourseList ();
-	Course.ResetCourse ();
-	SaveMessages ();
-	Audio.Close ();		// frees music and sound as well
-	FT.Clear ();
-	if (g_game.argument < 1) Players.SavePlayers ();
-	Score.SaveHighScore ();
-	SDL_Quit ();
+    CloseJoystick ();
+    Tex.FreeTextureList ();
+    Course.FreeCourseList ();
+    Course.ResetCourse ();
+    SaveMessages ();
+    Audio.Close ();		// frees music and sound as well
+    FT.Clear ();
+    if (g_game.argument < 1) Players.SavePlayers ();
+    Score.SaveHighScore ();
+
+#if defined(HAVE_GL_GLES1)
+    eglMakeCurrent(g_eglDisplay, NULL, NULL, EGL_NO_CONTEXT);
+    eglDestroySurface(g_eglDisplay, g_eglSurface);
+    eglDestroyContext(g_eglDisplay, g_eglContext);
+    g_eglSurface = 0;
+    g_eglContext = 0;
+    g_eglConfig = 0;
+    eglTerminate(g_eglDisplay);
+    g_eglDisplay = 0;
+    XCloseDisplay(g_x11Display);
+    g_x11Display = NULL;
+#endif
+
+    SDL_Quit ();
     exit (0);
 }
 
@@ -230,7 +345,11 @@ void CWinsys::PrintJoystickInfo () {
 }
 
 void CWinsys::SwapBuffers() {
-	SDL_GL_SwapBuffers();
+#if defined(HAVE_GL_GLES1)
+    eglSwapBuffers(g_eglDisplay, g_eglSurface);
+#else
+    SDL_GL_SwapBuffers();
+#endif
 }
 
 // ------------ modes -------------------------------------------------
@@ -240,10 +359,10 @@ void CWinsys::SetModeFuncs (
 		TKeybFuncN keyb, TMouseFuncN mouse, TMotionFuncN motion,
 		TJAxisFuncN jaxis, TJButtFuncN jbutt, TKeybFuncS keyb_spec) {
     modefuncs[mode].init      = init;
-   	modefuncs[mode].loop      = loop;
+    modefuncs[mode].loop      = loop;
     modefuncs[mode].term      = term;
     modefuncs[mode].keyb      = keyb;
-   	modefuncs[mode].mouse     = mouse;
+    modefuncs[mode].mouse     = mouse;
     modefuncs[mode].motion    = motion;
     modefuncs[mode].jaxis     = jaxis;
     modefuncs[mode].jbutt     = jbutt;
