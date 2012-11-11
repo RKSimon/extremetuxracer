@@ -194,33 +194,31 @@ void draw_ui_snow (void) {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    glPushMatrix();
-	for  (i=0; i<num_snowparticles; i++) {
-	    pt = &particles[i].pt;
-	    size = particles[i].size;
-	    tex_min = &particles[i].tex_min;
-	    tex_max = &particles[i].tex_max;
+    for  (i=0; i<num_snowparticles; i++) {
+	pt = &particles[i].pt;
+	size = particles[i].size;
+	tex_min = &particles[i].tex_min;
+	tex_max = &particles[i].tex_max;
 
-	    const float dx = pt->x * xres;
-	    const float dy = pt->y * yres;
-	    const GLfloat vtx[] = {
+	const float dx = pt->x * xres;
+	const float dy = pt->y * yres;
+	const GLfloat vtx[] = {
 		dx,      dy,
 		dx+size, dy,
 		dx+size, dy+size,
 		dx,      dy+size
-	    };
-	    const GLfloat tex[] = {
+	};
+	const GLfloat tex[] = {
 		tex_min->x, tex_min->y,
 		tex_max->x, tex_min->y,
 		tex_max->x, tex_max->y,
 		tex_min->x, tex_max->y
-	    };
+	};
 
-	    glVertexPointer(2, GL_FLOAT, 0, vtx);
-	    glTexCoordPointer(2, GL_FLOAT, 0, tex);
-	    glDrawArrays(GL_TRIANGLE_FAN,0,4);
-	}
-    glPopMatrix();
+	glVertexPointer(2, GL_FLOAT, 0, vtx);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex);
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
+    }
 
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
