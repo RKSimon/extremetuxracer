@@ -69,7 +69,9 @@ typedef void (*(*get_gl_proc_fptr_t)(const GLubyte *))();
 void InitOpenglExtensions () {
 	get_gl_proc_fptr_t get_gl_proc;
 
-	#if defined (HAVE_SDL)
+	#if defined(HAVE_GL_GLES1)
+	get_gl_proc = (get_gl_proc_fptr_t) eglGetProcAddress;
+	#elif defined (HAVE_SDL)
     	get_gl_proc = (get_gl_proc_fptr_t) SDL_GL_GetProcAddress;
 	#elif defined (OS_WIN32_NATIVE)
     	get_gl_proc = (get_gl_proc_fptr_t) wglGetProcAddress;
