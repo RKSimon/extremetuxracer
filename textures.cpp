@@ -95,7 +95,7 @@ bool CImage::LoadPng (const char *filepath, bool mirroring, bool texture) {
 	nx     = ( texture ? nextPowerOf2(sdlImage->w) : sdlImage->w );
 	ny     = ( texture ? nextPowerOf2(sdlImage->h) : sdlImage->h );
 	depth  = sdlImage->format->BytesPerPixel;
-	pitch  = ( 3 == depth ? 3 * nx : 4 * nx );
+	pitch  = ( texture ? ( 3 == depth ? 3 * nx : 4 * nx ) : sdlImage->pitch );
 	format = ( 3 == depth ? GL_RGB : GL_RGBA );
 
 	DisposeData ();
