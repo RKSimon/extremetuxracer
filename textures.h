@@ -126,8 +126,8 @@ public:
 	void DisposeData ();
 
 	// load:
-	bool LoadPng (const char *filepath, bool mirroring, bool stretchToPow2 = false);
-	bool LoadPng (const char *dir, const char *filepath, bool mirroring, bool stretchToPow2 = false);
+	bool LoadPng (const char *filepath, bool mirroring, bool texture);
+	bool LoadPng (const char *dir, const char *filepath, bool mirroring, bool texture);
 
 	// write:
 	bool ReadFrameBuffer_PPM ();

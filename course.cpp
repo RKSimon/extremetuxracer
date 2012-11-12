@@ -404,7 +404,7 @@ bool CCourse::LoadElevMap () {
     double slope;
     int x, y, pad;
 
-	if (!img.LoadPng (CourseDir.c_str(), "elev.png", true)) {
+	if (!img.LoadPng (CourseDir.c_str(), "elev.png", true, false)) {
 		Message ("unable to open elev.png");
 		return false;
 	}
@@ -546,7 +546,7 @@ bool CCourse::LoadObjectMap () {
 	CSPList savelist (10000);
 	string line;
 	
-	if (!treeImg.LoadPng (CourseDir.c_str(), "trees.png", true)) {
+	if (!treeImg.LoadPng (CourseDir.c_str(), "trees.png", true, false)) {
 		Message ("unable to open trees.png");
 		return false;
 	}
@@ -747,7 +747,7 @@ bool CCourse::LoadTerrainMap () {
 	GLuint texid;
 	string terrpath;
 		
-	if (!terrImage.LoadPng (CourseDir.c_str(), "terrain.png", true)) {
+	if (!terrImage.LoadPng (CourseDir.c_str(), "terrain.png", true, false)) {
 		Message ("unable to open terrain.png");
 		return false;
 	}

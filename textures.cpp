@@ -77,7 +77,7 @@ void CImage::DisposeData () {
 	}
 }
 
-bool CImage::LoadPng (const char *filepath, bool mirroring, bool stretchToPow2) {
+bool CImage::LoadPng (const char *filepath, bool mirroring, bool texture) {
 	SDL_Surface *sdlImage;
 	
 	sdlImage = IMG_Load (filepath);
@@ -92,8 +92,8 @@ bool CImage::LoadPng (const char *filepath, bool mirroring, bool stretchToPow2) 
 		return false;
 	}
 
-	nx     = ( stretchToPow2 ? nextPowerOf2(sdlImage->w) : sdlImage->w );
-	ny     = ( stretchToPow2 ? nextPowerOf2(sdlImage->h) : sdlImage->h );
+	nx     = ( texture ? nextPowerOf2(sdlImage->w) : sdlImage->w );
+	ny     = ( texture ? nextPowerOf2(sdlImage->h) : sdlImage->h );
 	depth  = sdlImage->format->BytesPerPixel;
 	pitch  = ( 3 == depth ? 3 * nx : 4 * nx );
 	format = ( 3 == depth ? GL_RGB : GL_RGBA );
@@ -108,22 +108,35 @@ bool CImage::LoadPng (const char *filepath, bool mirroring, bool stretchToPow2) 
 		};
    	}
 
-	float scaleW = (float)sdlImage->w / (float)nx;
-	float scaleH = (float)sdlImage->h / (float)ny;
-	for (int y=0; y<ny; y++) {
-		unsigned char* line = data + y * pitch;
-		int y_src = ( mirroring ? ny - 1 - y : y );
-		y_src = (int)(scaleH * y_src);
-		for (int x = 0; x<nx; x++) {
-			int x_src = (int)(scaleW * x);
-			unsigned int p = SDL_GetPixel (sdlImage, x_src, y_src);
-			if( 3 != depth ) {
-				SDL_GetRGBA(p, sdlImage->format, line+0, line+1, line+2, line+3);
-				line+=4;
-			} else {
-				SDL_GetRGB(p, sdlImage->format, line+0, line+1, line+2);
-				line+=3;
+	if ( texture ) {
+		float scaleW = (float)sdlImage->w / (float)nx;
+		float scaleH = (float)sdlImage->h / (float)ny;
+		for (int y=0; y<ny; y++) {
+			unsigned char* line = data + y * pitch;
+			int y_src = ( mirroring ? ny - 1 - y : y );
+			y_src = (int)(scaleH * y_src);
+			for (int x = 0; x<nx; x++) {
+				int x_src = (int)(scaleW * x);
+				unsigned int p = SDL_GetPixel (sdlImage, x_src, y_src);
+				if( 3 != depth ) {
+					SDL_GetRGBA(p, sdlImage->format, line+0, line+1, line+2, line+3);
+					line+=4;
+				} else {
+					SDL_GetRGB(p, sdlImage->format, line+0, line+1, line+2);
+					line+=3;
+				}
 			}
+		}
+	} else {
+#if defined(GL_BGR) && defined(GL_BGRA)
+		if ( sdlImage->format->Rmask != 0x000000ff ) {
+			format = ( 3 == depth ? GL_BGR : GL_BGRA );
+		}
+#endif
+		unsigned char* sdlData = (unsigned char *) sdlImage->pixels;
+		for (int y=0; y<ny; y++) {
+			int y_src = ( mirroring ? ny - 1 - y : y );
+			memcpy( data + y * pitch, sdlData + y_src * pitch, pitch*sizeof(sdlData[0]) );
 		}
 	}
 
@@ -132,11 +145,11 @@ bool CImage::LoadPng (const char *filepath, bool mirroring, bool stretchToPow2) 
 	return true;
 }
 
-bool CImage::LoadPng (const char *dir, const char *filename, bool mirroring, bool stretchToPow2) {
+bool CImage::LoadPng (const char *dir, const char *filename, bool mirroring, bool texture) {
 	string path = dir;
 	path += SEP;
 	path += filename;
-	return LoadPng (path.c_str(), mirroring, stretchToPow2);
+	return LoadPng (path.c_str(), mirroring, texture);
 }
 
 // ------------------ read framebuffer --------------------------------
