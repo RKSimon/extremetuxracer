@@ -213,8 +213,15 @@ inline void MultiplyMatrices (TMatrix ret, TMatrix mat1, TMatrix mat2){
             ret[i][j] = r[i][j];
 }
 
+inline void MakeIdentityMatrix (TMatrix h)
+{
+    int i,j;
 
-void MakeIdentityMatrix (TMatrix h);
+    for (i= 0 ; i< 4 ; i++)
+        for (j= 0 ; j< 4 ; j++)
+            h[i][j] = ( i == j );
+}
+
 void MakeRotationMatrix (TMatrix mat, double angle, char axis);
 void MakeTranslationMatrix (TMatrix mat, double x, double y, double z);
 void MakeScalingMatrix (TMatrix mat, double x, double y, double z);

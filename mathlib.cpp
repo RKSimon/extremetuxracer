@@ -84,14 +84,6 @@ bool IntersectPlanes (TPlane s1, TPlane s2, TPlane s3, TVector3 *p){
     }
 }
 
-void MakeIdentityMatrix(TMatrix h){
-    int i,j;
-  
-    for (i= 0 ; i< 4 ; i++)
-	for (j= 0 ; j< 4 ; j++)
-	    h[i][j]= (i==j);
-}
-
 void MultiplyRotationMatrices (TMatrix mat, TMatrix inv, double angle, char axis) {
   if(mat) {
     TMatrix r;
