@@ -106,7 +106,7 @@ static void draw_herring_count (int herring_count){
 	hcountstr = Int_StrN (herring_count, 3);
 	if (param.use_papercut_font < 2) {
 		Tex.DrawNumStr (hcountstr.c_str(), param.x_resolution - 90, 10, 1, colWhite);
-		Tex.Draw (HERRING_ICON, param.x_resolution-160, -20, 1);
+		Tex.Draw (HERRING_ICON, param.x_resolution-160,  -3, 1);
 	} else {
 		FT.SetColor (colDYell);
 		FT.DrawString ( param.x_resolution - 90, 10, hcountstr);
