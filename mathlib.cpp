@@ -239,7 +239,7 @@ void MakeBasismatrix_Inv (TMatrix mat, TMatrix invMat,
 
 void RotateAboutVectorMatrix (TMatrix mat, TVector3 u, double angle) {
     TMatrix rx, irx, ry, iry;
-    double a, b, c, d;
+    double a, b, c, d, bd, cd;
 
     a = u.x;
     b = u.y;
@@ -248,45 +248,43 @@ void RotateAboutVectorMatrix (TMatrix mat, TVector3 u, double angle) {
     d = sqrt (b*b + c*c);
 
     if  (d < EPS) {
-        if  (a < 0) 
-            MakeRotationMatrix (mat, -angle, 'x');
-        else
-            MakeRotationMatrix (mat, angle, 'x');
+        angle = (a < 0 ? -angle : angle);
+        MakeRotationMatrix (mat, angle, 'x');
         return;
-    } 
-
-    MakeIdentityMatrix (rx);
-    MakeIdentityMatrix (irx);
-    MakeIdentityMatrix (ry);
-    MakeIdentityMatrix (iry);
-
-    rx[1][1] = c/d;
-    rx[2][1] = -b/d;
-    rx[1][2] = b/d;
-    rx[2][2] = c/d;
-
-    irx[1][1] = c/d;
-    irx[2][1] = b/d;
-    irx[1][2] = -b/d;
-    irx[2][2] = c/d;
-
-    ry[0][0] = d;
-    ry[2][0] = -a;
-    ry[0][2] = a;
-    ry[2][2] = d;
-
-    iry[0][0] = d;
-    iry[2][0] = a;
-    iry[0][2] = -a;
-    iry[2][2] = d;
+    }
 
     MakeRotationMatrix (mat, angle, 'z');
+    bd = b/d;
+    cd = c/d;
 
+    //MakeIdentityMatrix (ry);
+    ry[0][0] =   d; ry[0][1] = 0.0; ry[0][2] =   a; ry[0][3] = 0.0;
+    ry[1][0] = 0.0; ry[1][1] = 1.0; ry[1][2] = 0.0; ry[1][3] = 0.0;
+    ry[2][0] =  -a; ry[2][1] = 0.0; ry[2][2] =   d; ry[2][3] = 0.0;
+    ry[3][0] = 0.0; ry[3][1] = 0.0; ry[3][2] = 0.0; ry[3][3] = 1.0;
     MultiplyMatrices (mat, mat, ry);
+
+    //MakeIdentityMatrix (rx);
+    rx[0][0] = 1.0; rx[0][1] = 0.0; rx[0][2] = 0.0; rx[0][3] = 0.0;
+    rx[1][0] = 0.0; rx[1][1] =  cd; rx[1][2] =  bd; rx[1][3] = 0.0;
+    rx[2][0] = 0.0; rx[2][1] = -bd; rx[2][2] =  cd; rx[2][3] = 0.0;
+    rx[3][0] = 0.0; rx[3][1] = 0.0; rx[3][2] = 0.0; rx[3][3] = 1.0;
     MultiplyMatrices (mat, mat, rx);
+
+    //MakeIdentityMatrix (iry);
+    iry[0][0] =   d; iry[0][1] = 0.0; iry[0][2] =  -a; iry[0][3] = 0.0;
+    iry[1][0] = 0.0; iry[1][1] = 1.0; iry[1][2] = 0.0; iry[1][3] = 0.0;
+    iry[2][0] =   a; iry[2][1] = 0.0; iry[2][2] =   d; iry[2][3] = 0.0;
+    iry[3][0] = 0.0; iry[3][1] = 0.0; iry[3][2] = 0.0; iry[3][3] = 1.0;
     MultiplyMatrices (mat, iry, mat);
+
+    //MakeIdentityMatrix (irx);
+    irx[0][0] = 1.0; irx[0][1] = 0.0; irx[0][2] = 0.0; irx[0][3] = 0.0;
+    irx[1][0] = 0.0; irx[1][1] =  cd; irx[1][2] = -bd; irx[1][3] = 0.0;
+    irx[2][0] = 0.0; irx[2][1] =  bd; irx[2][2] =  cd; irx[2][3] = 0.0;
+    irx[3][0] = 0.0; irx[3][1] = 0.0; irx[3][2] = 0.0; irx[3][3] = 1.0;
     MultiplyMatrices (mat, irx, mat);
-} 
+}
 
 void MakeMatrixFromQuaternion (TMatrix mat, TQuaternion q){
     mat[0][0] = 1.0 - 2.0 *  (q.y * q.y + q.z * q.z);
