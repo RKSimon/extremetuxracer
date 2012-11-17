@@ -26,7 +26,7 @@ static int nextPowerOf2(int val) {
   return i;
 }
 
-Uint32 SDL_GetPixel(SDL_Surface *surface, int x, int y)
+static Uint32 SDL_GetPixel(SDL_Surface *surface, int x, int y)
 {
      int bpp = surface->format->BytesPerPixel;
      /* Here p is the address to the pixel we want to retrieve */
