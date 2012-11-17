@@ -67,19 +67,17 @@ PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p = NULL;
 typedef void (*(*get_gl_proc_fptr_t)(const GLubyte *))(); 
 
 void InitOpenglExtensions () {
-	get_gl_proc_fptr_t get_gl_proc;
+	get_gl_proc_fptr_t get_gl_proc = NULL;
 
 	#if defined(HAVE_GL_GLES1)
 	get_gl_proc = (get_gl_proc_fptr_t) eglGetProcAddress;
-	#elif defined (HAVE_SDL)
-    	get_gl_proc = (get_gl_proc_fptr_t) SDL_GL_GetProcAddress;
 	#elif defined (OS_WIN32_NATIVE)
-    	get_gl_proc = (get_gl_proc_fptr_t) wglGetProcAddress;
-	#else
-    	get_gl_proc = NULL;
+	//get_gl_proc = (get_gl_proc_fptr_t) wglGetProcAddress;
+	#elif defined (HAVE_SDL)
+	get_gl_proc = (get_gl_proc_fptr_t) SDL_GL_GetProcAddress;
 	#endif
 
-    if (get_gl_proc) {
+	if (get_gl_proc) {
 		glLockArraysEXT_p = (PFNGLLOCKARRAYSEXTPROC) 
 		    (*get_gl_proc)((GLubyte*) "glLockArraysEXT");
 		glUnlockArraysEXT_p = (PFNGLUNLOCKARRAYSEXTPROC) 
@@ -89,13 +87,12 @@ void InitOpenglExtensions () {
 		
 		} else {
 		    Message ("GL_EXT_compiled_vertex_array extension NOT supported", "");
-	    	glLockArraysEXT_p = NULL;
+	    	    glLockArraysEXT_p = NULL;
 		    glUnlockArraysEXT_p = NULL;
 		}
-    } else {
+	} else {
 		Message ("No function available for obtaining GL proc addresses", "");
-    }
-
+	}
 }
 
 void PrintGLInfo (){

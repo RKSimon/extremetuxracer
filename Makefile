@@ -3,14 +3,21 @@
 # Platform Specific Settings
 ifeq ($(OS),Windows_NT)
   ifdef SystemRoot
-    # ----------------- Windows native ------------------------------------
-    # CXXFLAGS = -Wall -O2 -DOS_WIN32_NATIVE .....
-    # LDFLAGS = .....
-    # OBJ_EXT = o
-
-    # ----------------- Windows with Microsoft compiler -------------------
-    # CXXFLAGS = -Wall -O2 -DOS_WIN32_MSC .....
-    # LDFLAGS = .....
+    ifdef VSINSTALLDIR
+      # ----------------- Windows visual c --------------------------------
+      CXX = $(VSINSTALLDIR)\VC\bin\cl.exe
+      LD  = $(VSINSTALLDIR)\VC\bin\link.exe
+      CXXFLAGS  = /nologo /W1 /EHsc
+      CXXFLAGS += -DOS_WIN32_NATIVE -DFTGL_LIBRARY -DWIN32 -D_WIN32 -D_WINDOWS -D_MBCS -D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE
+      CXXFLAGS += -I$(LIB_SDL_DIR)/include
+      CXXFLAGS += -IC:/Projects/freetype-2.3.5-1/include
+      CXXFLAGS += -IC:/Projects/freetype-2.3.5-1/include/freetype2
+      LDFLAGS  = /MACHINE:X86
+      LDFLAGS += OpenGL32.lib GLU32.lib SDL.lib SDL_image.lib SDL_mixer.lib freetype.lib
+      LDFLAGS += -LIBPATH:$(LIB_SDL_DIR)/lib/x86
+      LDFLAGS += -LIBPATH:C:/Projects/freetype-2.3.5-1/lib
+      OBJ_EXT = obj
+    endif #VSINSTALLDIR
   else
     CXX ?= g++
     LD = $(CXX)

@@ -71,15 +71,17 @@ GNU General Public License for more details.
 	#include <io.h>
 	#include <direct.h>
 	#include <windows.h>
-	#pragma warning (disable:4244)	
-	#pragma warning (disable:4305)	
-	#pragma warning (disable:4761)	
+	#pragma warning (disable:4244)
+	#pragma warning (disable:4305)
+	#pragma warning (disable:4761)
 	#define SEP "\\"
 #elif defined ( OS_WIN32_NATIVE )
 	#include <io.h>
 	#include <direct.h>
 	#include <windows.h>
 	#define SEP "\\"
+	#define snprintf    _snprintf
+	#define mkdir(x,y)  _mkdir(x)
 #elif defined ( OS_MAC )
 	#include <unistd.h>
 	#include <sys/types.h>

@@ -211,11 +211,15 @@ bool FileExists (const string dir, const string filename) {
 }
 
 bool DirExists (const char *dirname) {
+#if defined ( OS_WIN32_NATIVE )
+    return DirExistsWin (dirname);
+#else
     DIR *xdir;
     if ((xdir = opendir (dirname)) == 0) 
 		return ((errno != ENOENT) && (errno != ENOTDIR));
     if (closedir (xdir) != 0) Message ("Couldn't close directory", dirname);
     return true;
+#endif
 }
 
 bool FileExistsWin (const char *filename) {

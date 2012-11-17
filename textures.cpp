@@ -154,8 +154,8 @@ bool CImage::LoadPng (const char *dir, const char *filename, bool mirroring, boo
 
 // ------------------ read framebuffer --------------------------------
 
-#if !defined(HAVE_GL_GLES1) // TODO
 bool CImage::ReadFrameBuffer_PPM () {
+#if defined(GL_BGR) && defined(GL_BGRA) // TODO
 	int viewport[4];
 	glGetIntegerv (GL_VIEWPORT, viewport);
 	
@@ -175,11 +175,13 @@ bool CImage::ReadFrameBuffer_PPM () {
 	}
 	
 	return true;
-}
+#else
+	return false;
 #endif
+}
 
-#if !defined(HAVE_GL_GLES1) // TODO
-void CImage::ReadFrameBuffer_TGA () {
+bool CImage::ReadFrameBuffer_TGA () {
+#if defined(GL_BGR) && defined(GL_BGRA) // TODO
 	nx = param.x_resolution;
 	ny = param.y_resolution;
 	depth = 3;
@@ -190,11 +192,15 @@ void CImage::ReadFrameBuffer_TGA () {
 
 	glReadBuffer (GL_FRONT);
 	glReadPixels (0, 0, nx, ny, format, GL_UNSIGNED_BYTE, data);	
-}
-#endif
 
-#if !defined(HAVE_GL_GLES1) //TODO
-void CImage::ReadFrameBuffer_BMP () {
+	return true;
+#else
+	return false;
+#endif
+}
+
+bool CImage::ReadFrameBuffer_BMP () {
+#if defined(GL_BGR) && defined(GL_BGRA) // TODO
 	nx = param.x_resolution;
 	ny = param.y_resolution;
 	depth = 4;
@@ -204,8 +210,12 @@ void CImage::ReadFrameBuffer_BMP () {
 	data  = (unsigned char *) malloc (nx * ny * depth * sizeof (unsigned char));
 	glReadBuffer (GL_FRONT);
 	glReadPixels (0, 0, nx, ny, format, GL_UNSIGNED_BYTE, data);	
-}
+
+	return true;
+#else
+	return false;
 #endif
+}
 
 // ---------------------------
 
@@ -703,7 +713,6 @@ void CTexture::DrawNumStr (const char *s, int x, int y, float size, TColor col) 
 #define SCREENSHOT_PROC 3
 
 void ScreenshotN () {
-#if !defined(HAVE_GL_GLES1) // TODO
 	CImage image;
 	string path = param.screenshot_dir;
 	path += SEP;
@@ -715,29 +724,32 @@ void ScreenshotN () {
 	switch (type) {
 		case 0:
 			path += ".ppm";
-			image.ReadFrameBuffer_PPM ();
-			image.WritePPM (path.c_str());
+			if (image.ReadFrameBuffer_PPM ()) {
+				image.WritePPM (path.c_str());
+			}
 			image.DisposeData ();
 			break;
 		case 1:
 			path += ".tga";
-			image.ReadFrameBuffer_TGA ();
-			image.WriteTGA (path.c_str());
+			if (image.ReadFrameBuffer_TGA ()) {
+				image.WriteTGA (path.c_str());
+			}
 			image.DisposeData ();
 			break;
 		case 2:
 			path += ".tga";
-			image.ReadFrameBuffer_TGA ();
-			image.WriteTGA_H (path.c_str());
+			if (image.ReadFrameBuffer_TGA ()) {
+				image.WriteTGA_H (path.c_str());
+			}
 			image.DisposeData ();
 			break;
 		case 3:
 			path += ".bmp";
-			image.ReadFrameBuffer_BMP ();
-			image.WriteBMP (path.c_str());
+			if (image.ReadFrameBuffer_BMP ()) {
+				image.WriteBMP (path.c_str());
+			}
 			image.DisposeData ();
 			break;
 	}
-#endif
 } 
 

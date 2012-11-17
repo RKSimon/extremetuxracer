@@ -80,7 +80,7 @@ void InitGame (int argc, char **argv) {
 // 					main
 // ====================================================================
 
-#if defined ( OS_WIN32_MINGW )
+#if defined ( OS_WIN32_MINGW ) || defined ( OS_WIN32_NATIVE )
 	#undef main
 #endif
 

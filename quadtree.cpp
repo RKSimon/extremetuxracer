@@ -1222,8 +1222,8 @@ static int get_root_level (int nx, int nz)
 {
     int xlev, zlev;
 
-    xlev = (int) (log(nx) / log (2.0));
-    zlev = (int) (log(nz) / log (2.0));
+    xlev = (int) (log((double)nx) / log(2.0));
+    zlev = (int) (log((double)nz) / log(2.0));
     if ((nx >> xlev) << xlev == nx) {
     } else nx += 1;
 

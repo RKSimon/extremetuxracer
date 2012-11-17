@@ -59,13 +59,15 @@ int SPosN (string &s, const string find) {
 }
 
 void STrimLeftN (string &s) {
+	if (s.empty()) return;
 	int i = 0;
 	while (s[i] == ' ' || s[i] == '\t') i++;
 	if (i > 0) SDeleteN (s, 0, i);
 }
 
 void STrimRightN (string &s) {
-	int i = s.size() -1;
+	if (s.empty()) return;
+	int i = s.size() - 1;
 	while ((s[i] == ' ' || s[i] == '\t') && i >= 0) i--;
 	s.erase (i+1);	
 }

@@ -131,8 +131,8 @@ public:
 
 	// write:
 	bool ReadFrameBuffer_PPM ();
-	void ReadFrameBuffer_TGA ();
-	void ReadFrameBuffer_BMP ();
+	bool ReadFrameBuffer_TGA ();
+	bool ReadFrameBuffer_BMP ();
 	void WritePPM (const char *filepath);
 	void WritePPM (const char *dir, const char *filename);
 	void WriteTGA (const char *filepath);
