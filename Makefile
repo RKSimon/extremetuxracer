@@ -62,8 +62,15 @@ else
     endif #PROFILE
 
     ifdef GLES
-      CXXFLAGS += -DHAVE_GL_GLES1 -I/usr/lib/pvr-omap4-egl/include
-      LDFLAGS += -L/usr/lib/pvr-omap4-egl -lGLESv1_CM -lEGL
+      CXXFLAGS += -DHAVE_GL_GLES1
+      LDFLAGS  += -lGLESv1_CM -lEGL
+      #Pandaboard
+      CXXFLAGS += -I/usr/lib/pvr-omap4-egl/include
+      LDFLAGS  += -L/usr/lib/pvr-omap4-egl
+      #Raspberry Pi
+      CXXFLAGS += -I/opt/vc/include
+      CXXFLAGS += -I/opt/vc/include/interface/vcos/pthreads
+      LDFLAGS  += -L/opt/vc/lib
     else
       LDFLAGS += -lGL -lGLU
     endif #GLES
