@@ -123,7 +123,6 @@ void GameOverMessage (CControl *ctrl) {
 		FT.DrawString (CENTER, topframe+30, Trans.Text(25));
 	} else {
 		DrawMessageFrame (leftframe, topframe, fwidth, 210, 4, backcol, framecol, 0.5);
-		string line;
 
 		if (param.use_papercut_font > 0) FT.SetSize (20); else FT.SetSize (14);
 		if (g_game.race_result >= 0 || g_game.game_type != CUPRACING) FT.SetColor (colDBlue);

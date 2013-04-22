@@ -50,7 +50,7 @@ CEnvironment::CEnvironment () {
 	for (i=0; i<6; i++) Skybox[i] = 0;
 
 	default_light.is_on = true;
-	for (int i=0; i<4; i++) { 
+	for (i=0; i<4; i++) { 
 		default_light.ambient[i]  = def_amb[i];
 		default_light.diffuse[i]  = def_diff[i];
 		default_light.specular[i] = def_spec[i];
@@ -62,7 +62,7 @@ CEnvironment::CEnvironment () {
 	default_fog.start = 20.0;
 	default_fog.end = 70.0;
 	default_fog.height = 0;
-	for (int i=0; i<4; i++) { 
+	for (i=0; i<4; i++) { 
 		default_fog.color[i] =  def_fogcol[i];
 		default_fog.part_color[i] =  def_partcol[i];
 	}

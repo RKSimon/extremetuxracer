@@ -213,26 +213,26 @@ void CKeyframe::InterpolateKeyframe (int idx, double frac, CCharShape *shape) {
     shape->RotateNode ("right_ankle", 3, vv);
 }
 
-void CKeyframe::CalcKeyframe (int idx, CCharShape *shape, TVector3 refpos) {
-	double vv;
-	TVector3 pos;
+void CKeyframe::CalcKeyframe (int idx, CCharShape *shape, TVector3 ref_position) {
+    double vv;
+    TVector3 pos;
 
-    pos.x = frames[idx]->val[1] + refpos.x;
-    pos.z = frames[idx]->val[3] + refpos.z;
-	pos.y = refpos.y;
+    pos.x = frames[idx]->val[1] + ref_position.x;
+    pos.z = frames[idx]->val[3] + ref_position.z;
+    pos.y = ref_position.y;
 
-	shape->ResetRoot ();
-	shape->ResetJoints ();
+    shape->ResetRoot ();
+    shape->ResetJoints ();
     shape->TranslateNode (0, MakeVector (pos.x, pos.y, pos.z));
 
     vv = frames[idx]->val[4];
     shape->RotateNode ("root", 2, vv);
 
     vv = frames[idx]->val[5];
-	shape->RotateNode ("root", 1, vv);
+    shape->RotateNode ("root", 1, vv);
 
     vv = frames[idx]->val[6];
-	shape->RotateNode ("root", 3, vv);
+    shape->RotateNode ("root", 3, vv);
 
     vv = frames[idx]->val[7];
     shape->RotateNode ("neck", 3, vv);

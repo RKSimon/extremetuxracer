@@ -58,7 +58,7 @@ public:
 	void Update (double timestep, CControl *ctrl);
 	void UpdateTest (double timestep, CCharShape *shape);
 	bool Load (string dir, string filename);
-	void CalcKeyframe (int idx, CCharShape *shape, TVector3 refpos);
+	void CalcKeyframe (int idx, CCharShape *shape, TVector3 ref_position);
 
 	// test and editing
 	TKeyframe2 *GetFrame (int idx);
