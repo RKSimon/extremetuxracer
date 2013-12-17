@@ -29,7 +29,6 @@ GNU General Public License for more details.
 #define TIME_WITH_SYS_TIME	
 #define HAVE_GETCWD 
 #define HAVE_GETTIMEOFDAY 
-#define HAVE_STRDUP 
 #define HAVE_GL_GLEXT_H 
 #define HAVE_GL_GLX_H 
 //#define HAVE_GL_GLES1
