@@ -101,8 +101,6 @@ public:
 	void SetMode (TGameMode mode) {new_mode = mode;}
 	bool ModePending ();
 	double ClockTime () {return SDL_GetTicks() * 1.e-3; } 
-//	SDL_Surface *GetSurfaceData ();
-	unsigned char *GetSurfaceData ();
 };
 
 extern CWinsys Winsys;

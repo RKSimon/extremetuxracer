@@ -505,8 +505,3 @@ void CWinsys::EventLoop () {
 	Delay (g_game.loopdelay);
     }
 }
-
-unsigned char *CWinsys::GetSurfaceData () {
-	return (unsigned char*)screen->pixels;
-}
-
