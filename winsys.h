@@ -30,7 +30,7 @@ typedef void (*TMotionFuncN)  (int x, int y);
 typedef void (*TKeybFuncN)    (unsigned int key, bool special, bool release, int x, int y);
 typedef void (*TJAxisFuncN)   (int axis, double value);
 typedef void (*TJButtFuncN)   (int button, int state);
-typedef void (*TKeybFuncS)    (SDL_keysym sym, bool release);
+typedef void (*TKeybFuncS)    (SDL_Keysym sym, bool release);
 
 typedef struct {
 	TInitFuncN   init; 
@@ -62,7 +62,8 @@ private:
  	TScreenRes resolution[NUM_RESOLUTIONS];
 	int auto_x_resolution;
 	int auto_y_resolution;
-	SDL_Surface *screen;
+	SDL_Window *window;
+	SDL_Renderer *renderer;
 	TScreenRes MakeRes (int width, int height);
 	double CalcScreenScale ();
 

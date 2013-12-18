@@ -9,12 +9,12 @@ ifeq ($(OS),Windows_NT)
       LD  = $(VSINSTALLDIR)\VC\bin\link.exe
       CXXFLAGS  = /nologo /W1 /EHsc
       CXXFLAGS += -DOS_WIN32_NATIVE -DFTGL_LIBRARY -DWIN32 -D_WIN32 -D_WINDOWS -D_MBCS -D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE
-      CXXFLAGS += -I$(LIB_SDL_DIR)/include
+      CXXFLAGS += -I$(LIB_SDL2_DIR)/include
       CXXFLAGS += -IC:/Projects/freetype-2.3.5-1/include
       CXXFLAGS += -IC:/Projects/freetype-2.3.5-1/include/freetype2
       LDFLAGS  = /MACHINE:X86
-      LDFLAGS += OpenGL32.lib GLU32.lib SDL.lib SDL_image.lib SDL_mixer.lib freetype.lib
-      LDFLAGS += -LIBPATH:$(LIB_SDL_DIR)/lib/x86
+      LDFLAGS += OpenGL32.lib GLU32.lib SDL2.lib SDL2_image.lib SDL2_mixer.lib freetype.lib
+      LDFLAGS += -LIBPATH:$(LIB_SDL2_DIR)/lib/x86
       LDFLAGS += -LIBPATH:C:/Projects/freetype-2.3.5-1/lib
       OBJ_EXT = obj
     endif #VSINSTALLDIR
@@ -25,13 +25,13 @@ ifeq ($(OS),Windows_NT)
 
     # ----------------- Windows with mingw --------------------------------
     CXXFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -mwindows -I/usr/include -I/usr/include/freetype2
-    LDFLAGS  = -L/usr/lib -lSDL -lSDL_image -lSDL_mixer -lfreetype
+    LDFLAGS  = -L/usr/lib -lSDL2 -lSDL2_image -lSDL2_mixer -lfreetype
     LDFLAGS += -lopengl32 -lGLU32
 
     # ----------------- Windows, erins mingw environment ;-) --------------
     # CXXFLAGS = -Wall -Wextra -O2 -DOS_WIN32_MINGW -Ic:/mingw/include/freetype2
-    # LDFLAGS = -Lc:/mingw/lib/sdl -lmingw32 -mwindows -lSDLmain -lSDL -lopengl32 -lglu32 \
-    # -l:SDL_image.lib -l:SDL_mixer.lib -lfreetype
+    # LDFLAGS = -Lc:/mingw/lib/sdl2 -lmingw32 -mwindows -lSDLmain -lSDL2 -lopengl32 -lglu32 \
+    # -l:SDL2_image.lib -l:SDL2_mixer.lib -lfreetype
   endif #SystemRoot
 else
   UNAME := $(shell uname)
@@ -42,11 +42,10 @@ else
     LD = $(CXX)
     OBJ_EXT = o
 
-    CXXFLAGS  = -Wall -Wextra -O2 -DOS_MAC -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype
-    CXXFLAGS += -framework OpenGL
-    LDFLAGS  = -framework Cocoa -framework SDL -framework SDL_image -framework SDL_mixer -framework Freetype 
-    LDFLAGS += -framework OpenGL
-    OBJ += SDLMain.$(OBJ_EXT)
+    CXXFLAGS  = -Wall -Wextra -DOS_MAC -framework OpenGL
+    CXXFLAGS += -I/usr/local/include -I/usr/include/freetype2 
+    LDFLAGS   = -framework Cocoa -framework OpenGL
+    LDFLAGS  += -L/usr/local/lib -lSDL2 -lSDL2_image -lSDL2_mixer -lfreetype
   else
     # ----------------- Linux (Default) -----------------------------------
     CXX ?= g++
@@ -54,7 +53,7 @@ else
     OBJ_EXT = o
 
     CXXFLAGS = -Wall -Wextra -O2 -DOS_LINUX -I/usr/include/freetype2
-    LDFLAGS  = -lSDL -lSDL_image -lSDL_mixer -lfreetype 
+    LDFLAGS  = -lSDL2 -lSDL2_image -lSDL2_mixer -lfreetype 
 
     ifdef PROFILE
       CXXFLAGS += -pg
@@ -99,10 +98,6 @@ clean :
 
 # mmmm.$(OBJ_EXT) : mmmm.cpp mmmm.h
 #	$(CXX) -c mmmm.cpp $(CXXFLAGS)
-
-# MAC OS
-SDLMain.$(OBJ_EXT) : SDLMain.m SDLMain.h
-	$(CXX) -c SDLMain.m
 
 # General
 ogl_test.$(OBJ_EXT) : ogl_test.cpp ogl_test.h

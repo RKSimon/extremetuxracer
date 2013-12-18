@@ -125,15 +125,7 @@ void ChangeAvatarSelection (int focus, int dir) {
 	}
 }
 
-/*
-typedef struct{
-  Uint8 scancode;
-  SDLKey sym;
-  SDLMod mod;
-  Uint16 unicode;
-} SDL_keysym;*/
-
-void NewPlayerKeySpec (SDL_keysym sym, bool release) {
+void NewPlayerKeySpec (SDL_Keysym sym, bool release) {
 	if (release) return;
 	unsigned int key = sym.sym;
 	unsigned int mod = sym.mod;

@@ -100,22 +100,22 @@ GNU General Public License for more details.
 #elif defined ( HAVE_GL_GLES1 )
 	#include <EGL/egl.h>
 	#include <GLES/gl.h>
-	#include "SDL/SDL_syswm.h"
+	#include "SDL2/SDL_syswm.h"
 #else
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 #endif
 
 #if defined ( OS_MAC )
-	#include "SDL/SDL.h"
-	#include "SDL/SDL_joystick.h"
-	#include "SDL_image/SDL_image.h"
-	#include "SDL_mixer/SDL_mixer.h"
+	#include "SDL2/SDL.h"
+	#include "SDL2/SDL_joystick.h"
+	#include "SDL2_image/SDL_image.h"
+	#include "SDL2_mixer/SDL_mixer.h"
 #else
-	#include "SDL/SDL.h"
-	#include "SDL/SDL_joystick.h"
-	#include "SDL/SDL_image.h"
-	#include "SDL/SDL_mixer.h"
+	#include "SDL2/SDL.h"
+	#include "SDL2/SDL_joystick.h"
+	#include "SDL2/SDL_image.h"
+	#include "SDL2/SDL_mixer.h"
 #endif
 
 // --------------------------------------------------------------------

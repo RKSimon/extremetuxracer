@@ -52,7 +52,8 @@ static const EGLint g_configAttribs[] = {
 CWinsys Winsys;
 
 CWinsys::CWinsys () {
-	screen = NULL;
+	window = NULL;
+	renderer = NULL;
 	for (int i=0; i<NUM_GAME_MODES; i++) {
 		modefuncs[i].init   = NULL;
 		modefuncs[i].loop   = NULL;
@@ -121,18 +122,6 @@ double CWinsys::CalcScreenScale () {
 	else return (hh / 768);
 }
 
-/*
-typedef struct SDL_Surface {
-    Uint32 flags;                           // Read-only 
-    SDL_PixelFormat *format;                // Read-only 
-    int w, h;                               // Read-only 
-    Uint16 pitch;                           // Read-only 
-    void *pixels;                           // Read-write 
-    SDL_Rect clip_rect;                     // Read-only 
-    int refcount;                           // Read-mostly
-} SDL_Surface;
-*/
-
 void CWinsys::SetupVideoMode (TScreenRes resolution) {
     int bpp = 0;
     switch (param.bpp_mode) {
@@ -142,28 +131,33 @@ void CWinsys::SetupVideoMode (TScreenRes resolution) {
 		default: param.bpp_mode = 0; bpp = 0;
     }
 
-    Uint32 video_flags = ( param.fullscreen ? SDL_FULLSCREEN : 0 );
+    Uint32 window_flags = ( param.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 );
 #if !defined(HAVE_GL_GLES1)
-    video_flags |= SDL_OPENGL;
+    window_flags |= SDL_WINDOW_OPENGL;
 #endif
 
-	if ((screen = SDL_SetVideoMode 
-	(resolution.width, resolution.height, bpp, video_flags)) == NULL) {
-		Message ("couldn't initialize video",  SDL_GetError()); 
-		Message ("set to 800 x 600");
-		screen = SDL_SetVideoMode (800, 600, bpp, video_flags);
-		param.res_type = 1;
-		SaveConfigFile ();
-	}
-	SDL_Surface *surf = SDL_GetVideoSurface ();
-	param.x_resolution = surf->w;
-	param.y_resolution = surf->h;
-	if (resolution.width == 0 && resolution.height == 0) {
-		auto_x_resolution = param.x_resolution;
-		auto_y_resolution = param.y_resolution;
-	}
- 	param.scale = CalcScreenScale ();
-	if (param.use_quad_scale) param.scale = sqrt (param.scale);
+    window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, resolution.width, resolution.height, window_flags);
+    if (NULL == window) {
+        Message ("couldn't initialize video",  SDL_GetError()); 
+        Message ("set to 800 x 600");
+        window = SDL_CreateWindow (WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+        param.res_type = 1;
+        SaveConfigFile ();
+    }
+
+    renderer = SDL_CreateRenderer(window, -1, 0);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
+
+    SDL_GetWindowSize(window, &param.x_resolution, &param.y_resolution);
+    if (resolution.width == 0 && resolution.height == 0) {
+        auto_x_resolution = param.x_resolution;
+        auto_y_resolution = param.y_resolution;
+    }
+    param.scale = CalcScreenScale ();
+    if (param.use_quad_scale) param.scale = sqrt (param.scale);
 }
 
 void CWinsys::SetupVideoMode (int idx) {
@@ -282,16 +276,15 @@ void CWinsys::Init () {
 
     Reshape (param.x_resolution, param.y_resolution);
 
-    SDL_WM_SetCaption (WINDOW_TITLE, WINDOW_TITLE);
     KeyRepeat (false);
     if (USE_JOYSTICK) InitJoystick ();
 //  SDL_EnableUNICODE (1);
 }
 
 void CWinsys::KeyRepeat (bool repeat) {
-    int delay = ( repeat ? SDL_DEFAULT_REPEAT_DELAY : 0 );
-    int interval = ( repeat ? SDL_DEFAULT_REPEAT_INTERVAL : 0 );
-    SDL_EnableKeyRepeat (delay, interval);
+    //int delay = ( repeat ? SDL_DEFAULT_REPEAT_DELAY : 0 );
+    //int interval = ( repeat ? SDL_DEFAULT_REPEAT_INTERVAL : 0 );
+    //SDL_EnableKeyRepeat (delay, interval);
 }
 
 void CWinsys::SetFonttype () {
@@ -348,7 +341,7 @@ void CWinsys::SwapBuffers() {
 #if defined(HAVE_GL_GLES1)
     eglSwapBuffers(g_eglDisplay, g_eglSurface);
 #else
-    SDL_GL_SwapBuffers();
+    SDL_GL_SwapWindow(window);
 #endif
 }
 
@@ -379,17 +372,9 @@ bool CWinsys::ModePending () {
 	return g_game.mode != new_mode;
 }
 
-/*
-typedef struct{
-  Uint8 scancode;
-  SDLKey sym;
-  SDLMod mod;
-  Uint16 unicode;
-} SDL_keysym;*/
-
 void CWinsys::PollEvent () {
     SDL_Event event; 
-	SDL_keysym sym;
+    SDL_Keysym sym;
     unsigned int key, axis;
     int x, y;
 	float val;
@@ -455,13 +440,15 @@ void CWinsys::PollEvent () {
 				}
 				break;
 
-				case SDL_VIDEORESIZE:
-					param.x_resolution = event.resize.w;
-					param.y_resolution = event.resize.h;
+				case SDL_WINDOWEVENT:
+				if (SDL_WINDOWEVENT_RESIZED == event.window.event) {
+					param.x_resolution = event.window.data1;
+					param.y_resolution = event.window.data2;
 					SetupVideoMode (param.res_type);
-					Reshape (event.resize.w, event.resize.h);
+					Reshape (event.window.data1, event.window.data2);
+				}
 				break;
-			
+
 				case SDL_QUIT: 
 					Quit ();
 				break;
