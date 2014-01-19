@@ -32,7 +32,6 @@ static int jointbase = 16;
 static bool shift = false;
 static bool control = false;
 static bool alt = false;
-static bool lastframe = 0;
 static bool keyrun = false;
 
 void InitFrameTools () {
@@ -46,7 +45,6 @@ void SingleFrameKeys (unsigned int key, bool special, bool release, int x, int y
 //PrintInt (key);
 	must_render = true;
 	int keyfact;
-	lastframe = TestFrame.numFrames - 1;
 	TKeyframe2 *frame = TestFrame.GetFrame (curr_frame);
 
 	// setting the camera change state

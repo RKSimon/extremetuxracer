@@ -60,15 +60,15 @@ int SPosN (string &s, const string find) {
 
 void STrimLeftN (string &s) {
 	if (s.empty()) return;
-	int i = 0;
-	while (s[i] == ' ' || s[i] == '\t') i++;
+	size_t i = 0;
+	while (i < s.size() && (s[i] == ' ' || s[i] == '\t')) i++;
 	if (i > 0) SDeleteN (s, 0, i);
 }
 
 void STrimRightN (string &s) {
 	if (s.empty()) return;
 	int i = s.size() - 1;
-	while ((s[i] == ' ' || s[i] == '\t') && i >= 0) i--;
+	while (i >= 0 && (s[i] == ' ' || s[i] == '\t')) i--;
 	s.erase (i+1);	
 }
 
@@ -265,7 +265,7 @@ string SPItemN (string &s, const string &tag) {
 	i = SPosN (s, tg);
 	if (i < 0) return item;
 	ii = i + tg.size();
-	while (s[ii] != '[' && s[ii] != '#' && ii < s.size()) {
+	while (ii < s.size() && s[ii] != '[' && s[ii] != '#') {
 		item += s[ii];
 		ii++;
 	}
@@ -624,7 +624,7 @@ bool CSPList::Load (const string &filepath) {
 		Message ("CSPList::Load - unable to open","");
 		return false;
 	} else {
-	    while (fgets (cbuffer, 4000, tempfile)) {
+		while (fgets (cbuffer, 4000, tempfile)) {
 			line = cbuffer;
 			STrimN (line);
 
@@ -634,8 +634,8 @@ bool CSPList::Load (const string &filepath) {
 
 			valid = true;
 			if (line.size() < 1) valid = false;	// empty line
-			if (line[0] == '#') valid = false;	// comment line
-			
+			else if (line[0] == '#') valid = false;	// comment line
+
 			if (valid) {
 				if (fcount < fmax) {
 					if (fnewlineflag == 0) {

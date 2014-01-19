@@ -79,16 +79,14 @@ void InitOpenglExtensions () {
 
 	if (get_gl_proc) {
 		glLockArraysEXT_p = (PFNGLLOCKARRAYSEXTPROC) 
-		    (*get_gl_proc)((GLubyte*) "glLockArraysEXT");
+			(*get_gl_proc)((GLubyte*) "glLockArraysEXT");
 		glUnlockArraysEXT_p = (PFNGLUNLOCKARRAYSEXTPROC) 
-		    (*get_gl_proc)((GLubyte*) "glUnlockArraysEXT");
+			(*get_gl_proc)((GLubyte*) "glUnlockArraysEXT");
 	
-		if (glLockArraysEXT_p != NULL && glUnlockArraysEXT_p != NULL) {
-		
-		} else {
-		    Message ("GL_EXT_compiled_vertex_array extension NOT supported", "");
-	    	    glLockArraysEXT_p = NULL;
-		    glUnlockArraysEXT_p = NULL;
+		if (glLockArraysEXT_p == NULL || glUnlockArraysEXT_p == NULL) {
+			Message ("GL_EXT_compiled_vertex_array extension NOT supported", "");
+			glLockArraysEXT_p = NULL;
+			glUnlockArraysEXT_p = NULL;
 		}
 	} else {
 		Message ("No function available for obtaining GL proc addresses", "");
