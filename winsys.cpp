@@ -123,41 +123,41 @@ double CWinsys::CalcScreenScale () {
 }
 
 void CWinsys::SetupVideoMode (TScreenRes resolution) {
-    int bpp = 0;
-    switch (param.bpp_mode) {
+	int bpp = 0;
+	switch (param.bpp_mode) {
 		case 0:	bpp = 0; break;
 		case 1:	bpp = 16; break;
 		case 2:	bpp = 32; break;
 		default: param.bpp_mode = 0; bpp = 0;
-    }
+	}
 
-    Uint32 window_flags = ( param.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 );
+	Uint32 window_flags = window_flags = ( param.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 );
 #if !defined(HAVE_GL_GLES1)
-    window_flags |= SDL_WINDOW_OPENGL;
+	window_flags |= SDL_WINDOW_OPENGL;
 #endif
 
-    window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, resolution.width, resolution.height, window_flags);
-    if (NULL == window) {
-        Message ("couldn't initialize video",  SDL_GetError()); 
-        Message ("set to 800 x 600");
-        window = SDL_CreateWindow (WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
-        param.res_type = 1;
-        SaveConfigFile ();
-    }
+	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, resolution.width, resolution.height, window_flags);
+	if (NULL == window) {
+		Message ("couldn't initialize video",  SDL_GetError()); 
+		Message ("set to 800 x 600");
+		window = SDL_CreateWindow (WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+		param.res_type = 1;
+		SaveConfigFile ();
+	}
 
-    renderer = SDL_CreateRenderer(window, -1, 0);
+	renderer = SDL_CreateRenderer(window, -1, 0);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+	SDL_RenderPresent(renderer);
 
-    SDL_GetWindowSize(window, &param.x_resolution, &param.y_resolution);
-    if (resolution.width == 0 && resolution.height == 0) {
-        auto_x_resolution = param.x_resolution;
-        auto_y_resolution = param.y_resolution;
-    }
-    param.scale = CalcScreenScale ();
-    if (param.use_quad_scale) param.scale = sqrt (param.scale);
+	SDL_GetWindowSize(window, &param.x_resolution, &param.y_resolution);
+	if (resolution.width == 0 && resolution.height == 0) {
+		auto_x_resolution = param.x_resolution;
+		auto_y_resolution = param.y_resolution;
+	}
+	param.scale = CalcScreenScale ();
+	if (param.use_quad_scale) param.scale = sqrt (param.scale);
 }
 
 void CWinsys::SetupVideoMode (int idx) {
@@ -170,114 +170,116 @@ void CWinsys::SetupVideoMode (int width, int height) {
 }
 
 void CWinsys::InitJoystick () {
-    if (SDL_InitSubSystem (SDL_INIT_JOYSTICK) < 0) {
-	Message ("Could not initialize SDL_joystick: %s", SDL_GetError());
-	return;
-    }
+	if (SDL_InitSubSystem (SDL_INIT_JOYSTICK) < 0) {
+		Message ("Could not initialize SDL_joystick: %s", SDL_GetError());
+		return;
+	}
 
-    numJoysticks = SDL_NumJoysticks ();
-    if (numJoysticks < 1) {
-	joystick = NULL;
-	return;		
-    }	
+	numJoysticks = SDL_NumJoysticks ();
+	if (numJoysticks < 1) {
+		joystick = NULL;
+		return;
+	}
 
-    SDL_JoystickEventState (SDL_ENABLE);
-    joystick = SDL_JoystickOpen (0);	// first stick with number 0
-    if (joystick == NULL) {
-	Message ("Cannot open joystick %s", SDL_GetError ());
-	return;
-    }
+	SDL_JoystickEventState (SDL_ENABLE);
+	joystick = SDL_JoystickOpen (0);	// first stick with number 0
+	if (joystick == NULL) {
+		Message ("Cannot open joystick %s", SDL_GetError ());
+		return;
+	}
 
-    joystick_active = true;
+	joystick_active = true;
 }
 
 void CWinsys::Init () {
-    Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE | SDL_INIT_TIMER;
-    if (SDL_Init (sdl_flags) < 0) Message ("Could not initialize SDL");
+	Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE | SDL_INIT_TIMER;
+	if (SDL_Init (sdl_flags) < 0) Message ("Could not initialize SDL");
 
 #if !defined(HAVE_GL_GLES1)
-    SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
 
-    #if defined (USE_STENCIL_BUFFER)
+#if defined (USE_STENCIL_BUFFER)
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 8);
-    #endif
 #endif
-	
-    SetupVideoMode (GetResolution (param.res_type));
+#endif
+
+	SetupVideoMode (GetResolution (param.res_type));
 
 #if defined(HAVE_GL_GLES1)
-    // use EGL to initialise GLES
-    g_x11Display = XOpenDisplay(NULL);
-    if (!g_x11Display)
-    {
-        fprintf(stderr, "ERROR: unable to get display!n");
-        exit(-1);
-    }
+	// use EGL to initialise GLES
+	g_x11Display = XOpenDisplay(NULL);
+	if (!g_x11Display)
+	{
+		fprintf(stderr, "ERROR: unable to get display!n");
+		exit(-1);
+	}
 
-    g_eglDisplay = eglGetDisplay((EGLNativeDisplayType)g_x11Display);
-    if (g_eglDisplay == EGL_NO_DISPLAY)
-    {
-        printf("Unable to initialise EGL display.");
-        exit(-1);
-    }
+	g_eglDisplay = eglGetDisplay((EGLNativeDisplayType)g_x11Display);
+	if (g_eglDisplay == EGL_NO_DISPLAY)
+	{
+		printf("Unable to initialise EGL display.");
+		exit(-1);
+	}
 
-    // Initialise egl
-    if (!eglInitialize(g_eglDisplay, NULL, NULL))
-    {
-        printf("Unable to initialise EGL display.");
-        exit(-1);
-    }
+	// Initialise egl
+	if (!eglInitialize(g_eglDisplay, NULL, NULL))
+	{
+		printf("Unable to initialise EGL display.");
+		exit(-1);
+	}
 
-    // Find a matching config
-    EGLint numConfigsOut = 0;
-    if (eglChooseConfig(g_eglDisplay, g_configAttribs, &g_eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0)
-    {
-        fprintf(stderr, "Unable to find appropriate EGL config.");
-        exit(-1);
-    }
+	// Find a matching config
+	EGLint numConfigsOut = 0;
+	if (eglChooseConfig(g_eglDisplay, g_configAttribs, &g_eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0)
+	{
+		fprintf(stderr, "Unable to find appropriate EGL config.");
+		exit(-1);
+	}
 
-    // Get the SDL window handle
-    SDL_SysWMinfo sysInfo; //Will hold our Window information
-    SDL_VERSION(&sysInfo.version); //Set SDL version
-    if(SDL_GetWMInfo(&sysInfo) <= 0)
-    {
-        printf("Unable to get window handle");
-        exit(-1);
-    }
+	// Get the SDL window handle
+	SDL_SysWMinfo sysInfo; //Will hold our Window information
+	SDL_VERSION(&sysInfo.version); //Set SDL version
+	if(SDL_GetWMInfo(&sysInfo) <= 0)
+	{
+		printf("Unable to get window handle");
+		exit(-1);
+	}
 
-    g_eglSurface = eglCreateWindowSurface(g_eglDisplay, g_eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
-    if (g_eglSurface == EGL_NO_SURFACE)
-    {
-        printf("Unable to create EGL surface!");
-        exit(-1);
-    }
+	g_eglSurface = eglCreateWindowSurface(g_eglDisplay, g_eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
+	if (g_eglSurface == EGL_NO_SURFACE)
+	{
+		printf("Unable to create EGL surface!");
+		exit(-1);
+	}
 
-    // Bind GLES and create the context
-    eglBindAPI(EGL_OPENGL_ES_API);
-    EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};             // Use GLES version 1.x
-    g_eglContext = eglCreateContext(g_eglDisplay, g_eglConfig, NULL, contextParams);
-    if (g_eglContext == EGL_NO_CONTEXT)
-    {
-        printf("Unable to create GLES context!");
-        exit(-1);
-    }
+	// Bind GLES and create the context
+	eglBindAPI(EGL_OPENGL_ES_API);
+	EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};             // Use GLES version 1.x
+	g_eglContext = eglCreateContext(g_eglDisplay, g_eglConfig, NULL, contextParams);
+	if (g_eglContext == EGL_NO_CONTEXT)
+	{
+		printf("Unable to create GLES context!");
+		exit(-1);
+	}
 
-    if (eglMakeCurrent(g_eglDisplay,  g_eglSurface,  g_eglSurface, g_eglContext) == EGL_FALSE)
-    {
-        printf("Unable to make GLES context current");
-        exit(-1);
-    }
+	if (eglMakeCurrent(g_eglDisplay,  g_eglSurface,  g_eglSurface, g_eglContext) == EGL_FALSE)
+	{
+		printf("Unable to make GLES context current");
+		exit(-1);
+	}
 #else
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, COLOURDEPTH_RED_SIZE);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, COLOURDEPTH_GREEN_SIZE);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, COLOURDEPTH_BLUE_SIZE);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, COLOURDEPTH_DEPTH_SIZE);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, COLOURDEPTH_RED_SIZE);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, COLOURDEPTH_GREEN_SIZE);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, COLOURDEPTH_BLUE_SIZE);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, COLOURDEPTH_DEPTH_SIZE);
 #endif
 
-    Reshape (param.x_resolution, param.y_resolution);
+	context = SDL_GL_CreateContext(window);
 
-    KeyRepeat (false);
-    if (USE_JOYSTICK) InitJoystick ();
+	Reshape (param.x_resolution, param.y_resolution);
+
+	KeyRepeat (false);
+	if (USE_JOYSTICK) InitJoystick ();
 //  SDL_EnableUNICODE (1);
 }
 

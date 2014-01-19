@@ -64,6 +64,7 @@ private:
 	int auto_y_resolution;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
+	SDL_GLContext context;
 	TScreenRes MakeRes (int width, int height);
 	double CalcScreenScale ();
 
