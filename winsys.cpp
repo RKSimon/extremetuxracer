@@ -239,7 +239,7 @@ void CWinsys::Init () {
 	// Get the SDL window handle
 	SDL_SysWMinfo sysInfo; //Will hold our Window information
 	SDL_VERSION(&sysInfo.version); //Set SDL version
-	if(SDL_GetWMInfo(&sysInfo) <= 0)
+	if(SDL_GetWindowWMInfo(window, &sysInfo) <= 0)
 	{
 		printf("Unable to get window handle");
 		exit(-1);
