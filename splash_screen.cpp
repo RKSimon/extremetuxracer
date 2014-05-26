@@ -33,8 +33,8 @@ GNU General Public License for more details.
 void SplashKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
 	if (release) return;
 	switch (key) {
-		case 27: Winsys.Quit (); break;
-		case 13: Winsys.SetMode (REGIST); break;
+		case SDLK_ESCAPE: Winsys.Quit (); break;
+		case SDLK_RETURN: Winsys.SetMode (REGIST); break;
 	}
 }
 

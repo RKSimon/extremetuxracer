@@ -211,7 +211,7 @@ static TScore aaa;
 void ScoreKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
 	if (release) return;
 	switch (key) {
-		case 27: Winsys.SetMode (GAME_TYPE_SELECT); break;
+		case SDLK_ESCAPE: Winsys.SetMode (GAME_TYPE_SELECT); break;
 		case SDLK_q: Winsys.Quit (); break;
 		case SDLK_DOWN: ChangeScoreSelection (curr_focus, 1); break;
 		case SDLK_UP: ChangeScoreSelection (curr_focus, 0); break;
@@ -219,7 +219,7 @@ void ScoreKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int
 		case SDLK_RIGHT: ChangeScoreSelection (curr_focus, 1); break;
 		case SDLK_s: Score.SaveHighScore (); break;
 		case SDLK_l: Score.LoadHighScore (); break;
-		case 13: Winsys.SetMode (GAME_TYPE_SELECT); break;
+		case SDLK_RETURN: Winsys.SetMode (GAME_TYPE_SELECT); break;
 	}
 }
 

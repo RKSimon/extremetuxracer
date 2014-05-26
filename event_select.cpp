@@ -63,21 +63,23 @@ void ChangeCupSelection (int focus, int dir) {
 }
 
 void EventSelectKeys (unsigned int key, bool special, bool release, int x, int y) {
-    if (release) return;
+	if (release) return;
 	switch (key) {
-		case 27: Winsys.SetMode (GAME_TYPE_SELECT); break;
+		case SDLK_ESCAPE: Winsys.SetMode (GAME_TYPE_SELECT); break;
 		case SDLK_TAB: if (curr_focus < 3) curr_focus++; else curr_focus = 0; 
 			if (Events.IsUnlocked (curr_event, curr_cup) == false && curr_focus == 2)
 			curr_focus = 3;
 			break;
 		case SDLK_q: Winsys.Quit (); break;
-		case 13: if (curr_focus == 3) Winsys.SetMode (GAME_TYPE_SELECT);
+		case SDLK_RETURN:
+			if (curr_focus == 3) Winsys.SetMode (GAME_TYPE_SELECT);
 			else if (Events.IsUnlocked (curr_event, curr_cup)) EnterEvent(); break;
 		case SDLK_DOWN: 
 			if (curr_focus == 0) ChangeEventSelection (curr_focus, 1); 
 			else ChangeCupSelection (curr_focus, 1); 
 			break;
-		case SDLK_UP: if (curr_focus == 0) ChangeEventSelection (curr_focus, 0); 
+		case SDLK_UP:
+			if (curr_focus == 0) ChangeEventSelection (curr_focus, 0); 
 			else ChangeCupSelection (curr_focus, 0); break;
 		case SDLK_u: param.ui_snow = !param.ui_snow; break;
 	}

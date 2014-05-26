@@ -472,18 +472,18 @@ void ChangeLanguage (int val) {
 }
 
 void GameConfigKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
-    if (release) return;
+	if (release) return;
 	switch (key) {
 		case SDLK_q: Winsys.Quit (); break;
-		case 27: Winsys.SetMode (g_game.prev_mode); break;
+		case SDLK_ESCAPE: Winsys.SetMode (g_game.prev_mode); break;
 		case SDLK_TAB: if (curr_focus < 7) curr_focus++; else curr_focus = 0; break;
-		case 13: 
+		case SDLK_RETURN:
 			switch (curr_focus) {
 				case 6: Winsys.SetMode (g_game.prev_mode); break;
 				case 7: SetConfig (); break;
 				default: SetConfig (); break;
 			} break;
-		case 276: 
+		case SDLK_LEFT:
 			switch (curr_focus) {
 				case 0: ToggleFullscreen (); break; 
 				case 1: ChangeRes (-1); break;
@@ -492,7 +492,7 @@ void GameConfigKeys (unsigned int key, bool /*special*/, bool release, int /*x*/
 				case 4: ChangeDetail (-1); break;
 				case 5: ChangeLanguage (-1); break;
 			} break;
-		case 275: 
+		case SDLK_RIGHT:
 			switch (curr_focus) {
 				case 0: ToggleFullscreen (); break; 
 				case 1: ChangeRes (1); break;
@@ -501,8 +501,8 @@ void GameConfigKeys (unsigned int key, bool /*special*/, bool release, int /*x*/
 				case 4: ChangeDetail (1); break;
 				case 5: ChangeLanguage (1); break;
 			} break;
-		case 273: if (curr_focus > 0) curr_focus--; break;
-		case 274: if (curr_focus < 7) curr_focus++; break;
+		case SDLK_UP: if (curr_focus > 0) curr_focus--; break;
+		case SDLK_DOWN: if (curr_focus < 7) curr_focus++; break;
 	}
 }
 

@@ -50,7 +50,7 @@ void SetTestLight () {
 void TestKeys (unsigned int key, bool /*special*/, bool release, int /*x*/, int /*y*/) {
 	if (release) return;
 	switch (key) {
-		case 27: Winsys.Quit (); break;
+		case SDLK_ESCAPE: Winsys.Quit (); break;
 	}
 }
 

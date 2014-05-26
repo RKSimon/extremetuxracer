@@ -117,12 +117,13 @@ static void RaceSelectMouseFunc (int button, int state, int x, int y ){
 	}
 }
 
-static void RaceSelectKeys 
-		(unsigned int key, bool special, bool release, int x, int y) {
+static void RaceSelectKeys (unsigned int key, bool special, bool release, int x, int y) {
 	if (release) return;
 	switch (key) {
-		case 27: Winsys.SetMode (GAME_TYPE_SELECT); break;
-		case SDLK_TAB: if (curr_focus < 7) curr_focus++; else curr_focus = 0; break;
+		case SDLK_ESCAPE: Winsys.SetMode (GAME_TYPE_SELECT); break;
+		case SDLK_TAB:
+			if (curr_focus < 7) curr_focus++;
+			else curr_focus = 0; break;
 		case SDLK_DOWN: ChangeSelection (curr_focus, 1); break;
 		case SDLK_UP: ChangeSelection (curr_focus, 0); break;
 		case SDLK_LEFT: ChangeSelection (curr_focus, 0); break;
@@ -133,8 +134,9 @@ static void RaceSelectKeys
 				if (g_game.treesize > 5) g_game.treesize = 1; break;
 		case SDLK_v: g_game.treevar++; 
 				if (g_game.treevar > 5) g_game.treevar = 1; break;
-		case 13: if (curr_focus == 8) Winsys.SetMode (GAME_TYPE_SELECT);
-				 else SetRaceConditions ();	break;
+		case SDLK_RETURN:
+			if (curr_focus == 8) Winsys.SetMode (GAME_TYPE_SELECT);
+			else SetRaceConditions ();	break;
 	}
 }
 

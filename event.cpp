@@ -57,13 +57,13 @@ void StartRace () {
 }
 
 void EventKeys (unsigned int key, bool special, bool release, int x, int y) {
-    if (release) return;
+	if (release) return;
 	switch (key) {
-	case 13: 
+	case SDLK_RETURN: 
 		if (curr_focus < 1 && ready < 1) StartRace (); 
 		else Winsys.SetMode (EVENT_SELECT);
 		break;
-	case 27:
+	case SDLK_ESCAPE:
 		Winsys.SetMode (EVENT_SELECT);
 		break;
 	case SDLK_TAB:

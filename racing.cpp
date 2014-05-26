@@ -58,37 +58,37 @@ static int lastsound = -1;
 void RacingKeys (unsigned int key, bool special, bool release, int x, int y) {
 	switch (key) {
 		// steering flipflops
-		case 273: key_paddling = !release; break;	
-		case 274: key_braking = !release; break;	
-		case 276: left_turn = !release; break;	
-		case 275: right_turn = !release; break;	
-		case 32:  key_charging = !release; break;
-		case SDLK_t: trick_modifier = !release; break;		
+		case SDLK_UP: key_paddling = !release; break;
+		case SDLK_DOWN: key_braking = !release; break;
+		case SDLK_LEFT: left_turn = !release; break;
+		case SDLK_RIGHT: right_turn = !release; break;
+		case SDLK_SPACE:  key_charging = !release; break;
+		case SDLK_t: trick_modifier = !release; break;
 
 		// mode changing and other actions
-		case 27:  if (!release) { 
+		case SDLK_ESCAPE:  if (!release) { 
 			g_game.raceaborted = true;
 			g_game.race_result = -1;
 			Winsys.SetMode (GAME_OVER);
-		} break;	
-		case SDLK_p: if (!release) Winsys.SetMode (PAUSED); break;			
-		case SDLK_r: if (!release) Winsys.SetMode (RESET); break;				
+		} break;
+		case SDLK_p: if (!release) Winsys.SetMode (PAUSED); break;
+		case SDLK_r: if (!release) Winsys.SetMode (RESET); break;
 		case SDLK_s: if (!release) ScreenshotN (); break;
 
 		// view changing
 		case SDLK_1: if (!release) {
 			set_view_mode (Players.GetCtrl (g_game.player_id), ABOVE);
 			param.view_mode = ABOVE;
-		} break;	
+		} break;
 		case SDLK_2: if (!release) {
 			set_view_mode (Players.GetCtrl (g_game.player_id), FOLLOW);
 			param.view_mode = FOLLOW;
-		} break;	
+		} break;
 		case SDLK_3: if (!release) {
 			set_view_mode (Players.GetCtrl (g_game.player_id), BEHIND);
 			param.view_mode = BEHIND;
-		} break;	
-		
+		} break;
+
 		// toggle
 		case SDLK_h:  if (!release) param.show_hud = !param.show_hud; break;
 		case SDLK_f:  if (!release) param.display_fps = !param.display_fps; break;

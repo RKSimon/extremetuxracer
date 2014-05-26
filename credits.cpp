@@ -190,8 +190,8 @@ void DrawBackLogo (int x, int y, double size) {
 void CreditsKeys (unsigned int key, bool special, bool release, int x, int y){
 	if (release) return;
 	switch (key) {
-		case 109: moving = !moving; break;
-		case 9: param.ui_snow = !param.ui_snow; break;
+		case SDLK_m: moving = !moving; break;
+		case SDLK_TAB: param.ui_snow = !param.ui_snow; break;
 		default: Winsys.SetMode (GAME_TYPE_SELECT); 
 	}
 }

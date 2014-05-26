@@ -48,7 +48,7 @@ void QuitGameOver () {
 
 void GameOverKeys (unsigned int key, bool special, bool release, int x, int y) {
 	if (release) return;
-	if (key == 13 || key == 27) QuitGameOver ();
+	if (key == SDLK_RETURN || key == SDLK_ESCAPE) QuitGameOver ();
 }
 
 static void mouse_cb (int button, int state, int x, int y) {

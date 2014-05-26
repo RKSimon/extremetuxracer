@@ -133,32 +133,32 @@ void NewPlayerKeySpec (SDL_Keysym sym, bool release) {
 	crsrtime = 0;
 	crsrvisible = true;
 
-	if (islower (key)) {
+	if (key < 255 && islower (key)) {
 		if (len (name) < maxlng) {
 			if (mod & KMOD_SHIFT) NameInsert (toupper (key));
 			else NameInsert (key);
 			posit++;
 		}
-	} else if (isdigit (key)) {
+	} else if (key < 255 && isdigit (key)) {
 		if (len (name) < maxlng) {
 			NameInsert (key);
 			posit++;
 		}
 	} else {
 		switch (key) {
-			case 127: if (posit < len(name)) NameDelete (posit); break;
-			case 8: if (posit > 0) NameDelete (posit-1); posit--; break;
-			case 27: Winsys.SetMode (REGIST); break;
-			case 13: 
+			case SDLK_DELETE: if (posit < len(name)) NameDelete (posit); break;
+			case SDLK_BACKSPACE: if (posit > 0) NameDelete (posit-1); posit--; break;
+			case SDLK_ESCAPE: Winsys.SetMode (REGIST); break;
+			case SDLK_RETURN:
 				if (curr_focus == 1) Winsys.SetMode (REGIST);
 				else QuitAndAddPlayer (); 
 				break;
 			case SDLK_RIGHT: if (posit < len(name)) posit++; break;
 			case SDLK_LEFT: if (posit > 0) posit--; break;
-			case 278: posit = 0; break;
-			case 279: posit = len (name); break;
+			case SDLK_AC_BACK: posit = 0; break;
+			case SDLK_AC_FORWARD: posit = len (name); break;
 			
-			case 32: NameInsert (32); posit++; break;
+			case SDLK_SPACE: NameInsert (32); posit++; break;
 			case SDLK_UP: if (curr_avatar>0) curr_avatar--; break;
 			case SDLK_DOWN: if (curr_avatar<last_avatar) curr_avatar++; break;
 			case SDLK_TAB: curr_focus++; if (curr_focus>2) curr_focus =0; break;

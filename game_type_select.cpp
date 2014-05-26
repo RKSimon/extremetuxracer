@@ -53,17 +53,17 @@ static void GameSelectMouseFunc (int button, int state, int x, int y) {
 }
 
 void GameSelectKeys (unsigned int key, bool special, bool release, int x, int y) {
-    if (release) return;
+	if (release) return;
 
 	switch (key) {
-		case SDLK_u: param.ui_snow = !param.ui_snow; break;	
-		case 27: Winsys.Quit (); break;
-		case 274: if (scope < 6) scope++; break;
-		case 273: if (scope > 0) scope--; break;
-		case 13: QuitGameType (scope); break;
+		case SDLK_u: param.ui_snow = !param.ui_snow; break;
+		case SDLK_ESCAPE: Winsys.Quit (); break;
+		case SDLK_DOWN: if (scope < 6) scope++; break;
+		case SDLK_UP: if (scope > 0) scope--; break;
+		case SDLK_RETURN: QuitGameType (scope); break;
 		case SDLK_TAB: scope++; if (scope > 6) scope = 0; break;
 		case SDLK_w: Music.FreeMusics (); break;
-	}	
+	}
 }
 
 void GameSelectMotionFunc (int x, int y) {

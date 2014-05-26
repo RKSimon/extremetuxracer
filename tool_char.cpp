@@ -128,9 +128,19 @@ void CharKeys (unsigned int key, bool special, bool release, int x, int y) {
 		return;
 	}
 
-	if (key == 304) shift = !release;
-	if (key == 306) control = !release;
-	if (key == 308) alt = !release;
+	switch (key)
+	{
+	case SDLK_LSHIFT:
+	case SDLK_RSHIFT:
+		shift = !release; break;
+	case SDLK_LCTRL:
+	case SDLK_RCTRL:
+		control = !release; break;
+	case SDLK_LALT:
+	case SDLK_RALT:
+		alt = !release; break;
+	}
+
 	if (shift) keyfact = -1; else keyfact = 1;
 
 	if (release) return;

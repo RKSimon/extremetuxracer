@@ -28,7 +28,7 @@ static int xleft1, xleft2, ytop;
 static TVector2 cursor_pos = {0, 0};
 				  
 void HelpKeys (unsigned int key, bool special, bool release, int x, int y) {
-	if (key == 27) Winsys.SetMode (GAME_TYPE_SELECT);
+	if (key == SDLK_ESCAPE) Winsys.SetMode (GAME_TYPE_SELECT);
 }
 
 void HelpMouseFunc (int button, int state, int x, int y) {
