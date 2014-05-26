@@ -62,7 +62,7 @@ else
 
     ifdef GLES
       CXXFLAGS += -DHAVE_GL_GLES1
-      LDFLAGS  += -lGLESv1_CM -lEGL
+      LDFLAGS  += -lGLESv1_CM -lEGL -lX11
       #Pandaboard
       CXXFLAGS += -I/usr/lib/pvr-omap4-egl/include
       LDFLAGS  += -L/usr/lib/pvr-omap4-egl
