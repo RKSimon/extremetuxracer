@@ -664,32 +664,5 @@ class FTGL_EXPORT FTGLTextureFont : public FTFont {
         int yOffset;
 };
 
-class FTGL_EXPORT FTGLPixmapFont : public FTFont
-{
-    public:
-        FTGLPixmapFont( const char* fontFilePath);
-        FTGLPixmapFont( const unsigned char *pBufferBytes, size_t bufferSizeInBytes);
-        ~FTGLPixmapFont();
-        void Render( const char* string);
-        void Render( const wchar_t* string);
-
-    private:
-        inline virtual FTGlyph* MakeGlyph( unsigned int g);
-        
-};
-
-class FTGL_EXPORT FTPixmapGlyph : public FTGlyph
-{
-    public:
-        FTPixmapGlyph( FT_GlyphSlot glyph);
-        virtual ~FTPixmapGlyph();
-        virtual const FTPoint& Render( const FTPoint& pen);
-    private:
-        int destWidth;
-        int destHeight;
-        FTPoint pos;
-        unsigned char* data;        
-};
-
 #endif 
 
